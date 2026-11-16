@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { usePathname } from "@/i18n/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, User, X } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
@@ -11,9 +11,15 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { appUrls } from "@/lib/app-urls";
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), [role="radio"]:not([disabled])';
+
 export function Header() {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   const navLinks = [
     { href: "/features", label: t("features") },
@@ -44,21 +50,70 @@ export function Header() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Escape + keyboard focus trap while the mobile menu is open.
   useEffect(() => {
     if (!mobileOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMobileOpen(false);
+
+    const getFocusable = () => {
+      const scopes = [headerRef.current, panelRef.current].filter(
+        Boolean
+      ) as HTMLElement[];
+      return scopes.flatMap((scope) =>
+        Array.from(
+          scope.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        ).filter((el) => {
+          const style = window.getComputedStyle(el);
+          return style.display !== "none" && style.visibility !== "hidden";
+        })
+      );
     };
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    menuButtonRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const items = getFocusable();
+      if (items.length === 0) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (active instanceof HTMLElement && !items.includes(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus?.();
+    };
   }, [mobileOpen]);
 
   return (
     <>
-      <header className="border-gray-20 fixed top-0 right-0 left-0 z-50 h-12 border-b bg-white">
+      <header
+        ref={headerRef}
+        className="border-gray-20 fixed top-0 right-0 left-0 z-50 h-12 border-b bg-white"
+      >
         <Container className="flex h-full items-center gap-2 px-4 min-[1056px]:gap-3 min-[1056px]:px-8">
           {/* Mobile (<1056): hamburger on the left */}
           <button
+            ref={menuButtonRef}
             type="button"
             className="text-foreground hidden shrink-0 max-[1055px]:inline-flex"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -144,7 +199,10 @@ export function Header() {
         viewport (LNA-255). Opaque background — never transparent over the hero.
       */}
       <div
+        ref={panelRef}
         id="mobile-nav-panel"
+        role="dialog"
+        aria-modal={mobileOpen}
         aria-hidden={!mobileOpen}
         className={cn(
           "fixed inset-0 z-40 hidden flex-col overflow-y-auto bg-white transition-opacity duration-200 max-[1055px]:flex",
