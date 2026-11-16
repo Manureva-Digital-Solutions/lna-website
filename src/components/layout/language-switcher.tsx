@@ -1,28 +1,27 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { Globe } from "lucide-react";
 
-const localeLabels: Record<string, string> = {
-  fr: "FR",
-  en: "EN",
-};
-
 export function LanguageSwitcher() {
   const locale = useLocale();
+  const t = useTranslations("languageSwitcher");
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  // Current locale first: EN | FR on English pages, FR | EN on French pages.
-  const orderedLocales = [
-    locale,
-    ...routing.locales.filter((loc) => loc !== locale),
-  ];
+  // Fixed order FR | EN — only weight/colour marks the active locale.
+  const orderedLocales = ["fr", "en"].filter((loc) =>
+    (routing.locales as readonly string[]).includes(loc)
+  );
+  const localeLabels: Record<string, string> = {
+    fr: t("fr"),
+    en: t("en"),
+  };
 
   function switchLocale(nextLocale: string) {
     if (nextLocale === locale) return;
@@ -34,11 +33,11 @@ export function LanguageSwitcher() {
   return (
     <div
       className={cn(
-        "text-muted-foreground inline-flex items-center gap-1.5 text-sm",
+        "text-muted-foreground inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap",
         isPending && "pointer-events-none opacity-60"
       )}
       role="radiogroup"
-      aria-label="Language"
+      aria-label={t("label")}
     >
       <Globe
         className="size-4 shrink-0"

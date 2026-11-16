@@ -44,10 +44,19 @@ export function Header() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   return (
     <>
-      <header className="border-gray-20 bg-background fixed top-0 right-0 left-0 z-50 h-12 border-b">
-        <Container className="flex h-full items-center gap-3">
+      <header className="border-gray-20 fixed top-0 right-0 left-0 z-50 h-12 border-b bg-white">
+        <Container className="flex h-full items-center gap-2 px-4 min-[1056px]:gap-3 min-[1056px]:px-8">
           {/* Mobile (<1056): hamburger on the left */}
           <button
             type="button"
@@ -74,7 +83,7 @@ export function Header() {
               alt="LNA"
               width={88}
               height={28}
-              className="dark:hidden"
+              className="h-7 w-auto max-[1055px]:h-6 dark:hidden"
               priority
             />
             <Image
@@ -82,7 +91,7 @@ export function Header() {
               alt="LNA"
               width={88}
               height={28}
-              className="hidden dark:block"
+              className="hidden h-7 w-auto max-[1055px]:h-6 dark:block"
               priority
             />
           </Link>
@@ -113,11 +122,11 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex shrink-0 items-center gap-2 min-[1056px]:gap-4">
             <LanguageSwitcher />
             <a
               href={appUrls.login}
-              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap transition-colors"
             >
               <User
                 className="size-4 shrink-0"
@@ -138,7 +147,7 @@ export function Header() {
         id="mobile-nav-panel"
         aria-hidden={!mobileOpen}
         className={cn(
-          "bg-background fixed inset-0 z-40 hidden flex-col overflow-y-auto transition-opacity duration-200 max-[1055px]:flex",
+          "fixed inset-0 z-40 hidden flex-col overflow-y-auto bg-white transition-opacity duration-200 max-[1055px]:flex",
           mobileOpen
             ? "visible opacity-100"
             : "pointer-events-none invisible opacity-0"
