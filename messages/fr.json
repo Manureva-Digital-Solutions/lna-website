@@ -79,13 +79,12 @@
       "ctaPrimary": "Tester sur mes documents",
       "ctaNote": "Vous créez un compte, puis vous déposez vos premiers documents.",
       "visual": {
-        "description": "Quatre documents PDF — deux devis d'assurance emprunteur, un tableau d'amortissement, un devis de complémentaire santé — alimentent un tableau comparatif Excel dont les colonnes sont les assureurs et les lignes les garanties : taux, coût total, quotité.",
-        "roleAdp": "Devis assurance emprunteur",
-        "roleAmortization": "Tableau d'amortissement",
-        "roleHealth": "Devis complémentaire santé"
+        "description": "Quatre documents PDF — deux devis d'assurance emprunteur, un tableau d'amortissement, un devis de complémentaire santé — alimentent un tableau comparatif Excel dont les colonnes sont les assureurs et les lignes les garanties : taux, coût total, quotité."
       },
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
+        "filename": "comparatif-adp.xlsx",
+        "reviewMarker": "[RELECTURE]",
         "tabFile": "Fichier",
         "tabHome": "Accueil",
         "tabInsert": "Insertion",

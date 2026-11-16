@@ -18,6 +18,7 @@ export function HeroExcelWindow() {
   const g = useTranslations("grid");
   const x = useTranslations("home.hero.excel");
   const locale = useLocale();
+  const reviewMarker = x("reviewMarker");
 
   const pct = (v: number, digits = 2) =>
     new Intl.NumberFormat(locale, {
@@ -105,11 +106,11 @@ export function HeroExcelWindow() {
             d="M4.1 3.2h2.2l1.7 3.05L9.7 3.2h2.2L9.4 8l2.6 4.8H9.7L7.95 9.7 6.2 12.8H4l2.55-4.8z"
           />
         </svg>
-        <span className="font-mono text-[10px] tracking-tight sm:text-[11px]">
-          comparatif-adp.xlsx
+        <span className="truncate font-mono text-[10px] tracking-tight sm:text-[11px]">
+          {x("filename")}
         </span>
         <span
-          className="ml-auto flex items-center gap-1 opacity-80"
+          className="ml-auto flex shrink-0 items-center gap-1 opacity-80"
           aria-hidden="true"
         >
           <span className="size-1.5 rounded-none bg-white/40" />
@@ -118,13 +119,13 @@ export function HeroExcelWindow() {
         </span>
       </div>
 
-      {/* Ribbon tabs */}
-      <div className="border-border bg-gray-10 flex gap-0.5 overflow-x-auto border-b px-1.5 pt-0.5 text-[9px] sm:text-[10px]">
+      {/* Ribbon tabs — wrap on narrow screens so every locale label stays visible without hiding or scrolling */}
+      <div className="border-border bg-gray-10 flex flex-wrap gap-x-0.5 gap-y-0 border-b px-1.5 pt-0.5 text-[9px] sm:flex-nowrap sm:overflow-hidden sm:text-[10px]">
         {tabs.map((tab, i) => (
           <span
             key={tab}
             className={cn(
-              "shrink-0 px-1.5 py-1 whitespace-nowrap",
+              "shrink-0 px-1 py-1 whitespace-nowrap sm:px-1.5",
               i === 1
                 ? "text-foreground border-excel-green border-b-2 font-semibold"
                 : "text-muted-foreground"
@@ -141,7 +142,7 @@ export function HeroExcelWindow() {
           D2
         </span>
         <span className="border-border bg-background text-foreground flex h-5 min-w-0 flex-1 items-center overflow-hidden border px-1.5 font-mono">
-          <span className="text-status-low shrink-0">[REVIEW]</span>
+          <span className="text-status-low shrink-0">{reviewMarker}</span>
           <span className="text-foreground ml-1 truncate">{formulaReview}</span>
         </span>
       </div>
@@ -209,7 +210,7 @@ export function HeroExcelWindow() {
                             "outline-excel-green outline outline-2 -outline-offset-2"
                         )}
                       >
-                        <CellContent cell={cell} />
+                        <CellContent cell={cell} reviewMarker={reviewMarker} />
                       </td>
                     );
                   })}
@@ -252,14 +253,20 @@ export function HeroExcelWindow() {
   );
 }
 
-function CellContent({ cell }: { cell: Cell }) {
+function CellContent({
+  cell,
+  reviewMarker,
+}: {
+  cell: Cell;
+  reviewMarker: string;
+}) {
   if (cell.kind === "empty") return null;
   if (cell.kind === "text") {
     return <span className="text-foreground">{cell.value}</span>;
   }
   return (
     <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1">
-      <span className="text-status-low font-mono">[REVIEW]</span>
+      <span className="text-status-low font-mono">{reviewMarker}</span>
       <span className="text-foreground">{cell.value}</span>
     </span>
   );
