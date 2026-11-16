@@ -80,7 +80,7 @@ function LinkButton({
     <ButtonPrimitive
       data-slot="button"
       nativeButton={nativeButton}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size }), className)}
       render={<Link href={href} />}
       {...props}
     >

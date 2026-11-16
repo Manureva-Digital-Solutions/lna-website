@@ -84,7 +84,19 @@
         "roleAmortization": "Amortisation schedule",
         "roleHealth": "Health cover quote"
       },
-      "headingHighlight": "Your Excel sheet comes out, already filled."
+      "headingHighlight": "Your Excel sheet comes out, already filled.",
+      "excel": {
+        "tabFile": "File",
+        "tabHome": "Home",
+        "tabInsert": "Insert",
+        "tabLayout": "Page Layout",
+        "tabFormulas": "Formulas",
+        "tabData": "Data",
+        "tabReview": "Review",
+        "tabView": "View",
+        "sheet": "Sheet1",
+        "ready": "Ready"
+      }
     },
     "bands": {
       "heading": "What you get, and what makes it trustworthy",
