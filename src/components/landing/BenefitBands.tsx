@@ -56,7 +56,7 @@ function Band({
 export function BenefitBands() {
   const t = useTranslations("home.bands");
   return (
-    <Section className="border-border border-t">
+    <Section className="pt-16 md:pt-16">
       <Container className="flex flex-col gap-20 md:gap-28">
         <AnimateIn>
           <h2 className="text-h2 text-foreground max-w-[34rem] text-balance">

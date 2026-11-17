@@ -6,31 +6,34 @@ import { AnimateIn } from "@/components/ui/animate-in";
 /**
  * Les libellés des trois étapes sont ceux de l'app, mot pour mot
  * (RapprochementPage.tsx, objet i18n t.steps). Ne pas les reformuler.
+ *
+ * LNAW-96 — frozen v4: three columns ≥1056, 1px Gray 20 top rule,
+ * Plex Mono 01/02/03, 20px titles, Gray 70 body; stack below 1056.
  */
 const STEPS = ["template", "documents", "review"] as const;
 
 export function HowItWorks() {
   const t = useTranslations("home.howItWorks");
   return (
-    <Section id="steps">
-      <Container className="flex flex-col gap-10">
+    <Section id="steps" className="pt-4 pb-4 md:pt-4 md:pb-4">
+      <Container className="flex flex-col gap-9">
         <AnimateIn>
-          <h2 className="text-h2 text-foreground max-w-[34rem] text-balance">
+          <h2 className="text-h2 text-foreground min-[1056px]:whitespace-nowrap">
             {t("heading")}
           </h2>
         </AnimateIn>
-        <ol className="grid gap-8 md:grid-cols-3 md:gap-12">
+        <ol className="grid grid-cols-1 gap-8 min-[1056px]:grid-cols-3 min-[1056px]:gap-12">
           {STEPS.map((step, i) => (
             <AnimateIn key={step} delay={i * 0.05}>
-              <li className="border-border flex flex-col gap-2 border-t pt-4">
+              <li className="border-gray-20 flex flex-col gap-2 border-t pt-4">
                 <span className="text-muted-foreground font-mono text-xs">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="text-tile text-foreground">
-                  {t(step + ".label")}
+                  {t(`${step}.label`)}
                 </h3>
-                <p className="text-body max-w-[46ch] text-pretty">
-                  {t(step + ".description")}
+                <p className="text-body text-muted-foreground max-w-[46ch] text-pretty">
+                  {t(`${step}.description`)}
                 </p>
               </li>
             </AnimateIn>
