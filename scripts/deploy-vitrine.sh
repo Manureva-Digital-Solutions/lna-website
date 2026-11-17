@@ -28,7 +28,9 @@ PROCESS_UNIT="lna-vitrine-staging"                  # production copy: lna-vitri
 
 # If PUBLIC_URL is behind basic auth, export DEPLOY_BASIC_AUTH="user:password"
 # in the environment of the person (or Action) running the script. Never hardcode
-# it here. The loopback health check does not need it.
+# it here. The loopback health check does not need it. A manual staging run without
+# it exits with a clear message AFTER the build is already live — it does not roll
+# back a healthy deploy.
 CURL_AUTH=()
 if [ -n "${DEPLOY_BASIC_AUTH:-}" ]; then
   CURL_AUTH=(-u "$DEPLOY_BASIC_AUTH")
@@ -142,7 +144,15 @@ log "loopback health: 200"
 
 # Public check (follows redirects). Supply DEPLOY_BASIC_AUTH for staging basic auth.
 PUB=$(curl -sI -o /dev/null -w '%{http_code}' "${CURL_AUTH[@]+"${CURL_AUTH[@]}"}" -L "$PUBLIC_URL" || echo 000)
-[ "$PUB" = "200" ] || rollback "public URL returned $PUB for $PUBLIC_URL"
+if [ "$PUB" != "200" ]; then
+  if [ "$PUB" = "401" ] && [ -z "${DEPLOY_BASIC_AUTH:-}" ]; then
+    # The build is already health-checked on loopback and is live. Rolling it back
+    # because the operator forgot the password would take a good deploy offline.
+    log "public URL answered 401 — staging is behind basic auth"
+    die "build is live and healthy on loopback, but $PUBLIC_URL cannot be asserted without credentials. Re-run with DEPLOY_BASIC_AUTH=\"user:password\""
+  fi
+  rollback "public URL returned $PUB for $PUBLIC_URL"
+fi
 log "public health: 200 ($PUBLIC_URL)"
 
 # Confirm the running checkout is still the SHA we intended (no mid-script drift).
