@@ -740,3 +740,43 @@ kept their original PIDs and restart counts throughout.
 
 The deploy script in this repo is the authority on paths and ports — if the two
 disagree, the script wins and this table is stale.
+
+### Operational notes learned on the first cut
+
+- **The first deploy on a fresh checkout cannot come from Actions.** The workflow
+  runs `./scripts/deploy-vitrine.sh` on the box, and the script that pulls
+  `develop` is itself in `develop`, so the checkout has to reach `develop` once by
+  hand (`git fetch origin develop && git reset --hard origin/develop`). After
+  that the workflow owns it. The first attempt failed with
+  `./scripts/deploy-vitrine.sh: No such file or directory` for exactly this reason.
+- **A manual staging run needs `DEPLOY_BASIC_AUTH`.** The post-deploy public
+  assertion is a 401 without credentials. The script now says so and exits
+  without rolling back — the build is already live and healthy on loopback by
+  then. The Action supplies it from the `STAGING_BASIC_AUTH` environment secret.
+- **`.next.prev` must stay ignored** (`.gitignore`, `tsconfig` exclude, eslint
+  `globalIgnores`, `.prettierignore`). The snapshot lives inside the checkout, so
+  an unignored `git add -A` stages the whole previous build and eslint/tsc then
+  read Next's generated route types. The script refuses to snapshot if the path is
+  not ignored.
+
+### Rollback drill — evidence
+
+Run on the box after the first green deploy, not simulated:
+
+```
+HEAD before:       da32557 (last good deploy, loopback 200)
+deploy target:     21db1eb — a local-only commit adding a deliberate type error
+result:            ✓ Compiled successfully → Failed to compile (TS2322)
+                   [deploy] ROLLBACK: next build failed
+                   script exit 1
+HEAD after:        da32557
+service:           active, loopback /fr → 200
+.next.prev:        consumed (restored), tree clean
+```
+
+The first attempt at this drill was invalid and taught something worth keeping:
+it left HEAD _at_ the broken commit, so `PREV_SHA` was the broken SHA and
+"rollback" restored only the build, not the source. A rollback only restores both
+when HEAD is a good commit at the time of the deploy — which is the real case, but
+it means a checkout left on a broken commit needs `git reset --hard origin/develop`
+before the next deploy.
