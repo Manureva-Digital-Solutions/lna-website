@@ -1,0 +1,62 @@
+name: Deploy vitrine staging
+
+# develop is the integration line: every push builds, then deploys to
+# staging.lnaflow.com over SSH. Deliberately NOT wired to the CI workflow with
+# `needs:` across files — this workflow runs its own gate (below) so a red CI run
+# on an unrelated branch can never block a deploy, and a broken deploy can never
+# mark CI red.
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vitrine-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci-gate:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run type-check
+      - run: npm run build
+
+  deploy:
+    name: Deploy to staging.lnaflow.com
+    needs: ci-gate
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Pull, build and reload on the server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_BASIC_AUTH: ${{ secrets.STAGING_BASIC_AUTH }}
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          port: ${{ vars.DEPLOY_SSH_PORT || 22 }}
+          envs: DEPLOY_BASIC_AUTH
+          script_stop: true
+          script: |
+            set -euo pipefail
+            export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
+            if [ -f "$HOME/.nvm/nvm.sh" ]; then
+              . "$HOME/.nvm/nvm.sh"
+            fi
+            cd "${{ vars.DEPLOY_PATH }}"
+            ./scripts/deploy-vitrine.sh "origin/develop"
