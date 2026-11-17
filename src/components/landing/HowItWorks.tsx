@@ -12,7 +12,7 @@ const STEPS = ["template", "documents", "review"] as const;
 export function HowItWorks() {
   const t = useTranslations("home.howItWorks");
   return (
-    <Section id="how-it-works" className="border-border border-t">
+    <Section id="steps">
       <Container className="flex flex-col gap-10">
         <AnimateIn>
           <h2 className="text-h2 text-foreground max-w-[34rem] text-balance">

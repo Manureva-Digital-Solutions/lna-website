@@ -1,47 +1,66 @@
 import { useTranslations } from "next-intl";
-import { ArrowRight } from "lucide-react";
-import { LinkButton } from "@/components/ui/button";
+import { ArrowDown, ArrowRight } from "lucide-react";
+import { Button, LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
-import { TransformationVisual } from "@/components/landing/visuals/TransformationVisual";
+import { HeroExcelWindow } from "@/components/landing/visuals/HeroExcelWindow";
 import { appUrls } from "@/lib/app-urls";
 
 /** Répond à la première question du visiteur : « ça remplit mon tableau ? » */
 export function Hero() {
   const t = useTranslations("home.hero");
+  const tSteps = useTranslations("home.howItWorks");
+
   return (
-    <Section className="overflow-hidden pt-24 pb-16 md:pt-32 md:pb-24">
-      <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="flex max-w-[38rem] flex-col gap-6">
-            <AnimateIn>
-              <h1 className="text-hero text-foreground text-balance">
-                {t("heading")}{" "}
-                <span className="text-primary">{t("headingHighlight")}</span>
-              </h1>
-            </AnimateIn>
-            <AnimateIn delay={0.05}>
-              <p className="text-body max-w-[42ch] text-pretty">
-                {t("description")}
+    <Section className="overflow-hidden pt-10 pb-12 md:pt-12 md:pb-16">
+      <Container grid className="items-start gap-y-10">
+        <div className="col-span-4 flex flex-col gap-5 min-[672px]:col-span-8 min-[1056px]:col-span-6">
+          <AnimateIn>
+            <h1 className="text-hero text-foreground min-[1056px]:max-w-[460px]">
+              <span className="block">{t("heading")}</span>
+              <span className="block">{t("headingHighlight")}</span>
+            </h1>
+          </AnimateIn>
+          <AnimateIn delay={0.05}>
+            <p className="text-body text-muted-foreground max-w-[42ch] text-pretty">
+              {t("description")}
+            </p>
+          </AnimateIn>
+          <AnimateIn delay={0.1}>
+            <div className="flex flex-col items-start gap-2">
+              <LinkButton
+                size="lg"
+                href={appUrls.register}
+                className="gap-2 px-4"
+              >
+                {t("ctaPrimary")}
+                <ArrowRight aria-hidden="true" />
+              </LinkButton>
+              <Button
+                variant="ghost"
+                nativeButton={false}
+                render={<a href="#steps" />}
+                className="text-primary ml-3 h-auto justify-start gap-2 border-0 px-0 py-1 font-normal shadow-none hover:bg-transparent"
+              >
+                {tSteps("heading")}
+                <ArrowDown className="size-4" aria-hidden="true" />
+              </Button>
+              <p className="text-muted-foreground mt-3 text-sm">
+                {t("ctaNote")}
               </p>
-            </AnimateIn>
-            <AnimateIn delay={0.1}>
-              <div className="flex flex-col items-start gap-3">
-                <LinkButton size="lg" href={appUrls.register}>
-                  {t("ctaPrimary")}
-                  <ArrowRight data-icon="inline-end" aria-hidden="true" />
-                </LinkButton>
-                <p className="text-muted-foreground text-sm">{t("ctaNote")}</p>
-              </div>
-            </AnimateIn>
-          </div>
-          <AnimateIn delay={0.15} className="w-full min-w-0">
-            <div className="border-border bg-gray-10 rounded-none border p-2 sm:p-3">
-              <TransformationVisual />
             </div>
           </AnimateIn>
         </div>
+
+        <AnimateIn
+          delay={0.15}
+          className="col-span-4 w-full min-w-0 min-[672px]:col-span-8 min-[1056px]:col-span-10"
+        >
+          <div className="bg-gray-10 w-full rounded-none p-3 sm:p-4 md:p-5">
+            <HeroExcelWindow />
+          </div>
+        </AnimateIn>
       </Container>
     </Section>
   );

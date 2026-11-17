@@ -79,12 +79,23 @@
       "ctaPrimary": "Try it on my documents",
       "ctaNote": "Create an account, then drop in your first documents.",
       "visual": {
-        "description": "Four PDF documents feed an Excel comparison sheet whose columns are the insurers and whose rows are the guarantees.",
-        "roleAdp": "Loan insurance quote",
-        "roleAmortization": "Amortisation schedule",
-        "roleHealth": "Health cover quote"
+        "description": "Four PDF documents feed an Excel comparison sheet whose columns are the insurers and whose rows are the guarantees."
       },
-      "headingHighlight": "Your Excel sheet comes out, already filled."
+      "headingHighlight": "Your Excel sheet comes out, already filled.",
+      "excel": {
+        "filename": "comparison-adp.xlsx",
+        "reviewMarker": "[REVIEW]",
+        "tabFile": "File",
+        "tabHome": "Home",
+        "tabInsert": "Insert",
+        "tabLayout": "Page Layout",
+        "tabFormulas": "Formulas",
+        "tabData": "Data",
+        "tabReview": "Review",
+        "tabView": "View",
+        "sheet": "Sheet1",
+        "ready": "Ready"
+      }
     },
     "bands": {
       "heading": "What you get, and what makes it trustworthy",
