@@ -18,6 +18,9 @@
 #
 set -euo pipefail
 
+# shellcheck source=scripts/deploy-vitrine-lib.sh
+. "$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/deploy-vitrine-lib.sh"
+
 # --- per-environment constants (staging values shown) ---
 APP_DIR="/home/ubuntu/lna-website-staging"          # production copy: /home/ubuntu/lna-website
 BRANCH="develop"                                    # production copy: release
@@ -41,16 +44,17 @@ fi
 
 # git reset --hard restores the staging defaults above. Production therefore
 # keeps overrides in a gitignored .deploy-constants next to this repo root.
+# That file is parsed as KEY=VALUE (never sourced or eval'd).
 ROOT="$(cd "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+log() { printf '[deploy %s] %s\n' "$(date -u +%H:%M:%SZ)" "$*"; }
+die() { printf '[deploy] FATAL: %s\n' "$*" >&2; exit 1; }
+
 if [ -f "$ROOT/.deploy-constants" ]; then
-  # shellcheck source=/dev/null
-  . "$ROOT/.deploy-constants"
+  load_deploy_constants "$ROOT/.deploy-constants" \
+    || die "invalid .deploy-constants"
 fi
 
 TARGET_REF="${1:-origin/$BRANCH}"
-
-log() { printf '[deploy %s] %s\n' "$(date -u +%H:%M:%SZ)" "$*"; }
-die() { printf '[deploy] FATAL: %s\n' "$*" >&2; exit 1; }
 
 cd "$APP_DIR" || die "no $APP_DIR"
 # Refuse to run if this script lives in a different checkout than APP_DIR.
@@ -167,23 +171,12 @@ log "loopback health: 200"
 # in front of a live vhost, not that the app failed. Accept that only when
 # PUBLIC_BEHIND_BASIC_AUTH=1 and PUBLIC_URL is not the live site. Production
 # must still get 200.
-is_production_public_url() {
-  case "$PUBLIC_URL" in
-    https://lnaflow.com|https://lnaflow.com/*|https://www.lnaflow.com|https://www.lnaflow.com/*)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
-
 PUB=$(curl -sI -o /dev/null -w '%{http_code}' "${CURL_AUTH[@]+"${CURL_AUTH[@]}"}" -L "$PUBLIC_URL" || echo 000)
 if [ "$PUB" = "200" ]; then
   log "public health: 200 ($PUBLIC_URL)"
-elif [ "$PUB" = "401" ] && [ "${PUBLIC_BEHIND_BASIC_AUTH:-0}" = "1" ] && ! is_production_public_url; then
+elif [ "$PUB" = "401" ] && [ "${PUBLIC_BEHIND_BASIC_AUTH:-0}" = "1" ] && ! is_production_public_url "$PUBLIC_URL"; then
   log "public URL answered 401 — treated as reachable (PUBLIC_BEHIND_BASIC_AUTH=1, loopback already 200)"
-elif [ "$PUB" = "401" ] && [ -z "${DEPLOY_BASIC_AUTH:-}" ] && ! is_production_public_url; then
+elif [ "$PUB" = "401" ] && [ -z "${DEPLOY_BASIC_AUTH:-}" ] && ! is_production_public_url "$PUBLIC_URL"; then
   # Loopback is already 200 and the build is live. Do not roll it back just
   # because a manual run omitted both the flag and the password.
   log "public URL answered 401 — staging is behind basic auth"
