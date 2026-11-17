@@ -24,6 +24,10 @@
 /.next.prev/
 /.deploy-previous-sha
 
+# Per-checkout deploy overrides (production APP_DIR/BRANCH/etc.). Survives
+# git reset --hard; never commit this file.
+/.deploy-constants
+
 # production
 /build
 
