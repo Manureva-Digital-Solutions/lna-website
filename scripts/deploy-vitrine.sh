@@ -56,6 +56,14 @@ TARGET_SHA=$(git rev-parse --verify --quiet "${TARGET_REF}^{commit}") \
 log "target: $TARGET_SHA (from $TARGET_REF)"
 
 # ── 2. Snapshot the running build for rollback ────────────────────────────────
+# `.next.prev` and `.deploy-previous-sha` live inside the checkout, so they MUST be
+# gitignored: an unignored 24MB previous build gets staged by `git add -A` and
+# type-checked by tsc. The trailing slash matters — git only matches the directory
+# form of `.next.prev/` when the directory does not exist yet.
+git check-ignore -q .next.prev/ \
+  || die ".next.prev/ is not gitignored — refusing to snapshot (see .gitignore)"
+git check-ignore -q .deploy-previous-sha \
+  || die ".deploy-previous-sha is not gitignored — refusing to snapshot (see .gitignore)"
 STAMP=$(date +%Y%m%d%H%M%S)
 PREV_SHA=$(git rev-parse HEAD)
 if [ -d .next ]; then
