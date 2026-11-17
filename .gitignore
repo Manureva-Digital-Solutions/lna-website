@@ -17,6 +17,13 @@
 /.next/
 /out/
 
+# deploy rollback snapshot (scripts/deploy-vitrine.sh copies .next here before a
+# build so a failed build can be rolled back). Without these two lines `git add -A`
+# in a deploy checkout stages the whole previous build, and tsc type-checks its
+# generated route types — which is how a 24MB .next.prev ended up in a commit.
+/.next.prev/
+/.deploy-previous-sha
+
 # production
 /build
 
