@@ -762,8 +762,13 @@ disagree, the script wins and this table is stale.
   `scripts/rotate-staging-basic-auth.sh --dry-run`, then without `--dry-run`.
   It writes the new `user:password` only to a 0600 file
   (default `~/.config/lna/staging-basic-auth.txt`) and prints that path; hand
-  the password to testers privately. A 401 with no credentials sent (empty
-  secret) still passes, but only with a loud warning.
+  the password to testers privately. It never reloads nginx (nginx re-reads
+  `auth_basic_user_file` per request, and a reload on the shared box could apply
+  unrelated pending config to production). If anything fails after the
+  htpasswd is replaced (`gh secret set`, a dropped ssh session), it restores the
+  timestamped backup and keeps the unused new password in `<out>.new`. A 401
+  with no credentials sent (empty secret) still passes, but only with a loud
+  warning.
 - **`.next.prev` must stay ignored** (`.gitignore`, `tsconfig` exclude, eslint
   `globalIgnores`, `.prettierignore`). The snapshot lives inside the checkout, so
   an unignored `git add -A` stages the whole previous build and eslint/tsc then

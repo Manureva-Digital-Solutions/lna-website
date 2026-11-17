@@ -113,15 +113,15 @@ log "server: $SSH_HOST  htpasswd: $HTPASSWD"
 log "github: $REPO  environment: $GH_ENV  secret: $SECRET"
 log "verify: $URL  output file: $OUT"
 
-remote "sudo -n test -f $(q "$HTPASSWD") && sudo -n nginx -t >/dev/null 2>&1" \
-  || die "preflight failed: no $HTPASSWD, no passwordless sudo, or nginx -t fails on $SSH_HOST"
+remote "sudo -n test -f $(q "$HTPASSWD")" \
+  || die "preflight failed: no $HTPASSWD or no passwordless sudo on $SSH_HOST"
 gh auth status >/dev/null 2>&1 || die "gh is not authenticated (run gh auth login)"
 gh secret list -R "$REPO" --env "$GH_ENV" >/dev/null \
   || die "cannot list secrets of environment '$GH_ENV' on $REPO (scope or permission)"
 log "preflight ok"
 
 if [ "$DRY_RUN" = 1 ]; then
-  log "dry run: would write $BA_USER's line in $HTPASSWD (backup first, nginx -t, reload),"
+  log "dry run: would write $BA_USER's line in $HTPASSWD (timestamped backup, atomic mv; no nginx reload),"
   log "dry run: then gh secret set $SECRET --env $GH_ENV -R $REPO, then check 200 with and 401 without."
   exit 0
 fi
@@ -160,8 +160,11 @@ BACKUP="$HTPASSWD.bak-$STAMP"
 
 # ── 1. htpasswd on the server ─────────────────────────────────────────────────
 # Keep every other user's line, replace (or add) ours, write to a temp file in
-# the same directory, copy owner/mode, back up, atomic mv, nginx -t, reload.
-# The hash travels on stdin, never on a command line.
+# the same directory, copy owner/mode, back up, then atomic mv. The hash travels
+# on stdin, never on a command line.
+# No nginx -t and no reload: nginx re-reads auth_basic_user_file on every
+# request, and a reload on this shared box could also apply unrelated pending
+# config to production.
 REMOTE_WRITE="set -euo pipefail
 f=$(q "$HTPASSWD"); u=$(q "$BA_USER"); bak=$(q "$BACKUP")
 tmp=\$(sudo -n mktemp \"\$(dirname \"\$f\")/.htpasswd-rotate.XXXXXX\")
@@ -170,36 +173,50 @@ trap 'sudo -n rm -f \"\$tmp\"' EXIT
 sudo -n chown --reference=\"\$f\" \"\$tmp\"
 sudo -n chmod --reference=\"\$f\" \"\$tmp\"
 sudo -n cp -p \"\$f\" \"\$bak\"
-sudo -n mv -f \"\$tmp\" \"\$f\"
-if ! sudo -n nginx -t >/dev/null 2>&1; then
-  sudo -n cp -p \"\$bak\" \"\$f\"
-  echo 'nginx -t failed; htpasswd restored from backup' >&2
-  exit 3
-fi
-sudo -n systemctl reload nginx"
+sudo -n mv -f \"\$tmp\" \"\$f\""
 
+# Put the backup back (atomically) if one was taken. Prints "restored" or
+# "no-backup" (the write failed before the backup, so the file never changed).
 REMOTE_RESTORE="set -euo pipefail
 f=$(q "$HTPASSWD"); bak=$(q "$BACKUP")
-sudo -n cp -p \"\$bak\" \"\$f\"
-sudo -n nginx -t >/dev/null 2>&1
-sudo -n systemctl reload nginx"
+if ! sudo -n test -f \"\$bak\"; then echo no-backup; exit 0; fi
+tmp=\$(sudo -n mktemp \"\$(dirname \"\$f\")/.htpasswd-restore.XXXXXX\")
+trap 'sudo -n rm -f \"\$tmp\"' EXIT
+sudo -n cp -p \"\$bak\" \"\$tmp\"
+sudo -n mv -f \"\$tmp\" \"\$f\"
+sudo -n cmp -s \"\$bak\" \"\$f\"
+echo restored"
+
+# Any failure once the htpasswd may have been replaced: restore from the
+# backup, and keep $NEW_OUT (never delete it, never claim more than we know).
+restore_or_die() {
+  local why="$1" result
+  log "$why — restoring $HTPASSWD from $BACKUP so the pair does not drift"
+  if result="$(remote "bash -c $(q "$REMOTE_RESTORE")")"; then
+    case "$result" in
+      restored)
+        die "$why. htpasswd restored from $BACKUP; the old credential is valid again. The unused new password is kept in $NEW_OUT (delete it once checked)."
+        ;;
+      no-backup)
+        die "$why. No backup was taken, so the htpasswd was never replaced. The unused new password is kept in $NEW_OUT (delete it once checked)."
+        ;;
+    esac
+  fi
+  die "$why AND the restore failed or could not be confirmed. Server state is UNKNOWN: check $HTPASSWD against $BACKUP on $SSH_HOST by hand. The new password is in $NEW_OUT."
+}
 
 log "writing new htpasswd line on $SSH_HOST (backup: $BACKUP)"
 if ! printf '%s\n' "$HASH" | remote "bash -c $(q "$REMOTE_WRITE")"; then
-  rm -f "$NEW_OUT"
-  die "htpasswd update failed; server unchanged or restored. Nothing else was changed."
+  # ssh can fail after the mv (e.g. the connection drops), so do not assume
+  # the file is unchanged.
+  restore_or_die "htpasswd update failed or was cut off; $SECRET was not touched"
 fi
 HASH=""
 
 # ── 2. GitHub environment secret ──────────────────────────────────────────────
 log "setting $SECRET in environment $GH_ENV on $REPO"
 if ! printf '%s:%s' "$BA_USER" "$PASSWORD" | gh secret set "$SECRET" -R "$REPO" --env "$GH_ENV" >/dev/null; then
-  log "gh secret set failed — restoring the htpasswd from $BACKUP so the pair does not drift"
-  if remote "bash -c $(q "$REMOTE_RESTORE")"; then
-    rm -f "$NEW_OUT"
-    die "secret not updated; htpasswd restored. Old credential still valid everywhere."
-  fi
-  die "secret not updated AND htpasswd restore failed. The NEW credential is live in nginx only; it is in $NEW_OUT. Restore $BACKUP by hand or re-run."
+  restore_or_die "gh secret set failed; $SECRET not updated"
 fi
 
 # The pair is now consistent; promote the local file.
@@ -216,7 +233,7 @@ WITHOUT="$(http_status "$URL" 0)"
 PASSWORD=""
 log "public check: with credentials $WITH, without $WITHOUT"
 if [ "$WITH" != "200" ] || [ "$WITHOUT" != "401" ]; then
-  die "verification failed (expected 200 / 401). htpasswd and $SECRET were both updated; check nginx and the app. Credential: $OUT"
+  die "verification failed (expected 200 / 401). htpasswd and $SECRET were both updated; check the vhost and the app. Credential: $OUT; previous htpasswd: $BACKUP"
 fi
 
 log "done: htpasswd and $SECRET now hold the same credential (backup on server: $BACKUP)"

@@ -23,11 +23,19 @@ BIN="$SANDBOX/bin"
 mkdir -p "$BIN"
 
 # ssh: drop options up to user@host, map /etc/nginx into the sandbox, run locally.
+# MOCK_SSH_DROP_AFTER_WRITE=1: run the htpasswd write, then fail like a dropped
+# connection. MOCK_SSH_FAIL_WRITE=1: fail the write before anything runs.
 cat >"$BIN/ssh" <<'STUB'
 #!/usr/bin/env bash
 while [ "$#" -gt 0 ]; do case "$1" in *@*) shift; break ;; *) shift ;; esac; done
 cmd="$*"
 cmd="${cmd//\/etc\/nginx\//$SANDBOX/etc/nginx/}"
+case "$cmd" in
+  *htpasswd-rotate*)
+    if [ "${MOCK_SSH_FAIL_WRITE:-0}" = 1 ]; then cat >/dev/null; exit 255; fi
+    if [ "${MOCK_SSH_DROP_AFTER_WRITE:-0}" = 1 ]; then bash -c "$cmd"; exit 255; fi
+    ;;
+esac
 exec bash -c "$cmd"
 STUB
 # sudo: no-op for chown/chmod (owner/mode is a server concern), else run.
@@ -37,16 +45,14 @@ cat >"$BIN/sudo" <<'STUB'
 case "$1" in chown | chmod) exit 0 ;; esac
 exec "$@"
 STUB
+# nginx / systemctl must never be called; record any call.
 cat >"$BIN/nginx" <<'STUB'
 #!/usr/bin/env bash
-if [ "${MOCK_NGINX_FAIL_AFTER_CHANGE:-0}" = 1 ] && ! cmp -s "$SANDBOX/etc/nginx/.htpasswd-lna-vitrine-staging" "$SANDBOX/original"; then
-  exit 1
-fi
-exit 0
+printf 'nginx %s\n' "$*" >>"$SANDBOX/forbidden.log"
 STUB
 cat >"$BIN/systemctl" <<'STUB'
 #!/usr/bin/env bash
-printf '%s\n' "$*" >>"$SANDBOX/systemctl.log"
+printf 'systemctl %s\n' "$*" >>"$SANDBOX/forbidden.log"
 STUB
 cat >"$BIN/gh" <<'STUB'
 #!/usr/bin/env bash
@@ -82,7 +88,7 @@ STUB
 chmod +x "$BIN"/*
 
 reset_server() {
-  rm -rf "${SANDBOX:?}/etc" "${SANDBOX:?}/home" "$SANDBOX/secret" "$SANDBOX/gh-args" "$SANDBOX/systemctl.log"
+  rm -rf "${SANDBOX:?}/etc" "${SANDBOX:?}/home" "$SANDBOX/secret" "$SANDBOX/gh-args" "$SANDBOX/forbidden.log"
   mkdir -p "$SANDBOX/etc/nginx" "$SANDBOX/home/.ssh"
   : >"$SANDBOX/home/.ssh/lna-ovh"
   # Hashes of throwaway values, only so the file has realistic lines.
@@ -98,7 +104,8 @@ OUT_DEFAULT="$SANDBOX/home/.config/lna/staging-basic-auth.txt"
 run() {
   env -i PATH="$BIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin" \
     HOME="$SANDBOX/home" SANDBOX="$SANDBOX" TMPDIR="$SANDBOX" \
-    MOCK_GH_FAIL="${MOCK_GH_FAIL:-0}" MOCK_NGINX_FAIL_AFTER_CHANGE="${MOCK_NGINX_FAIL_AFTER_CHANGE:-0}" \
+    MOCK_GH_FAIL="${MOCK_GH_FAIL:-0}" MOCK_SSH_DROP_AFTER_WRITE="${MOCK_SSH_DROP_AFTER_WRITE:-0}" \
+    MOCK_SSH_FAIL_WRITE="${MOCK_SSH_FAIL_WRITE:-0}" \
     bash "$SCRIPT" "$@"
 }
 
@@ -107,7 +114,7 @@ reset_server
 rc=0; run >"$SANDBOX/stdout" 2>"$SANDBOX/stderr" || rc=$?
 check "happy path exits 0" '[ "$rc" = 0 ]'
 check "stdout is only the output path" '[ "$(cat "$SANDBOX/stdout")" = "$OUT_DEFAULT" ]'
-check "output file is mode 600" '[ "$(stat -f %Lp "$OUT_DEFAULT" 2>/dev/null || stat -c %a "$OUT_DEFAULT")" = 600 ]'
+check "output file is mode 600" '[ "$(stat -c %a "$OUT_DEFAULT" 2>/dev/null || stat -f %Lp "$OUT_DEFAULT")" = 600 ]'
 check "secret equals output file" '[ "$(cat "$SANDBOX/secret")" = "$(cat "$OUT_DEFAULT")" ]'
 check "secret set on environment staging" 'grep -q -- "--env staging" "$SANDBOX/gh-args" && grep -q "STAGING_BASIC_AUTH" "$SANDBOX/gh-args"'
 pw="$(cut -d: -f2- "$OUT_DEFAULT")"
@@ -116,26 +123,38 @@ check "password not in stdout or stderr" '! grep -qF -- "$pw" "$SANDBOX/stdout" 
 check "other htpasswd users kept" 'grep -q "^other:" "$HT" && [ "$(grep "^other:" "$HT")" = "$(grep "^other:" "$SANDBOX/original")" ]'
 check "lna line replaced, exactly one" '[ "$(grep -c "^lna:" "$HT")" = 1 ] && [ "$(grep "^lna:" "$HT")" != "$(grep "^lna:" "$SANDBOX/original")" ]'
 check "timestamped backup equals original" 'cmp -s "$(ls "$HT".bak-* | head -1)" "$SANDBOX/original"'
-check "nginx reloaded" 'grep -q "reload nginx" "$SANDBOX/systemctl.log"'
+check "nginx and systemctl never called" '[ ! -e "$SANDBOX/forbidden.log" ]'
 check "no .new file left" '[ ! -e "$OUT_DEFAULT.new" ]'
 
 # 2. A second run keeps the previous credential file as .prev
 rc=0; run >/dev/null 2>&1 || rc=$?
 check "second run exits 0 and keeps .prev" '[ "$rc" = 0 ] && [ -f "$OUT_DEFAULT.prev" ]'
 
-# 3. gh fails after htpasswd changed -> htpasswd rolled back
+# 3. gh fails after the htpasswd mv -> restored from backup, new password kept
 reset_server
 rc=0; MOCK_GH_FAIL=1 run >/dev/null 2>"$SANDBOX/stderr" || rc=$?
 check "gh failure exits non-zero" '[ "$rc" != 0 ]'
-check "gh failure restores htpasswd" 'cmp -s "$HT" "$SANDBOX/original"'
-check "gh failure leaves no credential file" '[ ! -e "$OUT_DEFAULT" ] && [ ! -e "$OUT_DEFAULT.new" ]'
+check "gh failure restores htpasswd from the backup" 'cmp -s "$HT" "$SANDBOX/original" && cmp -s "$(ls "$HT".bak-* | head -1)" "$SANDBOX/original"'
+check "gh failure keeps the new-password file (0600), no promoted file" '[ -s "$OUT_DEFAULT.new" ] && [ "$(stat -c %a "$OUT_DEFAULT.new" 2>/dev/null || stat -f %Lp "$OUT_DEFAULT.new")" = 600 ] && [ ! -e "$OUT_DEFAULT" ]'
+check "gh failure message says restored" 'grep -q "htpasswd restored from" "$SANDBOX/stderr"'
+check "gh failure never calls nginx/systemctl" '[ ! -e "$SANDBOX/forbidden.log" ]'
 
-# 4. nginx -t fails after the write -> restored on the server, gh never called
+# 4. ssh drops right after the mv -> restored from backup, new password kept,
+#    secret never set
 reset_server
-rc=0; MOCK_NGINX_FAIL_AFTER_CHANGE=1 run >/dev/null 2>&1 || rc=$?
-check "nginx -t failure exits non-zero" '[ "$rc" != 0 ]'
-check "nginx -t failure restores htpasswd" 'cmp -s "$HT" "$SANDBOX/original"'
-check "nginx -t failure never sets the secret" '[ ! -e "$SANDBOX/secret" ]'
+rc=0; MOCK_SSH_DROP_AFTER_WRITE=1 run >/dev/null 2>"$SANDBOX/stderr" || rc=$?
+check "post-mv ssh failure exits non-zero" '[ "$rc" != 0 ]'
+check "post-mv ssh failure restores htpasswd from the backup" 'cmp -s "$HT" "$SANDBOX/original" && ls "$HT".bak-* >/dev/null 2>&1'
+check "post-mv ssh failure keeps the new-password file" '[ -s "$OUT_DEFAULT.new" ] && [ ! -e "$OUT_DEFAULT" ]'
+check "post-mv ssh failure never sets the secret" '[ ! -e "$SANDBOX/secret" ]'
+check "post-mv ssh failure message says restored" 'grep -q "htpasswd restored from" "$SANDBOX/stderr"'
+
+# 4b. write fails before anything ran -> no backup, file untouched, honest message
+reset_server
+rc=0; MOCK_SSH_FAIL_WRITE=1 run >/dev/null 2>"$SANDBOX/stderr" || rc=$?
+check "pre-write failure exits non-zero, htpasswd untouched" '[ "$rc" != 0 ] && cmp -s "$HT" "$SANDBOX/original"'
+check "pre-write failure says no backup was taken, keeps new-password file" 'grep -q "No backup was taken" "$SANDBOX/stderr" && [ -s "$OUT_DEFAULT.new" ]'
+check "pre-write failure never sets the secret" '[ ! -e "$SANDBOX/secret" ]'
 
 # 5. Dry run changes nothing
 reset_server
