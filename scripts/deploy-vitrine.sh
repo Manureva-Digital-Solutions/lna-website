@@ -31,12 +31,15 @@ PROCESS_MANAGER="systemd"                           # production copy: pm2
 PROCESS_UNIT="lna-vitrine-staging"                  # production copy: lna-vitrine
 
 # Staging is behind nginx auth_basic; production is not.
-# PUBLIC_BEHIND_BASIC_AUTH=1 (staging workflow, or a manual staging export)
-# means a public 401 is "reachable, password required", not a failed deploy.
-# Leave it unset/0 on production. It is also ignored when PUBLIC_URL is the
-# live site, so a mis-set flag cannot green a 401 on lnaflow.com.
-# DEPLOY_BASIC_AUTH="user:password" is optional: if current, the public check
-# can assert 200 through auth. Never hardcode it here. Never log it.
+# DEPLOY_BASIC_AUTH="user:password" (the staging workflow sends the
+# STAGING_BASIC_AUTH secret) makes the public check log in and require 200.
+# If those credentials are sent and still get 401, the htpasswd and the secret
+# have drifted: the deploy FAILS and rolls back, because testers would be locked
+# out. Fix it with scripts/rotate-staging-basic-auth.sh, which updates both.
+# PUBLIC_BEHIND_BASIC_AUTH=1 with NO credentials lets a public 401 count as
+# reachable, with a loud warning (nothing proved anyone can log in).
+# Production (lnaflow.com / www.lnaflow.com) always needs 200; the flag is
+# ignored there. Never hardcode the credential here. Never log it.
 CURL_AUTH=()
 if [ -n "${DEPLOY_BASIC_AUTH:-}" ]; then
   CURL_AUTH=(-u "$DEPLOY_BASIC_AUTH")
@@ -167,23 +170,38 @@ CODE=$(curl -s -o /dev/null -w '%{http_code}' "$HEALTH_URL" || echo 000)
 [ "$CODE" = "200" ] || rollback "loopback health returned $CODE for $HEALTH_URL"
 log "loopback health: 200"
 
-# Public check (follows redirects). A 401 on staging means nginx basic auth is
-# in front of a live vhost, not that the app failed. Accept that only when
-# PUBLIC_BEHIND_BASIC_AUTH=1 and PUBLIC_URL is not the live site. Production
-# must still get 200.
+# Public check (follows redirects). See the constants block for the rules;
+# deploy_public_check_decision in deploy-vitrine-lib.sh is the single source.
 PUB=$(curl -sI -o /dev/null -w '%{http_code}' "${CURL_AUTH[@]+"${CURL_AUTH[@]}"}" -L "$PUBLIC_URL" || echo 000)
-if [ "$PUB" = "200" ]; then
-  log "public health: 200 ($PUBLIC_URL)"
-elif [ "$PUB" = "401" ] && [ "${PUBLIC_BEHIND_BASIC_AUTH:-0}" = "1" ] && ! is_production_public_url "$PUBLIC_URL"; then
-  log "public URL answered 401 — treated as reachable (PUBLIC_BEHIND_BASIC_AUTH=1, loopback already 200)"
-elif [ "$PUB" = "401" ] && [ -z "${DEPLOY_BASIC_AUTH:-}" ] && ! is_production_public_url "$PUBLIC_URL"; then
-  # Loopback is already 200 and the build is live. Do not roll it back just
-  # because a manual run omitted both the flag and the password.
-  log "public URL answered 401 — staging is behind basic auth"
-  die "build is live and healthy on loopback, but $PUBLIC_URL returned 401. Re-run with PUBLIC_BEHIND_BASIC_AUTH=1 (preferred) or DEPLOY_BASIC_AUTH=\"user:password\""
-else
-  rollback "public URL returned $PUB for $PUBLIC_URL"
-fi
+case "$(deploy_public_check_decision "$PUB" "$PUBLIC_URL")" in
+  ok)
+    log "public health: 200 ($PUBLIC_URL)"
+    ;;
+  warn-unauthenticated)
+    log "WARNING: public URL answered 401 and no credentials were sent (DEPLOY_BASIC_AUTH empty)."
+    log "WARNING: treated as reachable because PUBLIC_BEHIND_BASIC_AUTH=1, but nothing checked that testers can log in."
+    log "WARNING: set the $STAGING_BASIC_AUTH_SECRET secret so the next deploy proves a 200 through $STAGING_HTPASSWD_FILE."
+    printf '::warning title=Staging basic auth not verified::%s returned 401 and no credentials were sent. Set %s.\n' \
+      "$PUBLIC_URL" "$STAGING_BASIC_AUTH_SECRET"
+    ;;
+  fail-rejected-credentials)
+    printf '::error title=Staging basic auth drift::%s\n' "$(deploy_basic_auth_drift_hint)"
+    log "ERROR: $(deploy_basic_auth_drift_hint)"
+    rollback "public URL returned 401 WITH credentials for $PUBLIC_URL (basic-auth drift: $STAGING_HTPASSWD_FILE vs $STAGING_BASIC_AUTH_SECRET)"
+    ;;
+  fail-production)
+    rollback "public URL returned 401 for $PUBLIC_URL — production must answer 200"
+    ;;
+  stop-needs-flag)
+    # Loopback is already 200 and the build is live. Do not roll it back just
+    # because a manual run omitted both the flag and the password.
+    log "public URL answered 401 — staging is behind basic auth"
+    die "build is live and healthy on loopback, but $PUBLIC_URL returned 401. Re-run with DEPLOY_BASIC_AUTH=\"user:password\" (preferred) or PUBLIC_BEHIND_BASIC_AUTH=1"
+    ;;
+  *)
+    rollback "public URL returned $PUB for $PUBLIC_URL"
+    ;;
+esac
 
 # Confirm the running checkout is still the SHA we intended (no mid-script drift).
 [ "$(git rev-parse HEAD)" = "$TARGET_SHA" ] || rollback "HEAD drifted during deploy"

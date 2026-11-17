@@ -753,6 +753,17 @@ disagree, the script wins and this table is stale.
   assertion is a 401 without credentials. The script now says so and exits
   without rolling back — the build is already live and healthy on loopback by
   then. The Action supplies it from the `STAGING_BASIC_AUTH` environment secret.
+- **Never rotate the staging password by hand.** The htpasswd
+  (`/etc/nginx/.htpasswd-lna-vitrine-staging`) and the `STAGING_BASIC_AUTH`
+  secret (environment `staging`) must hold the same credential. If credentials
+  are sent and the public URL still answers 401, the deploy fails and rolls back
+  with a "basic-auth drift" error (17 Nov: the htpasswd was rotated, the secret
+  was not). Rotate both together from a machine with ssh and `gh`:
+  `scripts/rotate-staging-basic-auth.sh --dry-run`, then without `--dry-run`.
+  It writes the new `user:password` only to a 0600 file
+  (default `~/.config/lna/staging-basic-auth.txt`) and prints that path; hand
+  the password to testers privately. A 401 with no credentials sent (empty
+  secret) still passes, but only with a loud warning.
 - **`.next.prev` must stay ignored** (`.gitignore`, `tsconfig` exclude, eslint
   `globalIgnores`, `.prettierignore`). The snapshot lives inside the checkout, so
   an unignored `git add -A` stages the whole previous build and eslint/tsc then

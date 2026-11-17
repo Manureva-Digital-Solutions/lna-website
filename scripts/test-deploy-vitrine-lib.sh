@@ -67,6 +67,45 @@ assert_is_prod "https://lnaflow.com/fr?utm=1#top"
 assert_host "https://staging.lnaflow.com/fr" "staging.lnaflow.com"
 assert_not_prod "https://staging.lnaflow.com/fr"
 
+# --- public check decision ---
+# Fake value only; never a real credential.
+FAKE_CREDS="qa-user:not-a-real-password"
+
+assert_decision() {
+  local label="$1" expected="$2" code="$3" url="$4" flag="$5" creds="$6"
+  local got
+  got="$(PUBLIC_BEHIND_BASIC_AUTH="$flag" DEPLOY_BASIC_AUTH="$creds" deploy_public_check_decision "$code" "$url")"
+  if [ "$got" = "$expected" ]; then
+    pass "decision: $label -> $expected"
+  else
+    fail "decision: $label: expected '$expected', got '$got'"
+  fi
+}
+
+STG="https://staging.lnaflow.com/fr"
+PROD="https://lnaflow.com/fr"
+assert_decision "staging 200 with creds" ok 200 "$STG" 1 "$FAKE_CREDS"
+assert_decision "staging no creds + 401 (flag=1) is reachable with warning" warn-unauthenticated 401 "$STG" 1 ""
+assert_decision "staging creds + 401 (flag=1) fails" fail-rejected-credentials 401 "$STG" 1 "$FAKE_CREDS"
+assert_decision "staging creds + 401 (no flag) fails" fail-rejected-credentials 401 "$STG" 0 "$FAKE_CREDS"
+assert_decision "staging no creds + 401 (no flag) stops" stop-needs-flag 401 "$STG" 0 ""
+assert_decision "prod + 401 (flag=1, no creds) fails" fail-production 401 "$PROD" 1 ""
+assert_decision "prod + 401 (creds) fails" fail-production 401 "https://WWW.LNAFLOW.COM:443/fr" 0 "$FAKE_CREDS"
+assert_decision "prod 200" ok 200 "$PROD" 0 ""
+assert_decision "staging 502" fail 502 "$STG" 1 ""
+assert_decision "staging 000 (no answer)" fail 000 "$STG" 1 "$FAKE_CREDS"
+
+hint="$(deploy_basic_auth_drift_hint)"
+case "$hint" in
+  *"/etc/nginx/.htpasswd-lna-vitrine-staging"*"STAGING_BASIC_AUTH"*"rotate-staging-basic-auth.sh"*)
+    pass "drift hint names htpasswd file, secret and rotation script" ;;
+  *) fail "drift hint missing names: $hint" ;;
+esac
+case "$(DEPLOY_BASIC_AUTH="$FAKE_CREDS" deploy_basic_auth_drift_hint)" in
+  *not-a-real-password*) fail "drift hint leaks the credential" ;;
+  *) pass "drift hint does not include the credential" ;;
+esac
+
 # --- constants parser ---
 tmp="$(mktemp -d "${TMPDIR:-/tmp}/vitrine-lib-test.XXXXXX")"
 cleanup() { rm -rf "$tmp"; }

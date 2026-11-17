@@ -55,6 +55,54 @@ is_production_public_url() {
   esac
 }
 
+# The nginx file and the GitHub secret that must always hold the same staging
+# basic-auth credential. scripts/rotate-staging-basic-auth.sh updates both.
+STAGING_HTPASSWD_FILE="/etc/nginx/.htpasswd-lna-vitrine-staging"
+STAGING_BASIC_AUTH_SECRET="STAGING_BASIC_AUTH"
+
+# Decide what a public HTTP status means after a deploy. Prints one token:
+#   ok                 200
+#   warn-unauthenticated  401, staging, PUBLIC_BEHIND_BASIC_AUTH=1 and no
+#                      credentials sent: reachable, but nothing proved that
+#                      testers can log in. Deploy passes with a loud warning.
+#   fail-rejected-credentials  401 although DEPLOY_BASIC_AUTH was sent: the
+#                      htpasswd and the secret have drifted. Roll back.
+#   fail-production    401 on lnaflow.com / www.lnaflow.com. Production must
+#                      answer 200. Roll back.
+#   stop-needs-flag    401, staging, no flag and no credentials (a manual run).
+#                      Stop without rolling back; the build is live on loopback.
+#   fail               anything else. Roll back.
+# Arguments: $1 status code, $2 public URL (default $PUBLIC_URL). Reads
+# PUBLIC_BEHIND_BASIC_AUTH and DEPLOY_BASIC_AUTH from the environment.
+deploy_public_check_decision() {
+  local code="$1" url="${2-${PUBLIC_URL-}}"
+
+  if [ "$code" = "200" ]; then
+    printf 'ok'
+    return 0
+  fi
+  if [ "$code" != "401" ]; then
+    printf 'fail'
+    return 0
+  fi
+  if is_production_public_url "$url"; then
+    printf 'fail-production'
+  elif [ -n "${DEPLOY_BASIC_AUTH:-}" ]; then
+    printf 'fail-rejected-credentials'
+  elif [ "${PUBLIC_BEHIND_BASIC_AUTH:-0}" = "1" ]; then
+    printf 'warn-unauthenticated'
+  else
+    printf 'stop-needs-flag'
+  fi
+}
+
+# One-line explanation of a credential drift, for logs. Never includes the
+# credential itself.
+deploy_basic_auth_drift_hint() {
+  printf '%s rejected the credentials in %s. The nginx file and the GitHub environment secret have drifted (one was rotated without the other). Rotate both together with scripts/rotate-staging-basic-auth.sh.' \
+    "$STAGING_HTPASSWD_FILE" "$STAGING_BASIC_AUTH_SECRET"
+}
+
 # Parse a .deploy-constants file as plain KEY=VALUE lines. Never source or eval.
 # Allowed keys only. Unknown keys, or lines containing $(, backticks or ;, fail
 # with a message on stderr and exit status 1. Successful assignments are made
