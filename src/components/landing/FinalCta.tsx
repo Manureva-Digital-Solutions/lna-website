@@ -9,28 +9,45 @@ import { appUrls } from "@/lib/app-urls";
 /**
  * Reprend le CTA du hero mot pour mot. La phrase dessous dit ce qui se passe
  * après le clic — pas un slogan.
+ *
+ * LNAW-92 — frozen v4 (lna-v4-fr.html `.final`):
+ * white band · heading + body c1–8 · navy primary CTA c11–16 (align end) ·
+ * stack below 1056 · same label/destination as hero (`appUrls.register`).
  */
 export function FinalCta() {
   const t = useTranslations("home.finalCta");
   return (
-    <Section className="bg-gray-10 border-border border-t">
-      <Container className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex max-w-[36rem] flex-col gap-3">
-          <AnimateIn>
-            <h2 className="text-h2 text-foreground text-balance">
-              {t("heading")}
-            </h2>
+    <Section
+      data-final-cta
+      className="bg-background pt-16! pb-16! md:pt-20! md:pb-24!"
+    >
+      <Container>
+        <div className="grid grid-cols-1 items-end gap-0 min-[1056px]:grid-cols-[repeat(16,minmax(0,1fr))] min-[1056px]:gap-x-8">
+          <AnimateIn className="min-[1056px]:col-span-8">
+            <h2 className="text-h2 text-foreground mb-4">{t("heading")}</h2>
+            <p className="text-body text-muted-foreground mb-0 max-w-[560px] text-pretty">
+              {t("reassurance")}
+            </p>
           </AnimateIn>
-          <AnimateIn delay={0.05}>
-            <p className="text-body text-pretty">{t("reassurance")}</p>
+          <AnimateIn
+            delay={0.05}
+            className="mt-8 flex justify-start min-[1056px]:col-span-6 min-[1056px]:col-start-11 min-[1056px]:mt-0"
+          >
+            {/*
+              Frozen desktop crop hugs the label (tight trailing icon).
+              Keep 16px type / 48px height from `.btn`, but avoid the wide
+              64px icon slot that left a large empty navy gap on the right.
+            */}
+            <LinkButton
+              size="lg"
+              href={appUrls.register}
+              className="min-w-[220px] justify-center gap-3 px-4 py-[13px] text-base leading-[22px]"
+            >
+              {t("cta")}
+              <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
+            </LinkButton>
           </AnimateIn>
         </div>
-        <AnimateIn delay={0.1}>
-          <LinkButton size="lg" href={appUrls.register}>
-            {t("cta")}
-            <ArrowRight data-icon="inline-end" aria-hidden="true" />
-          </LinkButton>
-        </AnimateIn>
       </Container>
     </Section>
   );
