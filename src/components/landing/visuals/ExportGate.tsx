@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
  * Carbon modal (lna-v4-fr.html `.modal` in `.stage`):
  * white · max 560 · mx-auto · border-top
  * .modal-h 16/16/0 · 20/28 · .modal-b 24/16/32 · .modal-f 64px
- * audit white (override) | navy Download
+ * audit white (frozen HTML `.modal-f .dn` override) | navy Download
  */
 export function ExportGate() {
   const t = useTranslations("home.bands.validation");

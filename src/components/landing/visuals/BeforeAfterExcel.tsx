@@ -11,11 +11,11 @@ export function BeforeAfterExcel() {
   const locale = useLocale();
   const filename = useTranslations("home.hero.excel")("filename");
 
-  const pct = (v: number) =>
+  const pct = (v: number, fractionDigits = 2) =>
     new Intl.NumberFormat(locale, {
       style: "percent",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
     }).format(v / 100);
   const eur = (v: number) =>
     new Intl.NumberFormat(locale, {
@@ -27,7 +27,8 @@ export function BeforeAfterExcel() {
   const rows = [
     { label: g("rowRate"), values: [pct(0.34), pct(0.29)] },
     { label: g("rowTotalCost"), values: [eur(4218), eur(3640)] },
-    { label: g("rowQuota"), values: [pct(100), pct(50)] },
+    // Frozen HTML mini sheets use whole percents for quotité (100 % / 50 %).
+    { label: g("rowQuota"), values: [pct(100, 0), pct(50, 0)] },
   ];
 
   return (

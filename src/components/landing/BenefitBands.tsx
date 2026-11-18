@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
-import { LinkButton } from "@/components/ui/button";
 import { BeforeAfterExcel } from "@/components/landing/visuals/BeforeAfterExcel";
 import { RoleClassification } from "@/components/landing/visuals/RoleClassification";
 import { ConfidenceGrid } from "@/components/landing/visuals/ConfidenceGrid";
@@ -78,14 +78,13 @@ export function BenefitBands() {
               <p className="text-body text-muted-foreground mb-8 max-w-[480px]">
                 {t("confidence.body")}
               </p>
-              <LinkButton
-                variant="ghost"
+              <Link
                 href={appUrls.register}
-                className="text-primary h-auto w-fit justify-start gap-2 border-0 px-0 py-1 font-normal shadow-none hover:bg-transparent"
+                className="text-primary inline-flex w-fit items-center gap-2 text-base hover:underline"
               >
                 {tHero("ctaPrimary")}
                 <ArrowRight className="size-4" aria-hidden="true" />
-              </LinkButton>
+              </Link>
             </div>
             <div className="bg-gray-10 min-w-0 p-4 max-[1056px]:mt-8 max-[672px]:-mx-4 min-[1056px]:col-span-11 min-[1313px]:p-12 md:p-8">
               <ConfidenceGrid />
