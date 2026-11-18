@@ -1,5 +1,4 @@
 import { useTranslations, useLocale } from "next-intl";
-import { cn } from "@/lib/utils";
 
 /** Bandes visuelles de la grille d'étape 3 de l'app. */
 const HIGH = 0.8;
@@ -15,23 +14,33 @@ function levelOf(score: number): Level {
   return "low";
 }
 
-const LEVEL_CLASS: Record<Level, { cell: string; dot: string }> = {
-  high: {
-    cell: "border-status-high/30 bg-status-high/10",
-    dot: "bg-status-high",
-  },
-  medium: {
-    cell: "border-status-medium/30 bg-status-medium/10",
-    dot: "bg-status-medium",
-  },
-  low: {
-    cell: "border-status-low/30 bg-status-low/10",
-    dot: "bg-status-low",
-  },
-};
+/** Shape + colour — never colour alone (frozen v4 / a11y). */
+function StatusShape({ level }: { level: Level }) {
+  if (level === "high") {
+    return (
+      <span
+        className="bg-status-high size-2.5 shrink-0 rounded-full"
+        aria-hidden="true"
+      />
+    );
+  }
+  if (level === "medium") {
+    return (
+      <span
+        className="bg-status-medium size-2 shrink-0 rotate-45"
+        aria-hidden="true"
+      />
+    );
+  }
+  return (
+    <span
+      className="inline-block size-0 shrink-0 border-x-[5px] border-b-[9px] border-x-transparent border-b-[var(--status-low)]"
+      aria-hidden="true"
+    />
+  );
+}
 
 interface Cell {
-  /** Raw number — formatted per locale at render (see `format`). */
   value: number;
   score: number;
 }
@@ -39,7 +48,6 @@ interface Cell {
 type RowLabelKey = "rowRate" | "rowTotalCost" | "rowQuota";
 
 interface Row {
-  /** Translation key in the `grid` namespace, never a display string. */
   labelKey: RowLabelKey;
   format: "pct" | "eur";
   confidence: number;
@@ -82,14 +90,15 @@ const ROWS: readonly Row[] = [
 ];
 
 /**
- * Bande 3 — la grille de vérification réelle : colonnes #, Row Key, Conf.,
- * puis un émetteur par colonne. Le niveau est toujours doublé d'un libellé texte
- * (lisible par lecteur d'écran, et rappelé dans la légende sous la grille).
+ * Carbon data table (lna-v4-fr.html `.dt`): white card on Gray 10 stage.
+ * Header Gray 20 / 48px · rows Gray 10 / 64px · value stacked over status.
+ * Legend footer white; `[REVIEW]` note right-aligned.
  */
 export function ConfidenceGrid() {
   const t = useTranslations("home.bands.confidence");
   const g = useTranslations("grid");
   const locale = useLocale();
+  const reviewMarker = useTranslations("home.hero.excel")("reviewMarker");
   const fmt = (v: number, kind: "pct" | "eur") =>
     kind === "eur"
       ? new Intl.NumberFormat(locale, {
@@ -108,112 +117,93 @@ export function ConfidenceGrid() {
   };
 
   return (
-    <div className="bg-card border-border overflow-x-auto rounded-none border shadow-none [contain:paint]">
-      <table className="w-full border-collapse text-left text-xs tabular-nums">
-        <caption className="sr-only">{t("tableCaption")}</caption>
-        <thead>
-          <tr className="bg-gray-10 text-foreground">
-            <th
-              scope="col"
-              className="border-border border-b px-2 py-2 font-semibold"
-            >
-              #
-            </th>
-            <th
-              scope="col"
-              className="border-border border-b px-3 py-2 font-semibold"
-            >
-              Row Key
-            </th>
-            <th
-              scope="col"
-              className="border-border border-b px-3 py-2 font-semibold"
-            >
-              Conf.
-            </th>
-            {COLUMNS.map((col) => (
+    <div
+      data-confidence-grid
+      className="bg-background max-w-full overflow-hidden rounded-none shadow-none"
+    >
+      <div className="max-w-full overflow-x-auto">
+        <table className="w-full min-w-[36rem] border-collapse text-left text-sm tabular-nums">
+          <caption className="sr-only">{t("tableCaption")}</caption>
+          <thead>
+            <tr className="bg-gray-20 text-foreground">
+              <th scope="col" className="h-12 px-4 align-middle font-semibold">
+                #
+              </th>
+              <th scope="col" className="h-12 px-4 align-middle font-semibold">
+                Row Key
+              </th>
               <th
-                key={col}
                 scope="col"
-                className="border-border border-b px-3 py-2 font-semibold"
+                className="h-12 px-4 text-right align-middle font-semibold"
               >
-                {col}
+                Conf.
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {ROWS.map((row, i) => (
-            <tr key={row.labelKey}>
-              <td className="text-muted-foreground border-border border-b px-2 py-2 font-mono">
-                {i + 1}
-              </td>
-              <th
-                scope="row"
-                className="text-foreground border-border border-b px-3 py-2 font-semibold"
-              >
-                {g(row.labelKey)}
-              </th>
-              <td className="border-border border-b px-3 py-2">
-                <span className="inline-flex items-center gap-1.5 font-mono">
-                  <span
-                    className={cn(
-                      "size-2 shrink-0 rounded-none",
-                      LEVEL_CLASS[levelOf(row.confidence)].dot
-                    )}
-                    aria-hidden="true"
-                  />
-                  {Math.round(row.confidence * 100)} %
-                </span>
-              </td>
-              {row.cells.map((cell, j) => {
-                const level = levelOf(cell.score);
-                return (
-                  <td
-                    key={row.labelKey + "-" + j}
-                    className="border-border border-b px-3 py-2"
-                  >
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-none border px-1.5 py-0.5",
-                        LEVEL_CLASS[level].cell,
-                        cell.score < REVIEW_THRESHOLD &&
-                          "ring-status-low/60 ring-1"
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "size-2 shrink-0 rounded-none",
-                          LEVEL_CLASS[level].dot
-                        )}
-                        aria-hidden="true"
-                      />
-                      {fmt(cell.value, row.format)}
-                      <span className="sr-only"> — {levelLabel[level]}</span>
-                      {cell.score < REVIEW_THRESHOLD ? (
-                        <span className="text-status-low font-mono text-[10px]">
-                          [REVIEW]
-                        </span>
-                      ) : null}
-                    </span>
-                  </td>
-                );
-              })}
+              {COLUMNS.map((col) => (
+                <th
+                  key={col}
+                  scope="col"
+                  className="h-12 px-4 align-middle font-semibold"
+                >
+                  {col}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <ul className="text-muted-foreground border-border flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t px-3 py-2 text-xs">
+          </thead>
+          <tbody>
+            {ROWS.map((row, i) => (
+              <tr key={row.labelKey}>
+                <td className="border-gray-20 bg-gray-10 text-muted-foreground h-16 border-t px-4 align-middle font-mono text-[13px]">
+                  {i + 1}
+                </td>
+                <th
+                  scope="row"
+                  className="border-gray-20 bg-gray-10 text-foreground h-16 border-t px-4 text-left align-middle font-semibold"
+                >
+                  {g(row.labelKey)}
+                </th>
+                <td className="border-gray-20 bg-gray-10 h-16 border-t px-4 text-right align-middle font-mono">
+                  {new Intl.NumberFormat(locale, {
+                    style: "percent",
+                    maximumFractionDigits: 0,
+                  }).format(row.confidence)}
+                </td>
+                {row.cells.map((cell, j) => {
+                  const level = levelOf(cell.score);
+                  return (
+                    <td
+                      key={row.labelKey + "-" + j}
+                      className="border-gray-20 bg-gray-10 h-16 border-t px-4 align-middle"
+                    >
+                      <span className="flex flex-col">
+                        <span className="leading-5 font-mono">
+                          {fmt(cell.value, row.format)}
+                        </span>
+                        <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4">
+                          <StatusShape level={level} />
+                          {levelLabel[level]}
+                          {cell.score < REVIEW_THRESHOLD ? (
+                            <span className="text-status-low ml-0.5 font-mono text-[11.5px] font-semibold">
+                              {reviewMarker}
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul className="bg-background text-muted-foreground border-gray-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t px-4 py-3 text-xs">
         {(["high", "medium", "low"] as const).map((level) => (
           <li key={level} className="inline-flex items-center gap-1.5">
-            <span
-              className={cn("size-2 rounded-none", LEVEL_CLASS[level].dot)}
-              aria-hidden="true"
-            />
+            <StatusShape level={level} />
             {levelLabel[level]}
           </li>
         ))}
-        <li className="font-mono">{t("reviewLegend")}</li>
+        <li className="ml-auto font-mono">{t("reviewLegend")}</li>
       </ul>
     </div>
   );
