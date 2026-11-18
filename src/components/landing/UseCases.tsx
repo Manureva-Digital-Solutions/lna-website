@@ -10,13 +10,14 @@ import { AnimateIn } from "@/components/ui/animate-in";
  * LNAW-98 — frozen v4 (lna-v4-fr.html `.cases` / `.case`):
  * Gray 10 tiles · 1 px Gray 20 gaps · Plex Mono 01/02/03 · 20 px titles ·
  * Gray 70 body · no arrows · 3 cols ≥1056 · stack below.
+ * Top padding 0 — previous `.sect` bottom already supplies the band gap.
  */
 const CASES = ["adp", "health", "condo"] as const;
 
 export function UseCases() {
   const t = useTranslations("home.useCases");
   return (
-    <Section className="pt-16 pb-16 md:pt-24 md:pb-24">
+    <Section className="pt-0! pb-16 md:pt-0! md:pb-24">
       <Container>
         <AnimateIn>
           <h2 className="text-h2 text-foreground mb-8 md:mb-12">
