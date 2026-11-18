@@ -45,12 +45,13 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           DEPLOY_BASIC_AUTH: ${{ secrets.STAGING_BASIC_AUTH }}
+          PUBLIC_BEHIND_BASIC_AUTH: "1"
         with:
           host: ${{ vars.DEPLOY_HOST }}
           username: ${{ vars.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           port: ${{ vars.DEPLOY_SSH_PORT || 22 }}
-          envs: DEPLOY_BASIC_AUTH
+          envs: DEPLOY_BASIC_AUTH,PUBLIC_BEHIND_BASIC_AUTH
           script_stop: true
           script: |
             set -euo pipefail

@@ -11,11 +11,15 @@
 #   ./scripts/deploy-vitrine.sh                 # tip of $BRANCH
 #   ./scripts/deploy-vitrine.sh <git-sha>       # a specific commit
 #
-# Per-environment constants live in the `--- constants ---` block below and in the
-# per-environment comments beside them. Edit them per checkout; do not pass them
-# as flags, so a mis-typed deploy cannot silently target the other environment.
+# Per-environment constants live in the `--- constants ---` block below (staging
+# defaults). Production overrides them with a gitignored .deploy-constants in
+# this checkout, because git reset --hard would otherwise restore the staging
+# values. Do not pass APP_DIR or BRANCH as flags.
 #
 set -euo pipefail
+
+# shellcheck source=scripts/deploy-vitrine-lib.sh
+. "$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/deploy-vitrine-lib.sh"
 
 # --- per-environment constants (staging values shown) ---
 APP_DIR="/home/ubuntu/lna-website-staging"          # production copy: /home/ubuntu/lna-website
@@ -26,23 +30,47 @@ PUBLIC_URL="https://staging.lnaflow.com/fr"         # production copy: https://l
 PROCESS_MANAGER="systemd"                           # production copy: pm2
 PROCESS_UNIT="lna-vitrine-staging"                  # production copy: lna-vitrine
 
-# If PUBLIC_URL is behind basic auth, export DEPLOY_BASIC_AUTH="user:password"
-# in the environment of the person (or Action) running the script. Never hardcode
-# it here. The loopback health check does not need it. A manual staging run without
-# it exits with a clear message AFTER the build is already live — it does not roll
-# back a healthy deploy.
+# Staging is behind nginx auth_basic; production is not.
+# DEPLOY_BASIC_AUTH="user:password" (the staging workflow sends the
+# STAGING_BASIC_AUTH secret) makes the public check log in and require 200.
+# If those credentials are sent and still get 401, the htpasswd and the secret
+# have drifted: the deploy FAILS and rolls back, because testers would be locked
+# out. Fix it with scripts/rotate-staging-basic-auth.sh, which updates both.
+# PUBLIC_BEHIND_BASIC_AUTH=1 with NO credentials lets a public 401 count as
+# reachable, with a loud warning (nothing proved anyone can log in).
+# Production (lnaflow.com / www.lnaflow.com) always needs 200; the flag is
+# ignored there. Never hardcode the credential here. Never log it.
 CURL_AUTH=()
 if [ -n "${DEPLOY_BASIC_AUTH:-}" ]; then
   CURL_AUTH=(-u "$DEPLOY_BASIC_AUTH")
 fi
 
-TARGET_REF="${1:-origin/$BRANCH}"
-
+# git reset --hard restores the staging defaults above. Production therefore
+# keeps overrides in a gitignored .deploy-constants next to this repo root.
+# That file is parsed as KEY=VALUE (never sourced or eval'd).
+ROOT="$(cd "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 log() { printf '[deploy %s] %s\n' "$(date -u +%H:%M:%SZ)" "$*"; }
 die() { printf '[deploy] FATAL: %s\n' "$*" >&2; exit 1; }
 
+if [ -f "$ROOT/.deploy-constants" ]; then
+  load_deploy_constants "$ROOT/.deploy-constants" \
+    || die "invalid .deploy-constants"
+fi
+
+TARGET_REF="${1:-origin/$BRANCH}"
+
 cd "$APP_DIR" || die "no $APP_DIR"
+# Refuse to run if this script lives in a different checkout than APP_DIR.
+# That is what happens on production after a reset --hard if .deploy-constants
+# is missing: the restored defaults point at the staging directory.
+if [ "$(pwd -P)" != "$(cd "$ROOT" && pwd -P)" ]; then
+  die "APP_DIR ($APP_DIR) is not this checkout ($ROOT). For production, add a gitignored .deploy-constants in this checkout (see the release notes)."
+fi
 [ -f .env ] || die ".env missing — refusing to build (NEXT_PUBLIC_* would be baked in wrong)"
+if [ -f .deploy-constants ]; then
+  git check-ignore -q .deploy-constants \
+    || die ".deploy-constants is not gitignored — refusing to run"
+fi
 
 if [ -f "$HOME/.nvm/nvm.sh" ]; then
   # shellcheck source=/dev/null
@@ -142,19 +170,39 @@ CODE=$(curl -s -o /dev/null -w '%{http_code}' "$HEALTH_URL" || echo 000)
 [ "$CODE" = "200" ] || rollback "loopback health returned $CODE for $HEALTH_URL"
 log "loopback health: 200"
 
-# Public check (follows redirects). Supply DEPLOY_BASIC_AUTH for staging basic auth.
+# Public check (follows redirects). See the constants block for the rules;
+# deploy_public_check_decision in deploy-vitrine-lib.sh is the single source.
 PUB=$(curl -sI -o /dev/null -w '%{http_code}' "${CURL_AUTH[@]+"${CURL_AUTH[@]}"}" -L "$PUBLIC_URL" || echo 000)
-if [ "$PUB" != "200" ]; then
-  if [ "$PUB" = "401" ] && [ -z "${DEPLOY_BASIC_AUTH:-}" ]; then
-    # The build is already health-checked on loopback and is live. Rolling it back
-    # because the operator forgot the password would take a good deploy offline.
+case "$(deploy_public_check_decision "$PUB" "$PUBLIC_URL")" in
+  ok)
+    log "public health: 200 ($PUBLIC_URL)"
+    ;;
+  warn-unauthenticated)
+    log "WARNING: public URL answered 401 and no credentials were sent (DEPLOY_BASIC_AUTH empty)."
+    log "WARNING: treated as reachable because PUBLIC_BEHIND_BASIC_AUTH=1, but nothing checked that testers can log in."
+    log "WARNING: set the $STAGING_BASIC_AUTH_SECRET secret so the next deploy proves a 200 through $STAGING_HTPASSWD_FILE."
+    printf '::warning title=Staging basic auth not verified::%s returned 401 and no credentials were sent. Set %s.\n' \
+      "$PUBLIC_URL" "$STAGING_BASIC_AUTH_SECRET"
+    ;;
+  fail-rejected-credentials)
+    printf '::error title=Staging basic auth drift::%s\n' "$(deploy_basic_auth_drift_hint)"
+    log "ERROR: $(deploy_basic_auth_drift_hint)"
+    rollback "public URL returned 401 WITH credentials for $PUBLIC_URL (basic-auth drift: $STAGING_HTPASSWD_FILE vs $STAGING_BASIC_AUTH_SECRET)"
+    ;;
+  fail-production)
+    rollback "public URL returned 401 for $PUBLIC_URL — production must answer 200"
+    ;;
+  stop-needs-flag)
+    # Loopback is already 200 and the build is live. Do not roll it back just
+    # because a manual run omitted both the flag and the password.
     log "public URL answered 401 — staging is behind basic auth"
-    die "build is live and healthy on loopback, but $PUBLIC_URL cannot be asserted without credentials. Re-run with DEPLOY_BASIC_AUTH=\"user:password\""
-  fi
-  rollback "public URL returned $PUB for $PUBLIC_URL"
-fi
-log "public health: 200 ($PUBLIC_URL)"
+    die "build is live and healthy on loopback, but $PUBLIC_URL returned 401. Re-run with DEPLOY_BASIC_AUTH=\"user:password\" (preferred) or PUBLIC_BEHIND_BASIC_AUTH=1"
+    ;;
+  *)
+    rollback "public URL returned $PUB for $PUBLIC_URL"
+    ;;
+esac
 
 # Confirm the running checkout is still the SHA we intended (no mid-script drift).
 [ "$(git rev-parse HEAD)" = "$TARGET_SHA" ] || rollback "HEAD drifted during deploy"
-log "DONE — $(git rev-parse --short HEAD), health 200"
+log "DONE — $(git rev-parse --short HEAD)"
