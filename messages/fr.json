@@ -84,7 +84,7 @@
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
         "filename": "comparatif-adp.xlsx",
-        "reviewMarker": "[REVIEW]",
+        "reviewMarker": "[RELECTURE]",
         "tabFile": "Fichier",
         "tabHome": "Accueil",
         "tabInsert": "Insertion",
@@ -121,14 +121,14 @@
         "levelHigh": "Élevée",
         "levelMedium": "Moyenne",
         "levelLow": "Faible",
-        "reviewLegend": "[REVIEW] — écrit dans la cellule exportée sous 0,6"
+        "reviewLegend": "[RELECTURE] — écrit dans la cellule exportée sous 0,6"
       },
       "validation": {
         "heading": "Rien ne part sans votre validation",
         "body": "L'export est une décision, pas un effet de bord : vous relisez les champs signalés, puis vous déclenchez le téléchargement. Chaque export est inscrit dans une piste d'audit.",
         "stepLabel": "Étape 3 — Vérifier & Télécharger",
         "checkbox": "J'ai relu les champs signalés",
-        "checkboxReview": "Conserver le marqueur [REVIEW] dans le fichier exporté",
+        "checkboxReview": "Conserver le marqueur [RELECTURE] dans le fichier exporté",
         "downloadButton": "Télécharger Excel",
         "auditNote": "L'export est inscrit dans la piste d'audit."
       }

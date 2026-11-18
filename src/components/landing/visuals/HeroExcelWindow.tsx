@@ -119,13 +119,14 @@ export function HeroExcelWindow() {
         </span>
       </div>
 
-      {/* Ribbon tabs — wrap on narrow screens so every locale label stays visible without hiding or scrolling */}
-      <div className="border-border bg-gray-10 flex flex-wrap gap-x-0.5 gap-y-0 border-b px-1.5 pt-0.5 text-[9px] sm:flex-nowrap sm:overflow-hidden sm:text-[10px]">
+      {/* Ribbon tabs — hide later tabs below sm (frozen HTML) so FR labels are not clipped at 390 */}
+      <div className="border-border bg-gray-10 flex flex-wrap gap-x-0.5 gap-y-0 border-b px-1 pt-0.5 text-[9px] sm:flex-nowrap sm:overflow-hidden sm:px-1.5 sm:text-[10px]">
         {tabs.map((tab, i) => (
           <span
             key={tab}
             className={cn(
-              "shrink-0 px-1 py-1 whitespace-nowrap sm:px-1.5",
+              "shrink-0 px-0.5 py-1 whitespace-nowrap sm:px-1.5",
+              i >= 4 && "max-sm:hidden",
               i === 1
                 ? "text-foreground border-excel-green border-b-2 font-semibold"
                 : "text-muted-foreground"

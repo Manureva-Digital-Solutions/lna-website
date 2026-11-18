@@ -33,7 +33,7 @@ export function ExcelGrid({
       )}
     >
       <div className="bg-excel-green truncate px-2 py-1 font-mono text-[11.5px] text-white">
-        {caption ?? "comparatif-adp.xlsx"}
+        {caption ?? "comparison-adp.xlsx"}
       </div>
       <div className="max-w-full overflow-x-auto">
         <table className="w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums">
