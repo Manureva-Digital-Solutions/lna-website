@@ -2,22 +2,20 @@ import { useTranslations, useLocale } from "next-intl";
 import { ExcelGrid } from "@/components/landing/visuals/ExcelGrid";
 
 /**
- * Bande 1 — le même fichier, vide puis rempli. En-têtes et structure identiques.
- *
- * Les libellés viennent du namespace `grid` et les nombres sont mis en forme selon
- * la locale : ils étaient auparavant codés en dur en français, donc la page
- * anglaise affichait « Garantie / Coût total » avec des décimales à la française.
+ * Tile 1 — same file empty then filled (lna-v4-fr.html `.tpl`).
+ * Columns: Guarantee · Generali · April · gap 16px · caption mb 8px.
  */
 export function BeforeAfterExcel() {
   const t = useTranslations("home.bands.template");
   const g = useTranslations("grid");
   const locale = useLocale();
+  const filename = useTranslations("home.hero.excel")("filename");
 
-  const pct = (v: number) =>
+  const pct = (v: number, fractionDigits = 2) =>
     new Intl.NumberFormat(locale, {
       style: "percent",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
     }).format(v / 100);
   const eur = (v: number) =>
     new Intl.NumberFormat(locale, {
@@ -29,21 +27,23 @@ export function BeforeAfterExcel() {
   const rows = [
     { label: g("rowRate"), values: [pct(0.34), pct(0.29)] },
     { label: g("rowTotalCost"), values: [eur(4218), eur(3640)] },
+    // Frozen HTML mini sheets use whole percents for quotité (100 % / 50 %).
+    { label: g("rowQuota"), values: [pct(100, 0), pct(50, 0)] },
   ];
 
   return (
-    <div className="flex min-w-0 flex-col gap-3">
+    <div className="grid min-w-0 grid-cols-1 gap-4 self-center sm:grid-cols-2">
       <div className="min-w-0">
-        <p className="text-muted-foreground mb-1.5 font-mono text-xs">
+        <p className="text-muted-foreground mb-2 text-xs leading-4">
           {t("before")}
         </p>
-        <ExcelGrid columns={columns} rows={rows} empty />
+        <ExcelGrid columns={columns} rows={rows} empty caption={filename} />
       </div>
       <div className="min-w-0">
-        <p className="text-muted-foreground mb-1.5 font-mono text-xs">
+        <p className="text-muted-foreground mb-2 text-xs leading-4">
           {t("after")}
         </p>
-        <ExcelGrid columns={columns} rows={rows} />
+        <ExcelGrid columns={columns} rows={rows} caption={filename} />
       </div>
     </div>
   );

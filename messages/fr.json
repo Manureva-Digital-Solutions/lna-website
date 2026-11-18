@@ -84,7 +84,7 @@
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
         "filename": "comparatif-adp.xlsx",
-        "reviewMarker": "[RELECTURE]",
+        "reviewMarker": "[REVIEW]",
         "tabFile": "Fichier",
         "tabHome": "Accueil",
         "tabInsert": "Insertion",

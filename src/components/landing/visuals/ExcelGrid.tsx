@@ -9,11 +9,14 @@ export interface ExcelGridProps {
   /** Nombre de cellules déjà révélées, pour le remplissage progressif. */
   revealed?: number;
   className?: string;
-  /** Nom de fichier affiché dans la barre de titre. */
-  caption?: string;
+  /** Nom de fichier affiché dans la barre de titre (pass i18n `home.hero.excel.filename`). */
+  caption: string;
 }
 
-/** Aperçu d'une feuille Excel : les émetteurs sont les colonnes, les garanties les lignes. */
+/**
+ * Mini sheet (lna-v4-fr.html `.file` / `.ms`):
+ * gray-30 border · Excel green filename · header navy · 30px rows.
+ */
 export function ExcelGrid({
   columns,
   rows,
@@ -25,15 +28,15 @@ export function ExcelGrid({
   return (
     <div
       className={cn(
-        "bg-card border-border overflow-hidden rounded-none border shadow-none",
+        "bg-background border-gray-30 max-w-full overflow-hidden rounded-none border shadow-none",
         className
       )}
     >
-      <div className="bg-excel-green px-3 py-1.5 font-mono text-[11px] text-white">
-        {caption ?? "comparatif-adp.xlsx"}
+      <div className="bg-excel-green truncate px-2 py-1 font-mono text-[11.5px] text-white">
+        {caption}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-left text-xs tabular-nums">
+      <div className="max-w-full overflow-x-auto">
+        <table className="w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums">
           <thead>
             <tr className="bg-sheet-header">
               {columns.map((col, i) => (
@@ -41,8 +44,8 @@ export function ExcelGrid({
                   key={col}
                   scope="col"
                   className={cn(
-                    "border-b border-white/20 px-3 py-2 font-semibold text-white",
-                    i > 0 && "border-l border-white/20 text-right"
+                    "border-gray-30 h-[30px] border px-2 font-semibold whitespace-nowrap text-white",
+                    i > 0 && "text-right"
                   )}
                 >
                   {col}
@@ -55,7 +58,7 @@ export function ExcelGrid({
               <tr key={row.label}>
                 <th
                   scope="row"
-                  className="text-foreground border-border border-b px-3 py-2 font-semibold"
+                  className="border-gray-30 text-foreground h-[30px] border px-2 text-left font-semibold whitespace-nowrap"
                 >
                   {row.label}
                 </th>
@@ -67,7 +70,7 @@ export function ExcelGrid({
                   return (
                     <td
                       key={row.label + "-" + i}
-                      className="border-border border-b border-l px-3 py-2 text-right"
+                      className="border-gray-30 h-[30px] border px-2 text-right whitespace-nowrap"
                     >
                       <span
                         className={cn(
