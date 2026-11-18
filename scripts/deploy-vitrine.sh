@@ -126,11 +126,20 @@ rollback() {
     rm -rf .next
     mv .next.prev .next
   fi
-  if git rev-parse --verify --quiet "${PREV_SHA}^{commit}" >/dev/null; then
-    git reset --hard "$PREV_SHA" >/dev/null || true
+  if ! git rev-parse --verify --quiet "${PREV_SHA}^{commit}" >/dev/null; then
+    reload_app >/dev/null 2>&1 || true
+    die "deploy failed ($reason); previous SHA $PREV_SHA is not a valid commit — HEAD is $(git rev-parse --short HEAD). Restore manually before the next deploy."
   fi
+  # Do not swallow reset failures: a half-rolled checkout left on $TARGET_SHA
+  # with a consumed .next.prev breaks the next deploy's PREV_SHA snapshot.
+  if ! git reset --hard "$PREV_SHA" >/dev/null; then
+    reload_app >/dev/null 2>&1 || true
+    die "deploy failed ($reason); git reset --hard $PREV_SHA failed — HEAD is still $(git rev-parse --short HEAD). Restore manually: git reset --hard $PREV_SHA"
+  fi
+  [ "$(git rev-parse HEAD)" = "$PREV_SHA" ] \
+    || die "deploy failed ($reason); after reset HEAD is $(git rev-parse --short HEAD), expected $PREV_SHA"
   reload_app >/dev/null 2>&1 || true
-  die "deploy failed and was rolled back toward $PREV_SHA"
+  die "deploy failed and was rolled back to $PREV_SHA ($reason)"
 }
 
 git reset --hard "$TARGET_SHA" >/dev/null
