@@ -9,8 +9,8 @@ export interface ExcelGridProps {
   /** Nombre de cellules déjà révélées, pour le remplissage progressif. */
   revealed?: number;
   className?: string;
-  /** Nom de fichier affiché dans la barre de titre. */
-  caption?: string;
+  /** Nom de fichier affiché dans la barre de titre (pass i18n `home.hero.excel.filename`). */
+  caption: string;
 }
 
 /**
@@ -33,7 +33,7 @@ export function ExcelGrid({
       )}
     >
       <div className="bg-excel-green truncate px-2 py-1 font-mono text-[11.5px] text-white">
-        {caption ?? "comparison-adp.xlsx"}
+        {caption}
       </div>
       <div className="max-w-full overflow-x-auto">
         <table className="w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums">
