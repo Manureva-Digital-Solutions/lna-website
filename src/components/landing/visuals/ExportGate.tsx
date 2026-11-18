@@ -20,7 +20,7 @@ export function ExportGate() {
       <div className="flex flex-col px-4 pt-6 pb-8">
         <label className="flex items-center gap-2 py-1.5 text-sm leading-[18px]">
           <span
-            className="bg-gray-100 inline-flex size-4 shrink-0 items-center justify-center rounded-none text-white"
+            className="inline-flex size-4 shrink-0 items-center justify-center rounded-none bg-gray-100 text-white"
             aria-hidden="true"
           >
             <Check className="size-3.5" strokeWidth={3} />
@@ -35,7 +35,7 @@ export function ExportGate() {
           <span>{t("checkboxReview")}</span>
         </label>
       </div>
-      <div className="grid grid-cols-1 max-[672px]:h-auto sm:grid-cols-2 sm:h-16">
+      <div className="grid grid-cols-1 max-[672px]:h-auto sm:h-16 sm:grid-cols-2">
         <div className="bg-background text-muted-foreground border-gray-20 flex items-start border-t px-4 py-3 text-xs leading-4">
           {t("auditNote")}
         </div>

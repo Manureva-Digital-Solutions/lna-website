@@ -28,7 +28,7 @@ function FeatureTile({
     <article className="bg-gray-10 flex h-full min-w-0 flex-col overflow-hidden rounded-none shadow-none">
       {/* .tile .vis — 32px sides/top, height 330 */}
       <div className="flex items-center px-4 pt-4 max-[672px]:h-auto md:h-[330px] md:px-8 md:pt-8">
-        <div className="min-w-0 w-full overflow-x-auto">{visual}</div>
+        <div className="w-full min-w-0 overflow-x-auto">{visual}</div>
       </div>
       {/* .tile .txt — 32px */}
       <div className="flex min-w-0 flex-col px-4 pt-6 pb-8 md:p-8">
@@ -87,7 +87,7 @@ export function BenefitBands() {
                 <ArrowRight className="size-4" aria-hidden="true" />
               </LinkButton>
             </div>
-            <div className="bg-gray-10 min-w-0 p-4 max-[672px]:-mx-4 max-[1056px]:mt-8 md:p-8 min-[1056px]:col-span-11 min-[1313px]:p-12">
+            <div className="bg-gray-10 min-w-0 p-4 max-[1056px]:mt-8 max-[672px]:-mx-4 min-[1056px]:col-span-11 min-[1313px]:p-12 md:p-8">
               <ConfidenceGrid />
             </div>
           </div>
@@ -96,7 +96,7 @@ export function BenefitBands() {
         {/* .split.rev — mt 96 · c1-10 .stage | c11-16 text on white */}
         <AnimateIn>
           <div className="mt-16 grid min-w-0 grid-cols-1 items-start gap-8 min-[1056px]:mt-24 min-[1056px]:grid-cols-[repeat(16,minmax(0,1fr))] min-[1056px]:gap-x-8">
-            <div className="bg-gray-10 order-2 flex min-w-0 items-start p-4 max-[672px]:-mx-4 max-[1056px]:mt-8 md:p-8 min-[1056px]:order-none min-[1056px]:col-span-10 min-[1313px]:p-12">
+            <div className="bg-gray-10 order-2 flex min-w-0 items-start p-4 max-[1056px]:mt-8 max-[672px]:-mx-4 min-[1056px]:order-none min-[1056px]:col-span-10 min-[1313px]:p-12 md:p-8">
               <ExportGate />
             </div>
             <div className="order-1 flex min-w-0 flex-col min-[1056px]:order-none min-[1056px]:col-span-6">

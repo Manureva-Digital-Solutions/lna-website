@@ -175,7 +175,7 @@ export function ConfidenceGrid() {
                       className="border-gray-20 bg-gray-10 h-16 border-t px-4 align-middle"
                     >
                       <span className="flex flex-col">
-                        <span className="leading-5 font-mono">
+                        <span className="font-mono leading-5">
                           {fmt(cell.value, row.format)}
                         </span>
                         <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4">
