@@ -178,10 +178,8 @@ export function Header() {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2 min-[1056px]:gap-4">
-            {/* Frozen ≤672: hide lang + Sign in label (LNA-260 / LNAW-82). */}
-            <div className="flex items-center max-[671px]:hidden">
-              <LanguageSwitcher />
-            </div>
+            {/* FR | EN stays visible at all widths; only Sign in label hides ≤671 (LNA-260). */}
+            <LanguageSwitcher />
             <a
               href={appUrls.login}
               aria-label={t("signIn")}
