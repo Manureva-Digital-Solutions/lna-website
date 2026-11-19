@@ -69,6 +69,7 @@
     "copyright": "© 2026 Lemon Tree SAS. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms",
+    "cookieSettings": "Cookie settings",
     "subscribe": "Subscribe",
     "signIn": "Sign in"
   },
@@ -910,11 +911,14 @@
     "emailLabel": "Email for newsletter",
     "subscribe": "Subscribe",
     "success": "You're subscribed! Check your email to confirm.",
-    "invalidEmail": "Please enter a valid email address."
+    "invalidEmail": "Please enter a valid email address.",
+    "error": "Could not subscribe. Please try again."
   },
   "languageSwitcher": {
     "label": "Language",
     "fr": "FR",
-    "en": "EN"
+    "en": "EN",
+    "english": "English",
+    "francais": "Français"
   }
 }

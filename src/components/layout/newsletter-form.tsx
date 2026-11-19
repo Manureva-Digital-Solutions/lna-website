@@ -2,10 +2,25 @@
 
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
+
+function ArrowIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className="absolute top-4 right-4"
+    >
+      <path
+        d="M9.3 3.3l-.7.7 3.5 3.5H2v1h10.1l-3.5 3.5.7.7L14 8z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 export function NewsletterForm() {
   const t = useTranslations("newsletter");
@@ -34,7 +49,9 @@ export function NewsletterForm() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to subscribe");
+        throw new Error(
+          typeof data.error === "string" && data.error ? data.error : t("error")
+        );
       }
 
       showToast(t("success"), "success");
@@ -51,22 +68,35 @@ export function NewsletterForm() {
   }
 
   return (
-    <form className="flex gap-2" onSubmit={handleSubmit} noValidate>
-      <Input
+    <form
+      className="flex max-w-[420px]"
+      onSubmit={handleSubmit}
+      noValidate
+      data-newsletter
+    >
+      <input
         type="email"
         name="email"
+        id="footer-newsletter-email"
         placeholder={t("emailPlaceholder")}
-        className="border-gray-70 text-foreground max-w-xs bg-white"
+        className="border-gray-60 bg-gray-90 h-12 min-w-0 flex-1 border-0 border-b px-4 text-sm text-white outline-none placeholder:text-gray-50"
         aria-label={t("emailLabel")}
         required
       />
-      <Button type="submit" size="lg" disabled={status === "submitting"}>
+      <button
+        type="submit"
+        disabled={status === "submitting"}
+        className="bg-primary text-primary-foreground relative h-12 shrink-0 cursor-pointer px-4 pr-12 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+      >
         {status === "submitting" ? (
           <Loader2 className="size-4 animate-spin" />
         ) : (
-          t("subscribe")
+          <>
+            {t("subscribe")}
+            <ArrowIcon />
+          </>
         )}
-      </Button>
+      </button>
     </form>
   );
 }

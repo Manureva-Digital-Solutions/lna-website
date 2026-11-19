@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const CONSENT_KEY = "lna-cookie-consent";
+/** Dispatched when the user asks to reopen cookie preferences (footer link). */
+export const COOKIE_CONSENT_OPEN_EVENT = "cookie-consent-open";
 
 export type ConsentValue = "all" | "essential" | null;
 
@@ -17,9 +19,29 @@ export function hasFullConsent(): boolean {
   return getConsent() === "all";
 }
 
-function subscribeNoop(_cb: () => void) {
-  // No external subscription needed — consent only changes via user action
-  return () => {};
+/**
+ * Clears stored consent and opens the cookie banner again.
+ * Wired from the footer "Cookie settings" / "Gérer les cookies" link (LNAW-94).
+ */
+export function openCookiePreferences() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(CONSENT_KEY);
+  window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_OPEN_EVENT));
+  window.dispatchEvent(
+    new CustomEvent("cookie-consent-change", { detail: null })
+  );
+}
+
+function subscribeConsent(cb: () => void) {
+  const onChange = () => cb();
+  window.addEventListener(COOKIE_CONSENT_OPEN_EVENT, onChange);
+  window.addEventListener("cookie-consent-change", onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(COOKIE_CONSENT_OPEN_EVENT, onChange);
+    window.removeEventListener("cookie-consent-change", onChange);
+    window.removeEventListener("storage", onChange);
+  };
 }
 
 function getConsentSnapshot() {
@@ -33,17 +55,25 @@ function getServerSnapshot() {
 export function CookieConsent() {
   const t = useTranslations("common");
   const consent = useSyncExternalStore(
-    subscribeNoop,
+    subscribeConsent,
     getConsentSnapshot,
     getServerSnapshot
   );
   const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    function onOpen() {
+      setDismissed(false);
+    }
+    window.addEventListener(COOKIE_CONSENT_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(COOKIE_CONSENT_OPEN_EVENT, onOpen);
+  }, []);
+
   const visible = !consent && !dismissed;
 
   function accept(value: "all" | "essential") {
     localStorage.setItem(CONSENT_KEY, value);
     setDismissed(true);
-    // Notify other components that consent has changed
     window.dispatchEvent(
       new CustomEvent("cookie-consent-change", { detail: value })
     );

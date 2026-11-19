@@ -20,6 +20,8 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/",
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
 }));
 
 vi.mock("@/components/ui/animate-in", () => ({
