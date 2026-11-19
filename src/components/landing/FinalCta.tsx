@@ -13,6 +13,9 @@ import { appUrls } from "@/lib/app-urls";
  * LNAW-92 — frozen v4 (lna-v4-fr.html `.final`):
  * white band · heading + body c1–8 · navy primary CTA c11–16 (align end) ·
  * stack below 1056 · same label/destination as hero (`appUrls.register`).
+ *
+ * Frozen `.btn`: min-height 48px, padding 13px 64px 13px 16px,
+ * svg absolute right 16px (lna-v4-fr.html). Link semantics — not role="button".
  */
 export function FinalCta() {
   const t = useTranslations("home.finalCta");
@@ -33,18 +36,17 @@ export function FinalCta() {
             delay={0.05}
             className="mt-8 flex justify-start min-[1056px]:col-span-6 min-[1056px]:col-start-11 min-[1056px]:mt-0"
           >
-            {/*
-              Frozen desktop crop hugs the label (tight trailing icon).
-              Keep 16px type / 48px height from `.btn`, but avoid the wide
-              64px icon slot that left a large empty navy gap on the right.
-            */}
             <LinkButton
               size="lg"
               href={appUrls.register}
-              className="min-w-[220px] justify-center gap-3 px-4 py-[13px] text-base leading-[22px]"
+              data-icon="inline-end"
+              className="relative h-12 w-full min-w-[220px] justify-start gap-0 py-[13px] pr-16 pl-4 text-base leading-[22px] min-[672px]:w-auto"
             >
               {t("cta")}
-              <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
+              <ArrowRight
+                className="absolute top-1/2 right-4 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
             </LinkButton>
           </AnimateIn>
         </div>

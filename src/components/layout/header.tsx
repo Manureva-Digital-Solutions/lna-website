@@ -178,17 +178,19 @@ export function Header() {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2 min-[1056px]:gap-4">
+            {/* FR | EN stays visible at all widths; only Sign in label hides ≤671 (LNA-260). */}
             <LanguageSwitcher />
             <a
               href={appUrls.login}
-              className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap transition-colors"
+              aria-label={t("signIn")}
+              className="text-muted-foreground hover:text-foreground inline-flex h-8 shrink-0 items-center gap-1.5 text-sm leading-none whitespace-nowrap transition-colors"
             >
               <User
                 className="size-4 shrink-0"
                 aria-hidden="true"
                 strokeWidth={1.75}
               />
-              {t("signIn")}
+              <span className="max-[671px]:hidden">{t("signIn")}</span>
             </a>
           </div>
         </Container>
