@@ -127,16 +127,16 @@ export function ConfidenceGrid() {
           <thead>
             <tr className="bg-gray-20 text-foreground">
               <th scope="col" className="h-12 px-4 align-middle font-semibold">
-                #
+                {t("colIndex")}
               </th>
               <th scope="col" className="h-12 px-4 align-middle font-semibold">
-                Row Key
+                {t("colRowKey")}
               </th>
               <th
                 scope="col"
                 className="h-12 px-4 text-right align-middle font-semibold"
               >
-                Conf.
+                {t("colConf")}
               </th>
               {COLUMNS.map((col) => (
                 <th
