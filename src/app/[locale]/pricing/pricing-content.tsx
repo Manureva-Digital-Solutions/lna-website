@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "@/i18n/navigation";
 import {
   Check,
   Minus,
@@ -12,10 +11,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { registerUrl, type RegisterPlan } from "@/lib/app-urls";
 import { cn } from "@/lib/utils";
 
 /* ─── Cell renderer ──────────────────────────────────────── */
@@ -53,6 +53,7 @@ export function PricingContent() {
   /* ─── Tier data ──────────────────────────────────────────── */
 
   const tierKeys = ["starter", "professional", "high", "enterprise"] as const;
+  const billing = annual ? "annual" : "monthly";
 
   const tiers = tierKeys.map((key) => {
     const isEnterprise = key === "enterprise";
@@ -67,7 +68,11 @@ export function PricingContent() {
       annualSavings: isEnterprise ? null : t(`tiers.${key}.savings`),
       badge: key === "professional" ? t("tiers.professional.badge") : null,
       cta: t(`tiers.${key}.cta`),
-      ctaHref: "/contact",
+      // Self-serve tiers keep the chosen plan on the product register URL;
+      // Enterprise stays an explicit Contact Sales path.
+      ctaHref: isEnterprise
+        ? "/contact"
+        : registerUrl({ plan: key as RegisterPlan, billing }),
       ctaMicrocopy: t(`tiers.${key}.microcopy`),
       features,
       isEnterprise,
@@ -445,13 +450,13 @@ export function PricingContent() {
                       )}
                     </div>
 
-                    <Button
+                    <LinkButton
                       className="mt-6 w-full"
                       variant={isPro ? "default" : "outline"}
-                      render={<Link href={tier.ctaHref} />}
+                      href={tier.ctaHref}
                     >
                       {tier.cta}
-                    </Button>
+                    </LinkButton>
                     <p className="text-muted-foreground mt-2 text-center text-xs">
                       {tier.ctaMicrocopy}
                     </p>
@@ -619,16 +624,16 @@ export function PricingContent() {
           </AnimateIn>
           <AnimateIn delay={0.2}>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Button size="lg" render={<Link href="/contact" />}>
+              <LinkButton size="lg" href="/contact">
                 {t("cta.buttonSales")}
-              </Button>
-              <Button
+              </LinkButton>
+              <LinkButton
                 variant="outline"
                 size="lg"
-                render={<Link href="/contact" />}
+                href={registerUrl({ billing })}
               >
                 {t("cta.buttonTrial")}
-              </Button>
+              </LinkButton>
             </div>
           </AnimateIn>
           <AnimateIn delay={0.3}>
