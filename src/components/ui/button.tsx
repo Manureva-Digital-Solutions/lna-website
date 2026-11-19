@@ -31,10 +31,10 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-12 gap-4 px-4 py-[13px] has-data-[icon=inline-end]:relative has-data-[icon=inline-end]:justify-start has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-end]:[&>svg]:absolute has-data-[icon=inline-end]:[&>svg]:top-1/2 has-data-[icon=inline-end]:[&>svg]:right-4 has-data-[icon=inline-end]:[&>svg]:-translate-y-1/2 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
+          "h-12 gap-4 px-4 py-[13px] data-[icon=inline-end]:relative data-[icon=inline-end]:justify-start data-[icon=inline-end]:gap-0 data-[icon=inline-end]:pr-16 data-[icon=inline-end]:pl-4 data-[icon=inline-end]:[&>svg]:absolute data-[icon=inline-end]:[&>svg]:top-1/2 data-[icon=inline-end]:[&>svg]:right-4 data-[icon=inline-end]:[&>svg]:-translate-y-1/2 data-[icon=inline-start]:pl-4 data-[icon=inline-start]:pr-4",
         xs: "h-8 gap-2 px-3 text-xs [&_svg:not([class*='size-'])]:size-3",
         sm: "h-10 gap-3 px-4 text-sm [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-12 gap-4 px-4 py-[13px] text-sm has-data-[icon=inline-end]:relative has-data-[icon=inline-end]:justify-start has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-end]:[&>svg]:absolute has-data-[icon=inline-end]:[&>svg]:top-1/2 has-data-[icon=inline-end]:[&>svg]:right-4 has-data-[icon=inline-end]:[&>svg]:-translate-y-1/2 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
+        lg: "h-12 gap-4 px-4 py-[13px] text-sm data-[icon=inline-end]:relative data-[icon=inline-end]:justify-start data-[icon=inline-end]:gap-0 data-[icon=inline-end]:pr-16 data-[icon=inline-end]:pl-4 data-[icon=inline-end]:[&>svg]:absolute data-[icon=inline-end]:[&>svg]:top-1/2 data-[icon=inline-end]:[&>svg]:right-4 data-[icon=inline-end]:[&>svg]:-translate-y-1/2 data-[icon=inline-start]:pl-4 data-[icon=inline-start]:pr-4",
         icon: "size-12 shrink-0 justify-center p-0",
         "icon-xs":
           "size-8 shrink-0 justify-center p-0 [&_svg:not([class*='size-'])]:size-3",

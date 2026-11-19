@@ -33,10 +33,13 @@ export function Hero() {
                 size="lg"
                 href={appUrls.register}
                 data-icon="inline-end"
-                className="w-full py-[13px] pr-16 pl-4 text-base leading-[22px] min-[672px]:w-auto"
+                className="relative w-full justify-start gap-0 py-[13px] pr-16 pl-4 text-base leading-[22px] min-[672px]:w-auto"
               >
                 {t("ctaPrimary")}
-                <ArrowRight className="size-4" aria-hidden="true" />
+                <ArrowRight
+                  className="absolute top-1/2 right-4 size-4 -translate-y-1/2"
+                  aria-hidden="true"
+                />
               </LinkButton>
               <Button
                 variant="ghost"

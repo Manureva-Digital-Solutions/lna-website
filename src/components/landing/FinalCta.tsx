@@ -40,10 +40,13 @@ export function FinalCta() {
               size="lg"
               href={appUrls.register}
               data-icon="inline-end"
-              className="h-12 w-full min-w-[220px] py-[13px] pr-16 pl-4 text-base leading-[22px] min-[672px]:w-auto"
+              className="relative h-12 w-full min-w-[220px] justify-start gap-0 py-[13px] pr-16 pl-4 text-base leading-[22px] min-[672px]:w-auto"
             >
               {t("cta")}
-              <ArrowRight className="size-4" aria-hidden="true" />
+              <ArrowRight
+                className="absolute top-1/2 right-4 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
             </LinkButton>
           </AnimateIn>
         </div>

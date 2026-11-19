@@ -35,6 +35,11 @@ describe("FinalCta", () => {
     expect(cta).toHaveClass("py-[13px]");
     expect(cta).toHaveClass("pl-4");
     expect(cta).toHaveClass("pr-16");
+    expect(cta).toHaveClass("relative");
+    const icon = cta.querySelector("svg");
+    expect(icon).not.toBeNull();
+    expect(icon).toHaveClass("absolute");
+    expect(icon).toHaveClass("right-4");
   });
 
   it("renders matching FR copy", () => {
