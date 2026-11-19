@@ -901,11 +901,9 @@
       "generic": "Une erreur est survenue. Veuillez réessayer."
     },
     "roles": {
-      "ceo": "CEO",
-      "cto": "CTO",
-      "vpEngineering": "VP Ingénierie",
-      "productManager": "Chef de produit",
-      "developer": "Développeur",
+      "accountant": "Expert-comptable",
+      "insuranceBroker": "Courtier en assurance",
+      "propertyManager": "Gestionnaire de biens",
       "other": "Autre"
     }
   },

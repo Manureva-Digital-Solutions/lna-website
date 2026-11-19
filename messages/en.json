@@ -901,11 +901,9 @@
       "generic": "Something went wrong. Please try again."
     },
     "roles": {
-      "ceo": "CEO",
-      "cto": "CTO",
-      "vpEngineering": "VP Engineering",
-      "productManager": "Product Manager",
-      "developer": "Developer",
+      "accountant": "Accountant",
+      "insuranceBroker": "Insurance broker",
+      "propertyManager": "Property manager",
       "other": "Other"
     }
   },

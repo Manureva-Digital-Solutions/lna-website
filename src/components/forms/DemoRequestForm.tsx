@@ -26,7 +26,9 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
   const [errorMessage, setErrorMessage] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
-  const roles = Object.values(t.raw("roles") as Record<string, string>);
+  // Stable keys as values so the CRM/email payload is locale-independent;
+  // labels come from messages/en.json + messages/fr.json (ICP roles).
+  const roles = Object.entries(t.raw("roles") as Record<string, string>);
 
   function validate(form: FormData): FormErrors {
     const errs: FormErrors = {};
@@ -235,9 +237,9 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
             <option value="" disabled>
               {t("rolePlaceholder")}
             </option>
-            {roles.map((r) => (
-              <option key={r} value={r}>
-                {r}
+            {roles.map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
               </option>
             ))}
           </select>

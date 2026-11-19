@@ -28,6 +28,8 @@ export async function POST(request: Request) {
       );
     }
 
+    // Role is required above and always forwarded — never dropped from the
+    // CRM/email payload (launch-readiness: ICP role must reach the inbox).
     if (!mailConfigured()) {
       console.warn(
         "Demo request received but SMTP_HOST is not set — email NOT sent:",
@@ -38,13 +40,13 @@ export async function POST(request: Request) {
 
     const result = await sendMail({
       replyTo: { email, name },
-      subject: `Demande de démo — ${name} (${company})`,
+      subject: `Demande de démo — ${name} (${company}) · ${role}`,
       html: `
         <h2>Nouvelle demande de démo</h2>
         <p><strong>Nom:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Société:</strong> ${escapeHtml(company)}</p>
-        <p><strong>Fonction:</strong> ${escapeHtml(role)}</p>
+        <p><strong>Fonction / Role:</strong> ${escapeHtml(role)}</p>
         ${message ? `<p><strong>Message:</strong> ${escapeHtml(message)}</p>` : ""}
       `,
     });
