@@ -10,7 +10,8 @@ import { AnimateIn } from "@/components/ui/animate-in";
  * aujourd'hui : pas de badge, pas de certification non obtenue.
  *
  * LNAW-99 — frozen v4 (lna-v4-fr.html `.secb` / `.slist` / `.slinks`):
- * full-width Gray 10 · heading c1-5 · list + legal links c7-16 ·
+ * full-width Gray 10 · margin-top 96px · padding 64px 0 ·
+ * heading c1-5 · list + legal links c7-16 ·
  * isolation / audit / delete icons · navy Privacy & Terms with arrows.
  */
 const POINTS = [
@@ -26,7 +27,7 @@ export function TrustSection() {
   return (
     <Section
       data-trust-band
-      className="bg-gray-10 mt-16 pt-16! pb-16! md:mt-24 md:pt-16! md:pb-16!"
+      className="bg-gray-10 mt-24 pt-16! pb-16! md:mt-24 md:pt-16! md:pb-16!"
     >
       <Container>
         <AnimateIn>

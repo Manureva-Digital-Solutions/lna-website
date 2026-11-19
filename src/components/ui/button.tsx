@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { Link } from "@/i18n/navigation";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -30,10 +31,10 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-12 gap-4 px-4 py-[13px] has-data-[icon=inline-end]:justify-between has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
+          "h-12 gap-4 px-4 py-[13px] has-data-[icon=inline-end]:relative has-data-[icon=inline-end]:justify-start has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-end]:[&>svg]:absolute has-data-[icon=inline-end]:[&>svg]:top-1/2 has-data-[icon=inline-end]:[&>svg]:right-4 has-data-[icon=inline-end]:[&>svg]:-translate-y-1/2 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
         xs: "h-8 gap-2 px-3 text-xs [&_svg:not([class*='size-'])]:size-3",
         sm: "h-10 gap-3 px-4 text-sm [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-12 gap-4 px-4 py-[13px] text-sm has-data-[icon=inline-end]:justify-between has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
+        lg: "h-12 gap-4 px-4 py-[13px] text-sm has-data-[icon=inline-end]:relative has-data-[icon=inline-end]:justify-start has-data-[icon=inline-end]:pr-16 has-data-[icon=inline-end]:pl-4 has-data-[icon=inline-end]:[&>svg]:absolute has-data-[icon=inline-end]:[&>svg]:top-1/2 has-data-[icon=inline-end]:[&>svg]:right-4 has-data-[icon=inline-end]:[&>svg]:-translate-y-1/2 has-data-[icon=inline-start]:pl-4 has-data-[icon=inline-start]:pr-4",
         icon: "size-12 shrink-0 justify-center p-0",
         "icon-xs":
           "size-8 shrink-0 justify-center p-0 [&_svg:not([class*='size-'])]:size-3",
@@ -65,27 +66,25 @@ function Button({
   );
 }
 
-/** Button rendered as a Next.js Link — safe to use from server components. */
+/** Anchor styled as a button — real link semantics (no role="button"). */
 function LinkButton({
   href,
   className,
   variant = "default",
   size = "default",
   children,
-  nativeButton = false,
   ...props
-}: Omit<ButtonPrimitive.Props, "render"> &
+}: Omit<ComponentProps<typeof Link>, "href"> &
   VariantProps<typeof buttonVariants> & { href: string }) {
   return (
-    <ButtonPrimitive
+    <Link
+      href={href}
       data-slot="button"
-      nativeButton={nativeButton}
       className={cn(buttonVariants({ variant, size }), className)}
-      render={<Link href={href} />}
       {...props}
     >
       {children}
-    </ButtonPrimitive>
+    </Link>
   );
 }
 

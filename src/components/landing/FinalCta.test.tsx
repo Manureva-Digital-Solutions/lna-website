@@ -20,17 +20,21 @@ describe("FinalCta", () => {
     expect(band).not.toBeNull();
     expect(band).toHaveClass("bg-background");
 
-    // LinkButton is an <a role="button"> (same pattern as the hero CTA).
-    const cta = screen.getByRole("button", { name: copy.cta });
+    // Real link — frozen `.btn` padding 13/64/13/16 + absolute icon (LNAW-82).
+    const cta = screen.getByRole("link", { name: copy.cta });
     expect(cta).toHaveAttribute("href", appUrls.register);
+    expect(cta).not.toHaveAttribute("role", "button");
+    expect(cta).toHaveAttribute("data-icon", "inline-end");
     expect(cta).toHaveClass("bg-primary");
     expect(cta).toHaveClass("rounded-none");
-    // Frozen `.btn` type scale + min width; full width below 672 (LNAW-82).
+    expect(cta).toHaveClass("h-12");
     expect(cta).toHaveClass("min-w-[220px]");
     expect(cta).toHaveClass("w-full");
     expect(cta).toHaveClass("min-[672px]:w-auto");
     expect(cta).toHaveClass("text-base");
-    expect(cta).toHaveClass("px-4");
+    expect(cta).toHaveClass("py-[13px]");
+    expect(cta).toHaveClass("pl-4");
+    expect(cta).toHaveClass("pr-16");
   });
 
   it("renders matching FR copy", () => {
@@ -41,7 +45,7 @@ describe("FinalCta", () => {
       screen.getByRole("heading", { level: 2, name: copy.heading })
     ).toBeInTheDocument();
     expect(screen.getByText(copy.reassurance)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: copy.cta })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: copy.cta })).toHaveAttribute(
       "href",
       appUrls.register
     );
@@ -53,7 +57,7 @@ describe("FinalCta", () => {
 
     renderWithIntl(<FinalCta />);
     expect(
-      screen.getByRole("button", { name: en.home.finalCta.cta })
+      screen.getByRole("link", { name: en.home.finalCta.cta })
     ).toHaveAttribute("href", appUrls.register);
   });
 
@@ -62,7 +66,7 @@ describe("FinalCta", () => {
 
     const band = document.querySelector("[data-final-cta]") as HTMLElement;
     expect(within(band).getAllByRole("heading")).toHaveLength(1);
-    expect(within(band).getAllByRole("button")).toHaveLength(1);
+    expect(within(band).getAllByRole("link")).toHaveLength(1);
     expect(within(band).queryByRole("img")).toBeNull();
   });
 });

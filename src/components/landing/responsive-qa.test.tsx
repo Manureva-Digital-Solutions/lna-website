@@ -13,18 +13,21 @@ import en from "../../../messages/en.json";
 describe("LNAW-82 responsive contracts", () => {
   it("makes the hero primary CTA full width below 672px", () => {
     renderWithIntl(<Hero />);
-    const cta = screen.getByRole("button", {
+    const cta = screen.getByRole("link", {
       name: en.home.hero.ctaPrimary,
     });
     expect(cta).toHaveClass("w-full");
     expect(cta).toHaveClass("min-[672px]:w-auto");
   });
 
-  it("makes the closing CTA full width below 672px", () => {
+  it("makes the closing CTA full width below 672px with frozen icon slot", () => {
     renderWithIntl(<FinalCta />);
-    const cta = screen.getByRole("button", { name: en.home.finalCta.cta });
+    const cta = screen.getByRole("link", { name: en.home.finalCta.cta });
     expect(cta).toHaveClass("w-full");
     expect(cta).toHaveClass("min-[672px]:w-auto");
+    expect(cta).toHaveAttribute("data-icon", "inline-end");
+    expect(cta).toHaveClass("pr-16");
+    expect(cta).toHaveClass("pl-4");
   });
 
   it("hides the confidence index column below 672px", () => {

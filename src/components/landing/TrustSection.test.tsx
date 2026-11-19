@@ -20,6 +20,8 @@ describe("TrustSection", () => {
     const band = document.querySelector("[data-trust-band]");
     expect(band).not.toBeNull();
     expect(band).toHaveClass("bg-gray-10");
+    // Frozen `.secb { margin-top: 96px }` (LNAW-82 / lna-v4-fr.html).
+    expect(band).toHaveClass("mt-24");
 
     const list = within(band as HTMLElement).getByRole("list");
     const items = within(list).getAllByRole("listitem");

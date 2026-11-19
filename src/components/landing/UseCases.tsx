@@ -11,13 +11,15 @@ import { AnimateIn } from "@/components/ui/animate-in";
  * Gray 10 tiles · 1 px Gray 20 gaps · Plex Mono 01/02/03 · 20 px titles ·
  * Gray 70 body · no arrows · 3 cols ≥1056 · stack below.
  * Top padding 0 — previous `.sect` bottom already supplies the band gap.
+ * No bottom pad — frozen `.sect` is `padding:96px 0 0`; `.secb` supplies
+ * the 96px white gap via `margin-top`.
  */
 const CASES = ["adp", "health", "condo"] as const;
 
 export function UseCases() {
   const t = useTranslations("home.useCases");
   return (
-    <Section className="pt-0! pb-16 md:pt-0! md:pb-24">
+    <Section className="pt-0! pb-0! md:pt-0! md:pb-0!">
       <Container>
         <AnimateIn>
           <h2 className="text-h2 text-foreground mb-8 md:mb-12">
