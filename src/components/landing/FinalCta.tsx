@@ -41,7 +41,7 @@ export function FinalCta() {
             <LinkButton
               size="lg"
               href={appUrls.register}
-              className="min-w-[220px] justify-center gap-3 px-4 py-[13px] text-base leading-[22px]"
+              className="w-full min-w-[220px] justify-center gap-3 px-4 py-[13px] text-base leading-[22px] min-[672px]:w-auto"
             >
               {t("cta")}
               <ArrowRight className="size-4 shrink-0" aria-hidden="true" />

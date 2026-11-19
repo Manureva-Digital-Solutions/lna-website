@@ -116,34 +116,32 @@ export function ConfidenceGrid() {
     low: t("levelLow"),
   };
 
+  // Cell chrome — frozen `.dt` densifies ≤672 (6px pad, 11.5px type, hide #).
+  const cellPad =
+    "h-16 px-4 align-middle max-[671px]:h-[60px] max-[671px]:px-1.5";
+  const headPad = "h-12 px-4 align-middle font-semibold max-[671px]:px-1.5";
+
   return (
     <div
       data-confidence-grid
       className="bg-background max-w-full overflow-hidden rounded-none shadow-none"
     >
-      <div className="max-w-full overflow-x-auto">
-        <table className="w-full min-w-[36rem] border-collapse text-left text-sm tabular-nums">
+      <div className="max-w-full overflow-x-auto max-[671px]:overflow-x-hidden">
+        <table className="w-full min-w-0 border-collapse text-left text-sm tabular-nums max-[671px]:table-fixed max-[671px]:text-[11.5px] min-[672px]:min-w-[36rem]">
           <caption className="sr-only">{t("tableCaption")}</caption>
           <thead>
             <tr className="bg-gray-20 text-foreground">
-              <th scope="col" className="h-12 px-4 align-middle font-semibold">
+              <th scope="col" className={`${headPad} max-[671px]:hidden`}>
                 {t("colIndex")}
               </th>
-              <th scope="col" className="h-12 px-4 align-middle font-semibold">
+              <th scope="col" className={headPad}>
                 {t("colRowKey")}
               </th>
-              <th
-                scope="col"
-                className="h-12 px-4 text-right align-middle font-semibold"
-              >
+              <th scope="col" className={`${headPad} text-right`}>
                 {t("colConf")}
               </th>
               {COLUMNS.map((col) => (
-                <th
-                  key={col}
-                  scope="col"
-                  className="h-12 px-4 align-middle font-semibold"
-                >
+                <th key={col} scope="col" className={headPad}>
                   {col}
                 </th>
               ))}
@@ -152,16 +150,20 @@ export function ConfidenceGrid() {
           <tbody>
             {ROWS.map((row, i) => (
               <tr key={row.labelKey}>
-                <td className="border-gray-20 bg-gray-10 text-muted-foreground h-16 border-t px-4 align-middle font-mono text-[13px]">
+                <td
+                  className={`border-gray-20 bg-gray-10 text-muted-foreground border-t font-mono text-[13px] max-[671px]:hidden ${cellPad}`}
+                >
                   {i + 1}
                 </td>
                 <th
                   scope="row"
-                  className="border-gray-20 bg-gray-10 text-foreground h-16 border-t px-4 text-left align-middle font-semibold"
+                  className={`border-gray-20 bg-gray-10 text-foreground border-t text-left font-semibold ${cellPad}`}
                 >
                   {g(row.labelKey)}
                 </th>
-                <td className="border-gray-20 bg-gray-10 h-16 border-t px-4 text-right align-middle font-mono">
+                <td
+                  className={`border-gray-20 bg-gray-10 border-t text-right font-mono ${cellPad}`}
+                >
                   {new Intl.NumberFormat(locale, {
                     style: "percent",
                     maximumFractionDigits: 0,
@@ -172,17 +174,17 @@ export function ConfidenceGrid() {
                   return (
                     <td
                       key={row.labelKey + "-" + j}
-                      className="border-gray-20 bg-gray-10 h-16 border-t px-4 align-middle"
+                      className={`border-gray-20 bg-gray-10 border-t ${cellPad}`}
                     >
                       <span className="flex flex-col">
                         <span className="font-mono leading-5">
                           {fmt(cell.value, row.format)}
                         </span>
-                        <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4">
+                        <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4 max-[671px]:gap-1 max-[671px]:text-[10.5px]">
                           <StatusShape level={level} />
                           {levelLabel[level]}
                           {cell.score < REVIEW_THRESHOLD ? (
-                            <span className="text-status-low ml-0.5 font-mono text-[11.5px] font-semibold">
+                            <span className="text-status-low ml-0.5 font-mono text-[11.5px] font-semibold max-[671px]:mt-0.5 max-[671px]:ml-0 max-[671px]:block max-[671px]:text-[10px]">
                               {reviewMarker}
                             </span>
                           ) : null}
@@ -196,14 +198,16 @@ export function ConfidenceGrid() {
           </tbody>
         </table>
       </div>
-      <ul className="bg-background text-muted-foreground border-gray-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t px-4 py-3 text-xs">
+      <ul className="bg-background text-muted-foreground border-gray-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t px-4 py-3 text-xs max-[671px]:gap-x-3">
         {(["high", "medium", "low"] as const).map((level) => (
           <li key={level} className="inline-flex items-center gap-1.5">
             <StatusShape level={level} />
             {levelLabel[level]}
           </li>
         ))}
-        <li className="ml-auto font-mono">{t("reviewLegend")}</li>
+        <li className="ml-auto font-mono max-[671px]:ml-0">
+          {t("reviewLegend")}
+        </li>
       </ul>
     </div>
   );

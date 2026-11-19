@@ -28,11 +28,11 @@ export function Hero() {
             </p>
           </AnimateIn>
           <AnimateIn delay={0.1}>
-            <div className="flex flex-col items-start gap-2">
+            <div className="flex w-full flex-col items-stretch gap-2 min-[672px]:items-start">
               <LinkButton
                 size="lg"
                 href={appUrls.register}
-                className="gap-2 px-4"
+                className="w-full gap-2 px-4 min-[672px]:w-auto"
               >
                 {t("ctaPrimary")}
                 <ArrowRight aria-hidden="true" />
@@ -41,7 +41,7 @@ export function Hero() {
                 variant="ghost"
                 nativeButton={false}
                 render={<a href="#steps" />}
-                className="text-primary ml-3 h-auto justify-start gap-2 border-0 px-0 py-1 font-normal shadow-none hover:bg-transparent"
+                className="text-primary h-auto justify-start gap-2 border-0 px-0 py-1 font-normal shadow-none hover:bg-transparent min-[672px]:ml-3"
               >
                 {tSteps("heading")}
                 <ArrowDown className="size-4" aria-hidden="true" />

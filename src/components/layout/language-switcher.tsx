@@ -65,7 +65,7 @@ export function LanguageSwitcher() {
   return (
     <div
       className={cn(
-        "text-muted-foreground inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap",
+        "text-muted-foreground inline-flex h-8 shrink-0 items-center gap-1.5 text-sm leading-none whitespace-nowrap",
         isPending && "pointer-events-none opacity-60"
       )}
       role="radiogroup"
@@ -76,11 +76,11 @@ export function LanguageSwitcher() {
         aria-hidden="true"
         strokeWidth={1.75}
       />
-      <div className="inline-flex items-center gap-1">
+      <div className="inline-flex h-full items-center gap-1">
         {orderedLocales.map((loc, index) => (
           <span key={loc} className="inline-flex items-center gap-1">
             {index > 0 && (
-              <span className="text-gray-30" aria-hidden="true">
+              <span className="text-gray-30 leading-none" aria-hidden="true">
                 |
               </span>
             )}
@@ -90,7 +90,7 @@ export function LanguageSwitcher() {
               aria-checked={loc === locale}
               onClick={() => switchLocale(loc)}
               className={cn(
-                "hover:text-foreground rounded-none px-0.5 transition-colors",
+                "hover:text-foreground inline-flex h-8 items-center rounded-none px-0.5 leading-none transition-colors",
                 loc === locale
                   ? "text-foreground font-semibold"
                   : "text-muted-foreground font-normal"

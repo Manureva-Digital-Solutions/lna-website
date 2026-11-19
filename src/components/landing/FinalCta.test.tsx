@@ -25,8 +25,10 @@ describe("FinalCta", () => {
     expect(cta).toHaveAttribute("href", appUrls.register);
     expect(cta).toHaveClass("bg-primary");
     expect(cta).toHaveClass("rounded-none");
-    // Frozen `.btn` type scale + min width; trailing icon sits tight after label.
+    // Frozen `.btn` type scale + min width; full width below 672 (LNAW-82).
     expect(cta).toHaveClass("min-w-[220px]");
+    expect(cta).toHaveClass("w-full");
+    expect(cta).toHaveClass("min-[672px]:w-auto");
     expect(cta).toHaveClass("text-base");
     expect(cta).toHaveClass("px-4");
   });
