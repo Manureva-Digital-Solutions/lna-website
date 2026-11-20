@@ -156,14 +156,18 @@ export function HeroExcelWindow() {
         ))}
       </div>
 
-      {/* Formula bar */}
-      <div className="border-border flex items-center gap-1.5 border-b px-1.5 py-0.5 text-[9px] sm:text-[10px]">
-        <span className="border-border bg-background text-foreground inline-flex h-5 min-w-7 items-center justify-center border px-1 font-mono">
-          D2
+      {/* Formula bar — frozen `.xl-fx`: nb | fx | fv */}
+      <div className="border-border flex h-[30px] items-center border-b text-[9px] sm:text-[12.5px]">
+        <span className="border-border text-foreground inline-flex h-full w-12 shrink-0 items-center border-r px-2 font-mono sm:w-[72px]">
+          {x("formulaRef")}
         </span>
-        <span className="border-border bg-background text-foreground flex h-5 min-w-0 flex-1 items-center overflow-hidden border px-1.5 font-mono">
-          <span className="text-status-low shrink-0">{reviewMarker}</span>
-          <span className="text-foreground ml-1 truncate">{formulaReview}</span>
+        <span className="border-border text-muted-foreground inline-flex h-full shrink-0 items-center border-r px-2 italic sm:px-2.5">
+          {x("formulaFx")}
+        </span>
+        <span className="text-foreground flex h-full min-w-0 flex-1 items-center overflow-hidden px-2 font-mono sm:px-2.5">
+          {/* Formula bar only: [REVIEW] stays foreground black (cells keep red). */}
+          <span className="text-foreground shrink-0">{reviewMarker}</span>
+          <span className="ml-1 truncate">{formulaReview}</span>
         </span>
       </div>
 
@@ -210,12 +214,19 @@ export function HeroExcelWindow() {
 
             {dataRows.map((row, rowIdx) => {
               const excelRow = rowIdx + 2;
+              // Frozen ≤672: review rows (2, 4) get extra height for stacked [REVIEW].
+              const reviewRow = excelRow === 2 || excelRow === 4;
               return (
                 <tr key={row.label}>
                   <th className="border-border text-muted-foreground bg-gray-10 border-r border-b px-0.5 py-0.5 text-center font-normal">
                     {excelRow}
                   </th>
-                  <td className="border-border text-foreground border-r border-b px-1 py-0.5 font-semibold">
+                  <td
+                    className={cn(
+                      "border-border text-foreground border-r border-b px-1 py-0.5 font-semibold",
+                      reviewRow && "max-sm:h-9"
+                    )}
+                  >
                     {row.label}
                   </td>
                   {row.cells.map((cell, i) => {
@@ -225,6 +236,7 @@ export function HeroExcelWindow() {
                         key={`${row.label}-${i}`}
                         className={cn(
                           "border-border border-r border-b px-1 py-0.5 text-right",
+                          reviewRow && "max-sm:h-9",
                           i >= 3 && "hidden sm:table-cell",
                           isSelected &&
                             "outline-excel-green outline outline-2 -outline-offset-2"
@@ -238,19 +250,22 @@ export function HeroExcelWindow() {
               );
             })}
 
-            {/* Empty rows 5–12 for the sober window height */}
+            {/* Empty rows 5–12; hide 9–12 at ≤672 (frozen `.xl tr:nth-child(n+10)`). */}
             {Array.from({ length: 8 }, (_, i) => {
               const excelRow = i + 5;
               return (
-                <tr key={`empty-${excelRow}`}>
-                  <th className="border-border text-muted-foreground bg-gray-10 border-r border-b px-0.5 py-0.5 text-center font-normal">
+                <tr
+                  key={`empty-${excelRow}`}
+                  className={cn(excelRow >= 9 && "max-sm:hidden")}
+                >
+                  <th className="border-border text-muted-foreground bg-gray-10 h-[26px] border-r border-b px-0.5 py-0.5 text-center font-normal sm:h-[30px]">
                     {excelRow}
                   </th>
                   {colLetters.map((_, colIdx) => (
                     <td
                       key={`e-${excelRow}-${colIdx}`}
                       className={cn(
-                        "border-border border-r border-b px-1 py-0.5",
+                        "border-border h-[26px] border-r border-b px-1 py-0.5 sm:h-[30px]",
                         colIdx >= 4 && "hidden sm:table-cell"
                       )}
                     />
@@ -285,8 +300,10 @@ function CellContent({
     return <span className="text-foreground">{cell.value}</span>;
   }
   return (
-    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1">
-      <span className="text-status-low font-mono">{reviewMarker}</span>
+    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1 max-sm:flex-col max-sm:items-end max-sm:gap-0">
+      <span className="text-status-low font-mono text-[9px] leading-tight sm:text-[11.5px]">
+        {reviewMarker}
+      </span>
       <span className="text-foreground">{cell.value}</span>
     </span>
   );

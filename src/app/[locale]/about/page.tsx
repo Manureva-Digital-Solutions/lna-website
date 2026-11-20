@@ -96,7 +96,11 @@ export default async function AboutPage({
             <AnimateIn delay={0.2}>
               <div className="border-border bg-gray-10 flex items-center justify-center rounded-none border p-8">
                 <Image
-                  src="/illustrations/workflow-diagram.svg"
+                  src={
+                    locale === "fr"
+                      ? "/illustrations/workflow-diagram-fr.svg"
+                      : "/illustrations/workflow-diagram.svg"
+                  }
                   alt={t("problem.imageAlt")}
                   width={480}
                   height={360}

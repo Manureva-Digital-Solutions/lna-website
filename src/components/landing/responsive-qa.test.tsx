@@ -37,6 +37,13 @@ describe("LNAW-82 responsive contracts", () => {
     );
   });
 
+  it("puts the confidence review legend on its own row below 672px", () => {
+    renderWithIntl(<ConfidenceGrid />);
+    const legend = screen.getByText(en.home.bands.confidence.reviewLegend);
+    expect(legend.className).toMatch(/max-\[671px\]:basis-full/);
+    expect(legend.className).toMatch(/max-\[671px\]:ml-0/);
+  });
+
   it("keeps [REVIEW] markers readable in the confidence grid", () => {
     renderWithIntl(<ConfidenceGrid />);
     expect(screen.getAllByText("[REVIEW]").length).toBeGreaterThanOrEqual(2);

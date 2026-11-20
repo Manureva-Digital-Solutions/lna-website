@@ -119,8 +119,9 @@ export function ConfidenceGrid() {
 
   // Cell chrome — frozen `.dt` densifies ≤672 (6px pad, 11.5px type, hide #).
   const cellPad =
-    "h-16 px-4 align-middle max-[671px]:h-[60px] max-[671px]:px-1.5";
-  const headPad = "h-12 px-4 align-middle font-semibold max-[671px]:px-1.5";
+    "h-16 px-4 align-middle max-[671px]:h-[60px] max-[671px]:px-1.5 max-[671px]:align-top max-[671px]:pt-2";
+  const headPad =
+    "h-12 px-4 align-middle font-semibold max-[671px]:h-10 max-[671px]:px-1 max-[671px]:text-[10px] max-[671px]:leading-tight";
 
   return (
     <div
@@ -142,7 +143,12 @@ export function ConfidenceGrid() {
                 {t("colConf")}
               </th>
               {DEMO_ISSUERS.map((col) => (
-                <th key={col} scope="col" className={headPad}>
+                <th
+                  key={col}
+                  scope="col"
+                  title={col}
+                  className={`${headPad} max-[671px]:truncate`}
+                >
                   {col}
                 </th>
               ))}
@@ -177,13 +183,15 @@ export function ConfidenceGrid() {
                       key={row.labelKey + "-" + j}
                       className={`border-gray-20 bg-gray-10 border-t ${cellPad}`}
                     >
-                      <span className="flex flex-col">
-                        <span className="font-mono leading-5">
+                      <span className="flex min-w-0 flex-col">
+                        <span className="font-mono leading-5 max-[671px]:truncate max-[671px]:text-[11px] max-[671px]:leading-4">
                           {fmt(cell.value, row.format)}
                         </span>
-                        <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4 max-[671px]:gap-1 max-[671px]:text-[10.5px]">
+                        <span className="text-muted-foreground inline-flex flex-wrap items-center gap-1.5 text-xs leading-4 max-[671px]:gap-0.5 max-[671px]:text-[9.5px]">
                           <StatusShape level={level} />
-                          {levelLabel[level]}
+                          <span className="max-[671px]:leading-tight">
+                            {levelLabel[level]}
+                          </span>
                           {cell.score < REVIEW_THRESHOLD ? (
                             <span className="text-status-low ml-0.5 font-mono text-[11.5px] font-semibold max-[671px]:mt-0.5 max-[671px]:ml-0 max-[671px]:block max-[671px]:text-[10px]">
                               {reviewMarker}
@@ -199,14 +207,14 @@ export function ConfidenceGrid() {
           </tbody>
         </table>
       </div>
-      <ul className="bg-background text-muted-foreground border-gray-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t px-4 py-3 text-xs max-[671px]:gap-x-3">
+      <ul className="bg-background text-muted-foreground border-gray-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t px-4 py-3 text-xs max-[671px]:gap-x-3 max-[671px]:px-3">
         {(["high", "medium", "low"] as const).map((level) => (
           <li key={level} className="inline-flex items-center gap-1.5">
             <StatusShape level={level} />
             {levelLabel[level]}
           </li>
         ))}
-        <li className="ml-auto font-mono max-[671px]:ml-0">
+        <li className="ml-auto font-mono max-[671px]:ml-0 max-[671px]:basis-full max-[671px]:pt-1">
           {t("reviewLegend")}
         </li>
       </ul>
