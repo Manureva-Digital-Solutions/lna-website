@@ -75,7 +75,7 @@ export function BenefitBands() {
               <h3 className="text-h3 text-foreground mb-4">
                 {t("confidence.heading")}
               </h3>
-              <p className="text-body text-muted-foreground mb-8 max-w-[480px]">
+              <p className="text-body text-muted-foreground mb-4 max-w-[480px] max-[671px]:mb-3 min-[1056px]:mb-8">
                 {t("confidence.body")}
               </p>
               <Link
@@ -86,7 +86,7 @@ export function BenefitBands() {
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
             </div>
-            <div className="bg-gray-10 min-w-0 p-4 max-[1056px]:mt-8 max-[672px]:-mx-4 min-[1056px]:col-span-11 min-[1313px]:p-12 md:p-8">
+            <div className="bg-gray-10 min-w-0 p-4 max-[1056px]:mt-4 max-[672px]:-mx-4 max-[671px]:mt-3 min-[1056px]:col-span-11 min-[1056px]:mt-0 min-[1313px]:p-12 md:p-8">
               <ConfidenceGrid />
             </div>
           </div>

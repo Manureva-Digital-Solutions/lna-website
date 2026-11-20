@@ -52,8 +52,7 @@ describe("Footer", () => {
     expect(footer).toHaveClass("text-gray-30");
 
     const cols = footer.querySelector("[data-footer-link-cols]") as HTMLElement;
-    expect(cols).toHaveClass("min-[768px]:grid-cols-2");
-    expect(cols).toHaveClass("min-[1024px]:grid-cols-3");
+    expect(cols).toHaveClass("contents");
 
     const copy = en.footer;
     expect(screen.getByText(copy.description)).toBeInTheDocument();
@@ -67,6 +66,21 @@ describe("Footer", () => {
     expect(
       screen.getByRole("heading", { name: copy.legal })
     ).toBeInTheDocument();
+
+    const product = screen.getByRole("heading", { name: copy.product })
+      .parentElement as HTMLElement;
+    const company = screen.getByRole("heading", { name: copy.company })
+      .parentElement as HTMLElement;
+    const legal = screen.getByRole("heading", { name: copy.legal })
+      .parentElement as HTMLElement;
+    // Frozen v4: Product c9-11, Company c11-13, Legal c13-17; ≤671 Product|Company span-2.
+    expect(product.className).toMatch(/min-\[1056px\]:col-start-9/);
+    expect(product.className).toMatch(/min-\[1056px\]:col-span-2/);
+    expect(company.className).toMatch(/min-\[1056px\]:col-start-11/);
+    expect(legal.className).toMatch(/min-\[1056px\]:col-start-13/);
+    expect(legal.className).toMatch(/col-span-full/);
+    expect(product.className).toMatch(/col-span-2/);
+    expect(company.className).toMatch(/col-span-2/);
 
     expect(screen.getByRole("link", { name: copy.features })).toHaveAttribute(
       "href",

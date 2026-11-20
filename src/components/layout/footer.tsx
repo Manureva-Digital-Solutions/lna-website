@@ -8,6 +8,7 @@ import { FooterLanguageSwitcher } from "@/components/layout/language-switcher";
 import { openCookiePreferences } from "@/components/integrations/CookieConsent";
 import { useTranslations } from "next-intl";
 import { appUrls } from "@/lib/app-urls";
+import { cn } from "@/lib/utils";
 
 type FooterLink = {
   href: string;
@@ -16,11 +17,11 @@ type FooterLink = {
 };
 
 /**
- * LNAW-94 — frozen v4 footer (lna-v4-fr.html `.foot`):
- * Gray 100 · ftop brand+langsel · fcols newsletter+link cols · fbot legal strip
- * with Cookie settings wired to openCookiePreferences.
+ * LNAW-94 / LNAW-114 / LNAW-115 — frozen v4 footer (lna-v4-fr.html `.foot`):
+ * Gray 100 · ftop brand+langsel · fcols newsletter + Product c9-11 /
+ * Company c11-13 / Legal c13-17 · fbot legal strip.
  *
- * Link columns: 1-col <768 · 2-col ≥768 · 3-col ≥1024 (desktop keeps 3 beside newsletter).
+ * Mobile ≤671: Product + Company side-by-side (span 2), Legal full width.
  */
 export function Footer() {
   const t = useTranslations("footer");
@@ -66,9 +67,9 @@ export function Footer() {
         </Container>
       </div>
 
-      {/* Columns: newsletter + Product / Company / Legal */}
+      {/* Columns: newsletter c1-6 + Product c9-11 / Company c11-13 / Legal c13-17 */}
       <div className="pt-10 pb-12">
-        <Container grid className="gap-y-10">
+        <Container grid className="items-start gap-y-0">
           <div className="col-span-full min-[1056px]:col-span-6">
             <label
               htmlFor="footer-newsletter-email"
@@ -79,16 +80,21 @@ export function Footer() {
             <NewsletterForm />
           </div>
 
-          <nav
-            data-footer-link-cols
-            className="col-span-full grid grid-cols-1 gap-x-8 gap-y-10 min-[768px]:grid-cols-2 min-[1024px]:grid-cols-3 min-[1056px]:col-span-8 min-[1056px]:col-start-9"
-          >
-            <FooterColumn title={t("product")} links={productLinks} />
-            <FooterColumn title={t("company")} links={companyLinks} />
+          <nav data-footer-link-cols className="contents">
+            <FooterColumn
+              title={t("product")}
+              links={productLinks}
+              className="col-span-2 mt-8 min-[672px]:col-span-4 min-[1056px]:col-span-2 min-[1056px]:col-start-9 min-[1056px]:mt-0"
+            />
+            <FooterColumn
+              title={t("company")}
+              links={companyLinks}
+              className="col-span-2 mt-8 min-[672px]:col-span-4 min-[1056px]:col-span-2 min-[1056px]:col-start-11 min-[1056px]:mt-0"
+            />
             <FooterColumn
               title={t("legal")}
               links={legalLinks}
-              className="min-[768px]:max-[1023px]:col-span-2"
+              className="col-span-full mt-8 min-[672px]:col-span-4 min-[1056px]:col-span-4 min-[1056px]:col-start-13 min-[1056px]:mt-0"
             />
           </nav>
         </Container>
@@ -130,7 +136,7 @@ function FooterColumn({
   className?: string;
 }) {
   return (
-    <div className={className}>
+    <div className={cn(className)} data-footer-col>
       <h4 className="mb-4 text-sm font-semibold text-white">{title}</h4>
       <ul className="grid gap-3">
         {links.map((link) => (

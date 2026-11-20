@@ -69,7 +69,7 @@ export function NewsletterForm() {
 
   return (
     <form
-      className="flex max-w-[420px]"
+      className="flex w-full max-w-[420px] max-[671px]:max-w-none"
       onSubmit={handleSubmit}
       noValidate
       data-newsletter
