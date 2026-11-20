@@ -2,6 +2,11 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import {
+  DEMO_CONFIDENCE,
+  DEMO_FILLED,
+  DEMO_ISSUERS,
+} from "@/components/landing/visuals/demo-sheet-data";
 
 type Cell =
   | { kind: "text"; value: string }
@@ -10,7 +15,8 @@ type Cell =
 
 /**
  * Sober HTML Excel window for the homepage hero (LNAW-87).
- * Values match existing site illustrations (Generali / April / MetLife).
+ * Columns/values come from the shared fictional ADP demo set
+ * (`demo-sheet-data.ts`) so hero, bands and PDF stack stay consistent.
  * Chrome labels follow the page locale (LNA-252).
  */
 export function HeroExcelWindow() {
@@ -49,20 +55,33 @@ export function HeroExcelWindow() {
   // Row 1 = header; rows 2–4 = data; 5–12 empty. E/F stay empty (hide on small screens).
   const headerCells: Cell[] = [
     { kind: "text", value: g("colGuarantee") },
-    { kind: "text", value: "Generali" },
-    { kind: "text", value: "April" },
-    { kind: "text", value: "MetLife" },
+    { kind: "text", value: DEMO_ISSUERS[0] },
+    { kind: "text", value: DEMO_ISSUERS[1] },
+    { kind: "text", value: DEMO_ISSUERS[2] },
     { kind: "empty" },
     { kind: "empty" },
   ];
+
+  const rateCell = (i: number): Cell =>
+    DEMO_CONFIDENCE.rate[i] < 0.6
+      ? { kind: "review", value: pct(DEMO_FILLED.rate[i]) }
+      : { kind: "text", value: pct(DEMO_FILLED.rate[i]) };
+  const costCell = (i: number): Cell => ({
+    kind: "text",
+    value: eur(DEMO_FILLED.totalCost[i]),
+  });
+  const quotaCell = (i: number): Cell =>
+    DEMO_CONFIDENCE.quota[i] < 0.6
+      ? { kind: "review", value: pct(DEMO_FILLED.quota[i], 0) }
+      : { kind: "text", value: pct(DEMO_FILLED.quota[i], 0) };
 
   const dataRows: { label: string; cells: Cell[] }[] = [
     {
       label: g("rowRate"),
       cells: [
-        { kind: "text", value: pct(0.34) },
-        { kind: "text", value: pct(0.29) },
-        { kind: "review", value: pct(0.41) },
+        rateCell(0),
+        rateCell(1),
+        rateCell(2),
         { kind: "empty" },
         { kind: "empty" },
       ],
@@ -70,9 +89,9 @@ export function HeroExcelWindow() {
     {
       label: g("rowTotalCost"),
       cells: [
-        { kind: "text", value: eur(4218) },
-        { kind: "text", value: eur(3640) },
-        { kind: "text", value: eur(5102) },
+        costCell(0),
+        costCell(1),
+        costCell(2),
         { kind: "empty" },
         { kind: "empty" },
       ],
@@ -80,16 +99,16 @@ export function HeroExcelWindow() {
     {
       label: g("rowQuota"),
       cells: [
-        { kind: "text", value: pct(100, 0) },
-        { kind: "review", value: pct(50, 0) },
-        { kind: "text", value: pct(100, 0) },
+        quotaCell(0),
+        quotaCell(1),
+        quotaCell(2),
         { kind: "empty" },
         { kind: "empty" },
       ],
     },
   ];
 
-  const formulaReview = pct(0.41);
+  const formulaReview = pct(DEMO_FILLED.rate[2]);
 
   return (
     <div

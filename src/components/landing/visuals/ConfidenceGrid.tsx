@@ -1,4 +1,9 @@
 import { useTranslations, useLocale } from "next-intl";
+import {
+  DEMO_CONFIDENCE,
+  DEMO_FILLED,
+  DEMO_ISSUERS,
+} from "@/components/landing/visuals/demo-sheet-data";
 
 /** Bandes visuelles de la grille d'étape 3 de l'app. */
 const HIGH = 0.8;
@@ -54,38 +59,33 @@ interface Row {
   cells: readonly Cell[];
 }
 
-const COLUMNS = ["Generali", "April", "MetLife"] as const;
-
 const ROWS: readonly Row[] = [
   {
     labelKey: "rowRate",
     format: "pct",
-    confidence: 0.91,
-    cells: [
-      { value: 0.34, score: 0.93 },
-      { value: 0.29, score: 0.71 },
-      { value: 0.41, score: 0.42 },
-    ],
+    confidence: DEMO_CONFIDENCE.row[0],
+    cells: DEMO_ISSUERS.map((_, i) => ({
+      value: DEMO_FILLED.rate[i],
+      score: DEMO_CONFIDENCE.rate[i],
+    })),
   },
   {
     labelKey: "rowTotalCost",
     format: "eur",
-    confidence: 0.86,
-    cells: [
-      { value: 4218, score: 0.91 },
-      { value: 3640, score: 0.82 },
-      { value: 5102, score: 0.88 },
-    ],
+    confidence: DEMO_CONFIDENCE.row[1],
+    cells: DEMO_ISSUERS.map((_, i) => ({
+      value: DEMO_FILLED.totalCost[i],
+      score: DEMO_CONFIDENCE.totalCost[i],
+    })),
   },
   {
     labelKey: "rowQuota",
     format: "pct",
-    confidence: 0.64,
-    cells: [
-      { value: 100, score: 0.88 },
-      { value: 50, score: 0.48 },
-      { value: 100, score: 0.86 },
-    ],
+    confidence: DEMO_CONFIDENCE.row[2],
+    cells: DEMO_ISSUERS.map((_, i) => ({
+      value: DEMO_FILLED.quota[i],
+      score: DEMO_CONFIDENCE.quota[i],
+    })),
   },
 ];
 
@@ -93,6 +93,7 @@ const ROWS: readonly Row[] = [
  * Carbon data table (lna-v4-fr.html `.dt`): white card on Gray 10 stage.
  * Header Gray 20 / 48px · rows Gray 10 / 64px · value stacked over status.
  * Legend footer white; `[REVIEW]` note right-aligned.
+ * Columns match the shared fictional ADP demo set.
  */
 export function ConfidenceGrid() {
   const t = useTranslations("home.bands.confidence");
@@ -140,7 +141,7 @@ export function ConfidenceGrid() {
               <th scope="col" className={`${headPad} text-right`}>
                 {t("colConf")}
               </th>
-              {COLUMNS.map((col) => (
+              {DEMO_ISSUERS.map((col) => (
                 <th key={col} scope="col" className={headPad}>
                   {col}
                 </th>
@@ -209,6 +210,9 @@ export function ConfidenceGrid() {
           {t("reviewLegend")}
         </li>
       </ul>
+      <p className="text-muted-foreground border-gray-20 border-t px-4 py-2 text-[11px] leading-4">
+        {t("provenance")}
+      </p>
     </div>
   );
 }
