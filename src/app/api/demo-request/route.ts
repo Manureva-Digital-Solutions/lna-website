@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { mailConfigured, escapeHtml, sendMail } from "@/lib/mailer";
+import {
+  isDemoRequestRole,
+  sanitizeEmailSubjectPart,
+} from "@/lib/demo-request-roles";
 
 interface DemoRequestBody {
   name: string;
@@ -21,6 +25,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isDemoRequestRole(role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
         { error: "Invalid email address" },
@@ -28,19 +36,24 @@ export async function POST(request: Request) {
       );
     }
 
+    const safeName = sanitizeEmailSubjectPart(name);
+    const safeCompany = sanitizeEmailSubjectPart(company);
+    // Role is allowlisted above — still sanitize for subject hygiene.
+    const safeRole = sanitizeEmailSubjectPart(role);
+
     // Role is required above and always forwarded — never dropped from the
     // CRM/email payload (launch-readiness: ICP role must reach the inbox).
     if (!mailConfigured()) {
       console.warn(
         "Demo request received but SMTP_HOST is not set — email NOT sent:",
-        { name, email, company, role, message }
+        { name: safeName, email, company: safeCompany, role: safeRole, message }
       );
       return NextResponse.json({ success: true, delivered: false });
     }
 
     const result = await sendMail({
-      replyTo: { email, name },
-      subject: `Demande de démo — ${name} (${company}) · ${role}`,
+      replyTo: { email, name: safeName },
+      subject: `Demande de démo — ${safeName} (${safeCompany}) · ${safeRole}`,
       html: `
         <h2>Nouvelle demande de démo</h2>
         <p><strong>Nom:</strong> ${escapeHtml(name)}</p>

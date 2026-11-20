@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEMO_REQUEST_ROLES } from "@/lib/demo-request-roles";
+import en from "../../../../messages/en.json";
+import fr from "../../../../messages/fr.json";
 
 const sendMail = vi.fn();
 const mailConfigured = vi.fn();
@@ -19,6 +22,15 @@ describe("POST /api/demo-request", () => {
     vi.resetModules();
     sendMail.mockReset();
     mailConfigured.mockReset();
+  });
+
+  it("keeps the server allowlist in sync with demoForm.roles catalogs", () => {
+    expect([...DEMO_REQUEST_ROLES].sort()).toEqual(
+      Object.keys(en.demoForm.roles).sort()
+    );
+    expect(Object.keys(fr.demoForm.roles).sort()).toEqual(
+      Object.keys(en.demoForm.roles).sort()
+    );
   });
 
   it("includes the submitted role in the email subject and body", async () => {
@@ -49,6 +61,54 @@ describe("POST /api/demo-request", () => {
     expect(arg.subject).toContain("accountant");
     expect(arg.html).toContain("accountant");
     expect(arg.html).toContain("Fonction / Role");
+  });
+
+  it("rejects roles outside the ICP allowlist", async () => {
+    mailConfigured.mockReturnValue(true);
+
+    const { POST } = await import("./route");
+    const res = await POST(
+      new Request("http://localhost/api/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Sam",
+          email: "sam@broker.fr",
+          company: "Courtage Sam",
+          role: "ceo\nBcc: evil@x.com",
+        }),
+      })
+    );
+
+    expect(res.status).toBe(400);
+    expect(sendMail).not.toHaveBeenCalled();
+    await expect(res.json()).resolves.toEqual({ error: "Invalid role" });
+  });
+
+  it("strips line breaks from the email subject parts", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await import("./route");
+    const res = await POST(
+      new Request("http://localhost/api/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Léa\nMartin",
+          email: "lea@example.fr",
+          company: "Cabinet\r\nMartin",
+          role: "propertyManager",
+        }),
+      })
+    );
+
+    expect(res.status).toBe(200);
+    const arg = sendMail.mock.calls[0][0] as { subject: string };
+    expect(arg.subject).not.toMatch(/[\r\n]/);
+    expect(arg.subject).toContain("Léa Martin");
+    expect(arg.subject).toContain("Cabinet Martin");
+    expect(arg.subject).toContain("propertyManager");
   });
 
   it("still records the role when SMTP is not configured", async () => {
