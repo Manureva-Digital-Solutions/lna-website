@@ -12,7 +12,6 @@ import { LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
-import { VideoEmbed } from "@/components/media/VideoEmbed";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { pageAlternates } from "@/lib/seo";
 
@@ -140,11 +139,6 @@ export default async function FeaturesPage({
                 {t("userManagement.label")}
               </a>
             </nav>
-          </AnimateIn>
-          <AnimateIn delay={0.4}>
-            <div className="mx-auto mt-12 max-w-4xl">
-              <VideoEmbed src="dQw4w9WgXcQ" title={t("videoTitle")} />
-            </div>
           </AnimateIn>
         </Container>
       </Section>
