@@ -1,21 +1,25 @@
 import { useTranslations } from "next-intl";
 import { PdfStack } from "@/components/landing/visuals/PdfStack";
+import { DEMO_SOURCE_DOCS } from "@/components/landing/visuals/demo-sheet-data";
 
 /**
- * Tile 2 — six example PDFs from the frozen crop (product-style FR filenames)
- * with locale type labels.
+ * Tile 2 — source PDFs for the shared ADP comparison demo
+ * (same fictional issuers as the hero / before-after / confidence sheet).
  */
 export function RoleClassification() {
   const t = useTranslations("home.bands.mixed");
 
-  const docs = [
-    { name: "devis-generali-2026.pdf", role: t("roleAdp") },
-    { name: "devis-april-2026.pdf", role: t("roleAdp") },
-    { name: "amortissement-pret.pdf", role: t("roleAmortization") },
-    { name: "devis-sante-malakoff.pdf", role: t("roleHealth") },
-    { name: "conditions-generales.pdf", role: t("roleContract") },
-    { name: "releve-bancaire.pdf", role: t("roleOther") },
-  ];
+  const docs = DEMO_SOURCE_DOCS.map((doc) => ({
+    name: doc.file,
+    role: t(doc.roleKey),
+  }));
 
-  return <PdfStack docs={docs} />;
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-2">
+      <PdfStack docs={docs} />
+      <p className="text-muted-foreground text-[11px] leading-4">
+        {t("provenance")}
+      </p>
+    </div>
+  );
 }

@@ -17,7 +17,12 @@ describe("BenefitBands", () => {
       screen.getByText("Your template, as you dropped it in")
     ).toBeInTheDocument();
     expect(screen.getByText("The same file, filled")).toBeInTheDocument();
-    expect(screen.getByText("devis-generali-2026.pdf")).toBeInTheDocument();
+    expect(screen.getByText("devis-lumina-2026.pdf")).toBeInTheDocument();
+    expect(screen.getByText("devis-atelier-2026.pdf")).toBeInTheDocument();
+    expect(screen.getByText("devis-rive-2026.pdf")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/generali|metlife|malakoff/i)
+    ).not.toBeInTheDocument();
     expect(screen.getAllByText("Loan insurance quote").length).toBeGreaterThan(
       0
     );
@@ -32,18 +37,23 @@ describe("BenefitBands", () => {
     expect(link.className).toMatch(/hover:underline/);
   });
 
-  it("formats mini-sheet quotité as whole percents", () => {
+  it("formats filled mini-sheet quotité as whole percents (before stays blank)", () => {
     renderWithIntl(<BenefitBands />);
 
     const beforeCaption = screen.getByText(
       "Your template, as you dropped it in"
     );
-    const miniSheet = beforeCaption.parentElement;
-    expect(miniSheet).not.toBeNull();
+    const beforeSheet = beforeCaption.parentElement;
+    expect(beforeSheet).not.toBeNull();
+    expect(within(beforeSheet!).queryByText("100%")).not.toBeInTheDocument();
+    expect(within(beforeSheet!).queryByText("50%")).not.toBeInTheDocument();
 
-    expect(within(miniSheet!).getAllByText("100%").length).toBeGreaterThan(0);
-    expect(within(miniSheet!).getAllByText("50%").length).toBeGreaterThan(0);
-    expect(within(miniSheet!).queryByText("100.00%")).not.toBeInTheDocument();
-    expect(within(miniSheet!).queryByText("50.00%")).not.toBeInTheDocument();
+    const afterCaption = screen.getByText("The same file, filled");
+    const afterSheet = afterCaption.parentElement;
+    expect(afterSheet).not.toBeNull();
+    expect(within(afterSheet!).getAllByText("100%").length).toBeGreaterThan(0);
+    expect(within(afterSheet!).getAllByText("50%").length).toBeGreaterThan(0);
+    expect(within(afterSheet!).queryByText("100.00%")).not.toBeInTheDocument();
+    expect(within(afterSheet!).queryByText("50.00%")).not.toBeInTheDocument();
   });
 });

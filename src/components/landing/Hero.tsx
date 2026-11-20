@@ -63,6 +63,9 @@ export function Hero() {
         >
           <div className="bg-gray-10 w-full rounded-none p-3 sm:p-4 md:p-5">
             <HeroExcelWindow />
+            <p className="text-muted-foreground mt-3 text-[11px] leading-4">
+              {t("visual.provenance")}
+            </p>
           </div>
         </AnimateIn>
       </Container>

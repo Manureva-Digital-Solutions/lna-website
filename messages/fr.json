@@ -80,7 +80,8 @@
       "ctaPrimary": "Tester sur mes documents",
       "ctaNote": "Vous créez un compte, puis vous déposez vos premiers documents.",
       "visual": {
-        "description": "Quatre documents PDF — deux devis d'assurance emprunteur, un tableau d'amortissement, un devis de complémentaire santé — alimentent un tableau comparatif Excel dont les colonnes sont les assureurs et les lignes les garanties : taux, coût total, quotité."
+        "description": "Quatre PDF illustratifs — devis d'assurance emprunteur Lumina Cover, Atelier Protect et Rive Prévoyance, plus un tableau d'amortissement — alimentent un tableau comparatif Excel dont les colonnes sont ces émetteurs et les lignes les garanties : taux, coût total, quotité.",
+        "provenance": "Démo illustrative : émetteurs fictifs et valeurs d'exemple. Pas une extraction client réelle."
       },
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
@@ -104,7 +105,8 @@
         "heading": "Votre modèle Excel, pas le nôtre",
         "body": "Vous récupérez le fichier que vous avez déposé, rempli. LNA écrit cellule par cellule dans votre modèle : la mise en forme, les colonnes calculées et les formules restent celles que vous avez construites.",
         "before": "Votre modèle, tel que vous l'avez déposé",
-        "after": "Le même fichier, rempli"
+        "after": "Le même fichier, rempli",
+        "provenance": "Même feuille illustrative que le hero : modèle vide à gauche, rempli à partir des PDF d'exemple à droite."
       },
       "mixed": {
         "heading": "Déposez le paquet entier, mélangé",
@@ -113,7 +115,8 @@
         "roleAmortization": "Tableau d'amortissement",
         "roleHealth": "Devis complémentaire santé",
         "roleContract": "Contrat / conditions générales",
-        "roleOther": "Autre"
+        "roleOther": "Autre",
+        "provenance": "Noms de fichiers d'exemple pour la démo du hero (Lumina Cover, Atelier Protect, Rive Prévoyance + amortissement). Émetteurs fictifs uniquement."
       },
       "confidence": {
         "heading": "Vous voyez ce dont l'IA n'est pas sûre",
@@ -125,7 +128,8 @@
         "levelHigh": "Élevée",
         "levelMedium": "Moyenne",
         "levelLow": "Faible",
-        "reviewLegend": "[REVIEW] — écrit dans la cellule exportée sous 0,6"
+        "reviewLegend": "[REVIEW] — écrit dans la cellule exportée sous 0,6",
+        "provenance": "Mêmes valeurs d'exemple et émetteurs fictifs que le tableau comparatif du hero."
       },
       "validation": {
         "heading": "Rien ne part sans votre validation",

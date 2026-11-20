@@ -80,7 +80,8 @@
       "ctaPrimary": "Try it on my documents",
       "ctaNote": "Create an account, then drop in your first documents.",
       "visual": {
-        "description": "Four PDF documents feed an Excel comparison sheet whose columns are the insurers and whose rows are the guarantees."
+        "description": "Four illustrative PDFs — loan insurance quotes from Lumina Cover, Atelier Protect and Rive Prévoyance, plus a loan amortisation schedule — feed an Excel comparison sheet whose columns are those issuers and whose rows are the guarantees: rate, total cost, cover ratio.",
+        "provenance": "Illustrative demo: fictional issuers and sample values. Not a real client extraction."
       },
       "headingHighlight": "Your Excel sheet comes out, already filled.",
       "excel": {
@@ -104,7 +105,8 @@
         "heading": "Your Excel template, not ours",
         "body": "You get back the file you dropped in, filled. LNA writes cell by cell into your template: formatting, calculated columns and formulas stay exactly as you built them.",
         "before": "Your template, as you dropped it in",
-        "after": "The same file, filled"
+        "after": "The same file, filled",
+        "provenance": "Same illustrative sheet as the hero: empty template on the left, filled from the sample PDFs on the right."
       },
       "mixed": {
         "heading": "Drop in the whole mixed batch",
@@ -113,7 +115,8 @@
         "roleAmortization": "Amortisation schedule",
         "roleHealth": "Health cover quote",
         "roleContract": "Contract / terms",
-        "roleOther": "Other"
+        "roleOther": "Other",
+        "provenance": "Sample filenames for the hero demo (Lumina Cover, Atelier Protect, Rive Prévoyance + amortisation). Fictional issuers only."
       },
       "confidence": {
         "heading": "You see what the AI is unsure about",
@@ -125,7 +128,8 @@
         "levelHigh": "High",
         "levelMedium": "Medium",
         "levelLow": "Low",
-        "reviewLegend": "[REVIEW] — written into the exported cell below 0.6"
+        "reviewLegend": "[REVIEW] — written into the exported cell below 0.6",
+        "provenance": "Same sample values and fictional issuers as the hero comparison sheet."
       },
       "validation": {
         "heading": "Nothing leaves without your approval",

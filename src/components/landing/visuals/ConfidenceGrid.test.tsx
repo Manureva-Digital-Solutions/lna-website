@@ -4,7 +4,7 @@ import { ConfidenceGrid } from "@/components/landing/visuals/ConfidenceGrid";
 import { renderWithIntl } from "@/test/render";
 
 describe("ConfidenceGrid", () => {
-  it("flags MetLife rate and April cover-ratio cells with [REVIEW]", () => {
+  it("flags Rive Prévoyance rate and Atelier Protect cover-ratio cells with [REVIEW]", () => {
     renderWithIntl(<ConfidenceGrid />);
 
     const table = screen.getByRole("table");
