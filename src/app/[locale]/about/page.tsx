@@ -8,6 +8,10 @@ import {
   Users,
   Sparkles,
   ArrowUpRight,
+  BrainCircuit,
+  LayoutTemplate,
+  Building2,
+  MapPinned,
 } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LinkButton } from "@/components/ui/button";
@@ -48,13 +52,8 @@ export default async function AboutPage({
     "innovation",
   ] as const;
 
-  const teamPhotos = [
-    "/illustrations/team/placeholder-1.svg",
-    "/illustrations/team/placeholder-2.svg",
-    "/illustrations/team/placeholder-3.svg",
-    "/illustrations/team/placeholder-4.svg",
-  ];
-  const teamMemberKeys = ["member1", "member2", "member3", "member4"] as const;
+  const teamIcons = [BrainCircuit, LayoutTemplate, Building2, MapPinned];
+  const teamKeys = ["ai", "product", "enterprise", "delivery"] as const;
 
   return (
     <>
@@ -188,30 +187,26 @@ export default async function AboutPage({
             </h2>
             <p className="text-body mt-3 max-w-2xl">{t("team.description")}</p>
           </AnimateIn>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {teamMemberKeys.map((key, i) => (
-              <AnimateIn key={key} delay={0.1 * i}>
-                <div className="bg-card border-border overflow-hidden rounded-none border text-center shadow-none">
-                  <div className="bg-gray-10 flex aspect-square items-center justify-center p-8">
-                    <Image
-                      src={teamPhotos[i]}
-                      alt={t(`team.${key}.name`)}
-                      width={200}
-                      height={200}
-                      className="size-32"
+          <div className="mt-12 grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {teamKeys.map((key, i) => {
+              const Icon = teamIcons[i];
+              return (
+                <AnimateIn key={key} delay={0.1 * i} className="h-full">
+                  <div className="bg-card border-border flex h-full min-h-[14rem] flex-col rounded-none border p-6 shadow-none">
+                    <Icon
+                      className="text-primary size-6 shrink-0"
+                      aria-hidden="true"
                     />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-tile text-foreground">
-                      {t(`team.${key}.name`)}
+                    <h3 className="text-tile text-foreground mt-3">
+                      {t(`team.${key}.title`)}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
-                      {t(`team.${key}.role`)}
+                    <p className="text-body mt-2 flex-1 text-sm">
+                      {t(`team.${key}.description`)}
                     </p>
                   </div>
-                </div>
-              </AnimateIn>
-            ))}
+                </AnimateIn>
+              );
+            })}
           </div>
         </Container>
       </Section>

@@ -560,23 +560,23 @@
     },
     "team": {
       "label": "L'équipe",
-      "heading": "Les personnes qui construisent LNA",
-      "description": "Nous sommes une équipe dédiée chez Lemon Tree SAS, qui travaille à rendre l'intelligence documentaire accessible à toute organisation qui s'appuie sur les données.",
-      "member1": {
-        "name": "Membre de l'équipe",
-        "role": "Co-fondateur & CEO"
+      "heading": "Une équipe concentrée entre Paris et Pondichéry",
+      "description": "LNA est construit par Lemon Tree SAS — des spécialistes de l'extraction IA, du design produit et du logiciel d'entreprise, réunis pour l'intelligence documentaire au service des flux professionnels.",
+      "ai": {
+        "title": "Ingénierie IA",
+        "description": "Modèles, scores de confiance et pipelines d'extraction qui transforment des lots de PDF mélangés en champs structurés et vérifiables."
       },
-      "member2": {
-        "name": "Membre de l'équipe",
-        "role": "CTO"
+      "product": {
+        "title": "Produit",
+        "description": "Des parcours calés sur les modèles Excel et les types de documents que les équipes utilisent déjà — pas une feuille blanche à réapprendre."
       },
-      "member3": {
-        "name": "Membre de l'équipe",
-        "role": "Responsable Produit"
+      "enterprise": {
+        "title": "Logiciel d'entreprise",
+        "description": "Comptes organisation, permissions et pistes d'audit pour isoler les documents clients et rendre chaque export traçable."
       },
-      "member4": {
-        "name": "Membre de l'équipe",
-        "role": "Ingénieur IA Principal"
+      "delivery": {
+        "title": "Livraison & design",
+        "description": "Paris et Pondichéry sur le même backlog — des interfaces claires et des livraisons fiables, pas des pages d'attente."
       }
     },
     "company": {
