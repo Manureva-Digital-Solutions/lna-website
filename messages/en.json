@@ -301,8 +301,7 @@
       "description": "Book a 30-minute demo and we'll walk you through the platform using your document types. No slides. No scripts. Just a live demonstration of exactly what LNA can do for your team.",
       "button": "Request a Demo"
     },
-    "navLabel": "Feature sections",
-    "videoTitle": "LNA platform overview"
+    "navLabel": "Feature sections"
   },
   "pricing": {
     "hero": {

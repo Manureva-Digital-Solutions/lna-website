@@ -301,8 +301,7 @@
       "description": "Réservez une démo de 30 minutes et nous vous guiderons à travers la plateforme avec vos types de documents. Pas de diapositives. Pas de script. Juste une démonstration en direct de ce que LNA peut faire pour votre équipe.",
       "button": "Demander une démo"
     },
-    "navLabel": "Sections fonctionnalités",
-    "videoTitle": "Présentation de la plateforme LNA"
+    "navLabel": "Sections fonctionnalités"
   },
   "pricing": {
     "hero": {
