@@ -49,7 +49,10 @@ export function Footer() {
       <div className="border-gray-80 border-b py-8">
         <Container grid className="items-center gap-y-6">
           <div className="col-span-full min-[1056px]:col-span-8">
-            <Link href="/" className="inline-block p-0 text-white">
+            <Link
+              href="/"
+              className="inline-block p-0 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+            >
               <Image
                 src="/brand/logo-white.svg"
                 alt="LNA"
@@ -103,16 +106,22 @@ export function Footer() {
       {/* Bottom legal strip */}
       <div className="bg-legal text-gray-30 text-xs leading-4">
         <Container className="flex min-h-12 flex-wrap items-center gap-x-6 gap-y-2 py-4">
-          <Link href="/privacy" className="hover:text-white hover:underline">
+          <Link
+            href="/privacy"
+            className="hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+          >
             {t("privacy")}
           </Link>
-          <Link href="/terms" className="hover:text-white hover:underline">
+          <Link
+            href="/terms"
+            className="hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+          >
             {t("terms")}
           </Link>
           <button
             type="button"
             onClick={openCookiePreferences}
-            className="hover:text-white hover:underline"
+            className="hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
             data-cookie-settings
           >
             {t("cookieSettings")}
@@ -144,14 +153,14 @@ function FooterColumn({
             {link.external ? (
               <a
                 href={link.href}
-                className="text-gray-30 hover:text-white hover:underline"
+                className="text-gray-30 hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
               >
                 {link.label}
               </a>
             ) : (
               <Link
                 href={link.href}
-                className="text-gray-30 hover:text-white hover:underline"
+                className="text-gray-30 hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
               >
                 {link.label}
               </Link>

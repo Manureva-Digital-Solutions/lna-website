@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
  * full-width and compact header CTAs are not clipped.
  */
 const buttonVariants = cva(
-  "group/button inline-flex items-center justify-center rounded-none border border-transparent text-sm font-normal whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex items-center justify-center rounded-none border border-transparent text-sm font-normal whitespace-nowrap transition-colors select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -26,7 +26,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-gray-20 aria-expanded:bg-gray-20",
         ghost: "text-primary hover:bg-gray-10 aria-expanded:bg-gray-10",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:outline-destructive",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

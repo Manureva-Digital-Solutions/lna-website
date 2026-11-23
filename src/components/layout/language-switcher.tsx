@@ -90,7 +90,7 @@ export function LanguageSwitcher() {
               aria-checked={loc === locale}
               onClick={() => switchLocale(loc)}
               className={cn(
-                "hover:text-foreground inline-flex h-8 items-center rounded-none px-0.5 leading-none transition-colors",
+                "hover:text-foreground focus-visible:outline-primary inline-flex h-8 items-center rounded-none px-0.5 leading-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]",
                 loc === locale
                   ? "text-foreground font-semibold"
                   : "text-muted-foreground font-normal"
@@ -165,7 +165,7 @@ export function FooterLanguageSwitcher() {
         aria-expanded={open}
         aria-controls={listId}
         className={cn(
-          "border-gray-60 bg-gray-90 inline-flex h-10 min-w-[200px] items-center gap-2 border-b px-4 text-sm text-white",
+          "border-gray-60 bg-gray-90 inline-flex h-10 min-w-[200px] items-center gap-2 border-b px-4 text-sm text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white",
           isPending && "pointer-events-none opacity-60"
         )}
       >
@@ -193,7 +193,7 @@ export function FooterLanguageSwitcher() {
                   aria-selected={selected}
                   onClick={() => switchLocale(option.locale)}
                   className={cn(
-                    "hover:bg-gray-80 w-full px-4 py-2.5 text-left text-sm text-white",
+                    "hover:bg-gray-80 w-full px-4 py-2.5 text-left text-sm text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white",
                     selected && "bg-gray-80 font-semibold"
                   )}
                 >

@@ -232,7 +232,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
   html {
@@ -242,6 +242,27 @@
   body {
     @apply bg-background text-foreground text-base leading-6 antialiased;
     font-weight: 400;
+  }
+
+  /**
+   * Frozen v4 / LNAW-84: visible 2px navy focus on interactive controls.
+   * Prefer :focus-visible so mouse clicks do not leave a permanent ring.
+   */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+
+  /**
+   * Dark footer (Gray 100 / Gray 90).
+   * Frozen v4 (`lna-v4-fr.html`) uses a global navy `:focus-visible` ring —
+   * including `.news input` — but navy on g100/g90 is only ~1.3–1.5:1.
+   * LNAW-84 review: white outline on footer controls (≥3:1), same as
+   * the newsletter submit button.
+   */
+  [data-footer] :focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -2px;
   }
 
   /* Soften default shadows from any leftover utilities */

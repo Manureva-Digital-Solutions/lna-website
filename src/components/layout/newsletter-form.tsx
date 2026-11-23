@@ -79,14 +79,14 @@ export function NewsletterForm() {
         name="email"
         id="footer-newsletter-email"
         placeholder={t("emailPlaceholder")}
-        className="border-gray-60 bg-gray-90 h-12 min-w-0 flex-1 border-0 border-b px-4 text-sm text-white outline-none placeholder:text-gray-50"
+        className="border-gray-60 bg-gray-90 h-12 min-w-0 flex-1 border-0 border-b px-4 text-sm text-white placeholder:text-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
         aria-label={t("emailLabel")}
         required
       />
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="bg-primary text-primary-foreground relative h-12 shrink-0 cursor-pointer px-4 pr-12 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-primary text-primary-foreground relative h-12 shrink-0 cursor-pointer px-4 pr-12 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {status === "submitting" ? (
           <Loader2 className="size-4 animate-spin" />
