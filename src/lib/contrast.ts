@@ -61,6 +61,10 @@ export const LNA_A11Y_COLORS = {
   navy: "#14366F",
   white: "#FFFFFF",
   gray10: "#F4F4F4",
+  /** Footer surface (Gray 100). */
+  gray100: "#161616",
+  /** Footer control chrome (Gray 90). */
+  gray90: "#262626",
   muted: "#525252",
   primaryForeground: "#FFFFFF",
 } as const;

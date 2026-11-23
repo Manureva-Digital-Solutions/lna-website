@@ -41,4 +41,35 @@ describe("LNAW-84 focus + skip wiring", () => {
     expect(input).toMatch(/focus-visible:outline-2/);
     expect(input).toMatch(/focus-visible:outline-primary/);
   });
+
+  it("uses a white focus outline on dark footer controls (3:1 vs Gray 100/90)", () => {
+    const css = readFileSync(join(root, "src/app/globals.css"), "utf8");
+    // Full shorthand so frozen global navy outline cannot leak through.
+    expect(css).toMatch(
+      /\[data-footer\]\s*:focus-visible\s*\{[\s\S]*?outline:\s*2px solid #ffffff/
+    );
+
+    const newsletter = readFileSync(
+      join(root, "src/components/layout/newsletter-form.tsx"),
+      "utf8"
+    );
+    expect(newsletter).toMatch(
+      /footer-newsletter-email[\s\S]*?focus-visible:outline-white/
+    );
+    expect(newsletter).toMatch(/focus-visible:outline-white/);
+
+    const lang = readFileSync(
+      join(root, "src/components/layout/language-switcher.tsx"),
+      "utf8"
+    );
+    const footerLangBlock = lang.slice(lang.indexOf("FooterLanguageSwitcher"));
+    expect(footerLangBlock).toMatch(/focus-visible:outline-white/);
+    expect(footerLangBlock).not.toMatch(/focus-visible:outline-primary/);
+
+    const footer = readFileSync(
+      join(root, "src/components/layout/footer.tsx"),
+      "utf8"
+    );
+    expect(footer).toMatch(/focus-visible:outline-white/);
+  });
 });

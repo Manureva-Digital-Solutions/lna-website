@@ -36,4 +36,13 @@ describe("LNAW-84 contrast tokens", () => {
     expect(meetsWcagAa(navy, white)).toBe(true);
     expect(meetsWcagAa(navy, gray10)).toBe(true);
   });
+
+  it("white focus ring on dark footer meets 3:1 UI contrast (navy does not)", () => {
+    const { gray100, gray90 } = LNA_A11Y_COLORS;
+    // Non-text UI component minimum (WCAG 2.1 SC 1.4.11).
+    expect(contrastRatio(white, gray100)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(white, gray90)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(navy, gray100)).toBeLessThan(3);
+    expect(contrastRatio(navy, gray90)).toBeLessThan(3);
+  });
 });

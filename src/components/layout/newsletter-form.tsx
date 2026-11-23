@@ -79,7 +79,7 @@ export function NewsletterForm() {
         name="email"
         id="footer-newsletter-email"
         placeholder={t("emailPlaceholder")}
-        className="border-gray-60 bg-gray-90 focus-visible:outline-primary h-12 min-w-0 flex-1 border-0 border-b px-4 text-sm text-white placeholder:text-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+        className="border-gray-60 bg-gray-90 h-12 min-w-0 flex-1 border-0 border-b px-4 text-sm text-white placeholder:text-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
         aria-label={t("emailLabel")}
         required
       />
