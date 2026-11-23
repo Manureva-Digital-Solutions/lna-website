@@ -24,6 +24,7 @@ function StatusShape({ level }: { level: Level }) {
   if (level === "high") {
     return (
       <span
+        data-status-shape="circle"
         className="bg-status-high size-2.5 shrink-0 rounded-full"
         aria-hidden="true"
       />
@@ -32,6 +33,7 @@ function StatusShape({ level }: { level: Level }) {
   if (level === "medium") {
     return (
       <span
+        data-status-shape="diamond"
         className="bg-status-medium size-2 shrink-0 rotate-45"
         aria-hidden="true"
       />
@@ -39,6 +41,7 @@ function StatusShape({ level }: { level: Level }) {
   }
   return (
     <span
+      data-status-shape="triangle"
       className="inline-block size-0 shrink-0 border-x-[5px] border-b-[9px] border-x-transparent border-b-[var(--status-low)]"
       aria-hidden="true"
     />

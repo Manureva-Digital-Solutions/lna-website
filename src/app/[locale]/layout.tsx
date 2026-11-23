@@ -80,7 +80,11 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <SkipToContent />
           <Header />
-          <main id="main-content" className="min-h-screen pt-12">
+          <main
+            id="main"
+            tabIndex={-1}
+            className="min-h-screen pt-12 outline-none"
+          >
             {children}
           </main>
           <Footer />

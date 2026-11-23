@@ -232,7 +232,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
   html {
@@ -242,6 +242,15 @@
   body {
     @apply bg-background text-foreground text-base leading-6 antialiased;
     font-weight: 400;
+  }
+
+  /**
+   * Frozen v4 / LNAW-84: visible 2px navy focus on interactive controls.
+   * Prefer :focus-visible so mouse clicks do not leave a permanent ring.
+   */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
   }
 
   /* Soften default shadows from any leftover utilities */
