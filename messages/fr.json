@@ -894,7 +894,7 @@
     "required": "*",
     "success": {
       "heading": "Vous êtes inscrit !",
-      "description": "Merci pour votre intérêt pour LNA. Nous vous contacterons sous 24 heures pour planifier votre démo personnalisée.",
+      "description": "Merci pour votre intérêt pour LNA. Un email de confirmation est en route — nous vous contacterons sous 24 heures pour planifier votre démo personnalisée.",
       "close": "Fermer"
     },
     "errors": {
@@ -910,6 +910,26 @@
       "insuranceBroker": "Courtier en assurance",
       "propertyManager": "Gestionnaire de biens",
       "other": "Autre"
+    }
+  },
+  "emails": {
+    "brand": {
+      "tagline": "Vos PDF entrent, votre Excel sort.",
+      "legal": "LNA est un produit de Lemon Tree SAS — 21 rue du Docteur Fournier, 37000 Tours, France.",
+      "automated": "Message automatique ; merci de ne pas y répondre."
+    },
+    "demoAcknowledgement": {
+      "subject": "Nous avons bien reçu votre demande de démo LNA",
+      "greeting": "Bonjour {name},",
+      "heading": "Nous avons bien reçu votre demande de démo",
+      "body": "Merci pour votre intérêt pour LNA. Nous confirmons la réception de votre demande et nous vous recontacterons sous 24 heures pour planifier votre démo personnalisée.",
+      "signoff": "L'équipe LNA"
+    },
+    "newsletterConfirmation": {
+      "subject": "Votre inscription à la newsletter LNA",
+      "heading": "Merci — votre inscription est bien enregistrée.",
+      "body": "Vous recevrez les actualités produit de LNA et nos publications sur le traitement documentaire. Pour vous désinscrire, il suffit de répondre à cet email.",
+      "signoff": "L'équipe LNA"
     }
   },
   "newsletter": {

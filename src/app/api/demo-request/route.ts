@@ -4,6 +4,10 @@ import {
   isDemoRequestRole,
   sanitizeEmailSubjectPart,
 } from "@/lib/demo-request-roles";
+import {
+  demoAcknowledgementEmail,
+  resolveEmailLocale,
+} from "@/lib/transactional-email";
 
 interface DemoRequestBody {
   name: string;
@@ -11,12 +15,13 @@ interface DemoRequestBody {
   company: string;
   role: string;
   message?: string;
+  locale?: string;
 }
 
 export async function POST(request: Request) {
   try {
     const body: DemoRequestBody = await request.json();
-    const { name, email, company, role, message } = body;
+    const { name, email, company, role, message, locale } = body;
 
     if (!name || !email || !company || !role) {
       return NextResponse.json(
@@ -40,17 +45,26 @@ export async function POST(request: Request) {
     const safeCompany = sanitizeEmailSubjectPart(company);
     // Role is allowlisted above — still sanitize for subject hygiene.
     const safeRole = sanitizeEmailSubjectPart(role);
+    const emailLocale = resolveEmailLocale(locale);
 
     // Role is required above and always forwarded — never dropped from the
     // CRM/email payload (launch-readiness: ICP role must reach the inbox).
     if (!mailConfigured()) {
       console.warn(
         "Demo request received but SMTP_HOST is not set — email NOT sent:",
-        { name: safeName, email, company: safeCompany, role: safeRole, message }
+        {
+          name: safeName,
+          email,
+          company: safeCompany,
+          role: safeRole,
+          message,
+          locale: emailLocale,
+        }
       );
       return NextResponse.json({ success: true, delivered: false });
     }
 
+    // 1. Internal notification — durable record of the request.
     const result = await sendMail({
       replyTo: { email, name: safeName },
       subject: `Demande de démo — ${safeName} (${safeCompany}) · ${safeRole}`,
@@ -71,7 +85,26 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    // 2. Acknowledgement to the visitor. Failure must not report success —
+    //    the contact-page UI would otherwise claim the request was confirmed
+    //    when no confirmation email was delivered (QA production finding #27).
+    const ack = demoAcknowledgementEmail(emailLocale, safeName);
+    const acknowledged = await sendMail({
+      to: email,
+      replyTo: { email: "hello@lnaflow.com" },
+      subject: ack.subject,
+      html: ack.html,
+    });
+
+    if (!acknowledged.ok) {
+      console.error("Demo-request acknowledgement failed", { acknowledged });
+      return NextResponse.json(
+        { error: "Failed to send acknowledgement" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, acknowledged: true });
   } catch {
     return NextResponse.json(
       { error: "Invalid request body" },

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { mailConfigured, escapeHtml, sendMail } from "@/lib/mailer";
+import {
+  newsletterConfirmationEmail,
+  resolveEmailLocale,
+} from "@/lib/transactional-email";
 
 /**
  * Newsletter signup.
@@ -13,23 +17,6 @@ import { mailConfigured, escapeHtml, sendMail } from "@/lib/mailer";
  * was notified, so a signup produced no acknowledgement for the person who signed
  * up and could not be double-opt-in verified (QA finding Pravin #6).
  */
-
-const CONFIRMATION = {
-  fr: {
-    subject: "Votre inscription à la newsletter LNA",
-    heading: "Merci — votre inscription est bien enregistrée.",
-    body: "Vous recevrez les actualités produit de LNA et nos publications sur le traitement documentaire. Pour vous désinscrire, il suffit de répondre à cet email.",
-    signoff: "L'équipe LNA",
-  },
-  en: {
-    subject: "Your LNA newsletter subscription",
-    heading: "Thank you — your subscription is confirmed.",
-    body: "You will receive LNA product news and our writing on document processing. To unsubscribe, simply reply to this email.",
-    signoff: "The LNA team",
-  },
-} as const;
-
-type Locale = keyof typeof CONFIRMATION;
 
 export async function POST(request: Request) {
   try {
@@ -68,17 +55,12 @@ export async function POST(request: Request) {
 
     // 2. Confirmation to the subscriber. A failure here must NOT fail the signup:
     //    the signup is already recorded by the notification above.
-    const key: Locale = locale === "en" ? "en" : "fr";
-    const copy = CONFIRMATION[key];
+    const copy = newsletterConfirmationEmail(resolveEmailLocale(locale));
     const confirmed = await sendMail({
       to: email,
       replyTo: { email: "hello@lnaflow.com" },
       subject: copy.subject,
-      html: `
-        <h2>${copy.heading}</h2>
-        <p>${copy.body}</p>
-        <p>${copy.signoff}</p>
-      `,
+      html: copy.html,
     });
 
     if (!confirmed.ok) {

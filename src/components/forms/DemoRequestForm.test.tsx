@@ -86,9 +86,85 @@ describe("DemoRequestForm ICP roles", () => {
           company: "Cabinet Ada",
           role: "insuranceBroker",
           message: "",
+          locale: "en",
         }),
       })
     );
+  });
+
+  it("includes the FR locale on submit so the acknowledgement is localized", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<DemoRequestForm />, { locale: "fr" });
+
+    await user.type(
+      screen.getByLabelText(new RegExp(fr.demoForm.nameLabel)),
+      "Léa Martin"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(fr.demoForm.emailLabel)),
+      "lea@cabinet.fr"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(fr.demoForm.companyLabel)),
+      "Cabinet Léa"
+    );
+    await user.selectOptions(
+      screen.getByLabelText(new RegExp(fr.demoForm.roleLabel)),
+      "accountant"
+    );
+    await user.click(screen.getByRole("button", { name: fr.demoForm.submit }));
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/demo-request",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          name: "Léa Martin",
+          email: "lea@cabinet.fr",
+          company: "Cabinet Léa",
+          role: "accountant",
+          message: "",
+          locale: "fr",
+        }),
+      })
+    );
+  });
+
+  it("does not show success when the acknowledgement request fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "Failed to send acknowledgement" }),
+      })
+    );
+    const user = userEvent.setup();
+    renderWithIntl(<DemoRequestForm />);
+
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.nameLabel)),
+      "Ada Broker"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.emailLabel)),
+      "ada@cabinet.fr"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.companyLabel)),
+      "Cabinet Ada"
+    );
+    await user.selectOptions(
+      screen.getByLabelText(new RegExp(en.demoForm.roleLabel)),
+      "other"
+    );
+    await user.click(screen.getByRole("button", { name: en.demoForm.submit }));
+
+    expect(
+      await screen.findByText(en.demoForm.errors.generic)
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(en.demoForm.success.heading)
+    ).not.toBeInTheDocument();
   });
 
   it("renders FR ICP labels with the same stable option values", () => {

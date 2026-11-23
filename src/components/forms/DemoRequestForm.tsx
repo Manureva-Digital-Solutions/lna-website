@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, AlertCircle, X } from "lucide-react";
 
@@ -19,6 +19,7 @@ interface DemoRequestFormProps {
 
 export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
   const t = useTranslations("demoForm");
+  const locale = useLocale();
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
@@ -68,12 +69,13 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
           company: formData.get("company"),
           role: formData.get("role"),
           message: formData.get("message"),
+          locale,
         }),
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to submit");
+        // Never surface raw API English strings in the UI — keep locale copy.
+        throw new Error(t("errors.generic"));
       }
 
       setStatus("success");
