@@ -8,6 +8,15 @@ import en from "../../../../messages/en.json";
 import fr from "../../../../messages/fr.json";
 
 describe("PricingContent CTAs", () => {
+  it("renders comparison category rows without unkeyed fragments", () => {
+    const { container } = renderWithIntl(<PricingContent />);
+    const categoryCells = container.querySelectorAll("tbody td[colspan='5']");
+    expect(categoryCells.length).toBeGreaterThan(0);
+    // Categories should be unique table section labels from the catalog.
+    const labels = [...categoryCells].map((el) => el.textContent?.trim());
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+
   it("routes self-serve tier trials to register with plan + annual billing by default", () => {
     renderWithIntl(<PricingContent />);
 

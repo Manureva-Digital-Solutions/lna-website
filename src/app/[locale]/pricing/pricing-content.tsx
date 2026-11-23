@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   Check,
   Minus,
@@ -526,8 +526,8 @@ export function PricingContent() {
                 </thead>
                 <tbody>
                   {comparisonData.map((cat) => (
-                    <>
-                      <tr key={cat.category}>
+                    <Fragment key={cat.category}>
+                      <tr>
                         <td
                           colSpan={5}
                           className="bg-gray-10 px-4 py-2 text-xs font-semibold tracking-wide uppercase"
@@ -555,7 +555,7 @@ export function PricingContent() {
                           </td>
                         </tr>
                       ))}
-                    </>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
