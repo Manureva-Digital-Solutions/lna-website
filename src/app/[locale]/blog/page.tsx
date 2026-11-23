@@ -32,7 +32,7 @@ export default async function BlogPage({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "blog" });
 
-  const posts = getAllPosts();
+  const posts = getAllPosts(locale);
 
   return (
     <>
