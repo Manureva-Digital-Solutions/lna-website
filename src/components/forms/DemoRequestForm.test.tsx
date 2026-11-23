@@ -130,12 +130,12 @@ describe("DemoRequestForm ICP roles", () => {
     );
   });
 
-  it("does not show success when the acknowledgement request fails", async () => {
+  it("shows success without the confirmation-email line when acknowledged is false", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
-        ok: false,
-        json: async () => ({ error: "Failed to send acknowledgement" }),
+        ok: true,
+        json: async () => ({ success: true, acknowledged: false }),
       })
     );
     const user = userEvent.setup();
@@ -160,11 +160,48 @@ describe("DemoRequestForm ICP roles", () => {
     await user.click(screen.getByRole("button", { name: en.demoForm.submit }));
 
     expect(
-      await screen.findByText(en.demoForm.errors.generic)
+      await screen.findByText(en.demoForm.success.heading)
     ).toBeInTheDocument();
     expect(
-      screen.queryByText(en.demoForm.success.heading)
+      screen.getByText(en.demoForm.success.description)
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(en.demoForm.success.descriptionWithEmail)
     ).not.toBeInTheDocument();
+  });
+
+  it("mentions the confirmation email when acknowledgement succeeded", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, acknowledged: true }),
+      })
+    );
+    const user = userEvent.setup();
+    renderWithIntl(<DemoRequestForm />);
+
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.nameLabel)),
+      "Ada Broker"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.emailLabel)),
+      "ada@cabinet.fr"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.companyLabel)),
+      "Cabinet Ada"
+    );
+    await user.selectOptions(
+      screen.getByLabelText(new RegExp(en.demoForm.roleLabel)),
+      "other"
+    );
+    await user.click(screen.getByRole("button", { name: en.demoForm.submit }));
+
+    expect(
+      await screen.findByText(en.demoForm.success.descriptionWithEmail)
+    ).toBeInTheDocument();
   });
 
   it("renders FR ICP labels with the same stable option values", () => {

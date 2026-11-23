@@ -37,6 +37,9 @@ describe("transactional-email", () => {
     expect(html).toContain("Lemon Tree SAS");
     expect(html).toContain(en.emails.brand.tagline);
     expect(html).toContain("Body");
+    // Newsletter body asks readers to reply to unsubscribe — no "do not reply".
+    expect(html).not.toMatch(/do not reply/i);
+    expect(html).not.toMatch(/ne pas y répondre/i);
   });
 
   it("builds the demo acknowledgement in EN with the 24-hour follow-up", () => {

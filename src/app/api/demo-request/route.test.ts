@@ -130,11 +130,12 @@ describe("POST /api/demo-request", () => {
     expect(ack.html).toMatch(/sous 24 heures/i);
   });
 
-  it("does not report success when the acknowledgement email fails", async () => {
+  it("soft-fails acknowledgement with 200 acknowledged:false after inbox notify", async () => {
     mailConfigured.mockReturnValue(true);
     sendMail
       .mockResolvedValueOnce({ ok: true })
       .mockResolvedValueOnce({ ok: false, error: "SMTP down" });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const { POST } = await import("./route");
     const res = await POST(
@@ -151,10 +152,18 @@ describe("POST /api/demo-request", () => {
       })
     );
 
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({
-      error: "Failed to send acknowledgement",
+      success: true,
+      acknowledged: false,
     });
+    expect(error).toHaveBeenCalledWith(
+      "Demo-request acknowledgement failed",
+      expect.objectContaining({
+        acknowledged: { ok: false, error: "SMTP down" },
+      })
+    );
+    error.mockRestore();
   });
 
   it("rejects roles outside the ICP allowlist", async () => {

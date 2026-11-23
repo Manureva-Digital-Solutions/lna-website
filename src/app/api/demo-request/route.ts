@@ -85,9 +85,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Acknowledgement to the visitor. Failure must not report success —
-    //    the contact-page UI would otherwise claim the request was confirmed
-    //    when no confirmation email was delivered (QA production finding #27).
+    // 2. Acknowledgement to the visitor. The inbox notification already
+    //    recorded the lead — never 500 here or the visitor will resubmit
+    //    and create duplicates. Soft-fail with acknowledged:false instead.
     const ack = demoAcknowledgementEmail(emailLocale, safeName);
     const acknowledged = await sendMail({
       to: email,
@@ -98,10 +98,7 @@ export async function POST(request: Request) {
 
     if (!acknowledged.ok) {
       console.error("Demo-request acknowledgement failed", { acknowledged });
-      return NextResponse.json(
-        { error: "Failed to send acknowledgement" },
-        { status: 500 }
-      );
+      return NextResponse.json({ success: true, acknowledged: false });
     }
 
     return NextResponse.json({ success: true, acknowledged: true });

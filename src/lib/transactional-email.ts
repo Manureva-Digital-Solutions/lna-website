@@ -54,7 +54,6 @@ export function emailShell(bodyHtml: string, locale: EmailLocale): string {
           <td style="padding:16px 28px;border-top:1px solid #e2e8f0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#94a3b8;">
             ${brand.legal}<br>
             <a href="https://lnaflow.com" style="color:#64748b;text-decoration:none;">lnaflow.com</a>
-            &nbsp;·&nbsp; ${brand.automated}
           </td>
         </tr>
       </table>

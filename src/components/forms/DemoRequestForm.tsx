@@ -23,6 +23,7 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const [acknowledged, setAcknowledged] = useState(true);
   const [errors, setErrors] = useState<FormErrors>({});
   const [errorMessage, setErrorMessage] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -78,6 +79,11 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
         throw new Error(t("errors.generic"));
       }
 
+      const data = (await res.json().catch(() => ({}))) as {
+        acknowledged?: boolean;
+      };
+      // Soft-fail ack still counts as success (lead already in inbox).
+      setAcknowledged(data.acknowledged !== false);
       setStatus("success");
       window.gtag?.("event", "demo_request_submitted", {
         company: formData.get("company"),
@@ -107,7 +113,9 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
         </div>
         <h3 className="text-h3 text-foreground mt-4">{t("success.heading")}</h3>
         <p className="text-muted-foreground mt-2 max-w-sm">
-          {t("success.description")}
+          {acknowledged
+            ? t("success.descriptionWithEmail")
+            : t("success.description")}
         </p>
         {onClose && (
           <Button onClick={onClose} className="mt-6">

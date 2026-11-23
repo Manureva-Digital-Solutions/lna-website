@@ -894,7 +894,8 @@
     "required": "*",
     "success": {
       "heading": "You're on the list!",
-      "description": "Thank you for your interest in LNA. A confirmation email is on its way — we'll reach out within 24 hours to schedule your personalized demo.",
+      "description": "Thank you for your interest in LNA. We'll reach out within 24 hours to schedule your personalized demo.",
+      "descriptionWithEmail": "Thank you for your interest in LNA. A confirmation email is on its way — we'll reach out within 24 hours to schedule your personalized demo.",
       "close": "Close"
     },
     "errors": {
@@ -915,8 +916,7 @@
   "emails": {
     "brand": {
       "tagline": "PDF in, your Excel sheet out.",
-      "legal": "LNA is a product of Lemon Tree SAS — 21 rue du Docteur Fournier, 37000 Tours, France.",
-      "automated": "This is an automated message; please do not reply."
+      "legal": "LNA is a product of Lemon Tree SAS — 21 rue du Docteur Fournier, 37000 Tours, France."
     },
     "demoAcknowledgement": {
       "subject": "We've received your LNA demo request",
