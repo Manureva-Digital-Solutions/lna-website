@@ -33,7 +33,7 @@ describe("POST /api/demo-request", () => {
     );
   });
 
-  it("includes the submitted role in the email subject and body", async () => {
+  it("includes the submitted role in the inbox email subject and body", async () => {
     mailConfigured.mockReturnValue(true);
     sendMail.mockResolvedValue({ ok: true });
 
@@ -48,19 +48,122 @@ describe("POST /api/demo-request", () => {
           company: "Cabinet Martin",
           role: "accountant",
           message: "Besoin d'une démo",
+          locale: "fr",
         }),
       })
     );
 
     expect(res.status).toBe(200);
-    expect(sendMail).toHaveBeenCalledTimes(1);
-    const arg = sendMail.mock.calls[0][0] as {
+    expect(sendMail).toHaveBeenCalledTimes(2);
+    const inbox = sendMail.mock.calls[0][0] as {
       subject: string;
       html: string;
     };
-    expect(arg.subject).toContain("accountant");
-    expect(arg.html).toContain("accountant");
-    expect(arg.html).toContain("Fonction / Role");
+    expect(inbox.subject).toContain("accountant");
+    expect(inbox.html).toContain("accountant");
+    expect(inbox.html).toContain("Fonction / Role");
+  });
+
+  it("sends a branded EN acknowledgement after the inbox notification", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await import("./route");
+    const res = await POST(
+      new Request("http://localhost/api/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Ada Broker",
+          email: "ada@cabinet.fr",
+          company: "Cabinet Ada",
+          role: "insuranceBroker",
+          locale: "en",
+        }),
+      })
+    );
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({
+      success: true,
+      acknowledged: true,
+    });
+
+    expect(sendMail).toHaveBeenCalledTimes(2);
+    const ack = sendMail.mock.calls[1][0] as {
+      to: string;
+      subject: string;
+      html: string;
+      replyTo: { email: string };
+    };
+    expect(ack.to).toBe("ada@cabinet.fr");
+    expect(ack.replyTo.email).toBe("hello@lnaflow.com");
+    expect(ack.subject).toBe(en.emails.demoAcknowledgement.subject);
+    expect(ack.html).toContain("Hi Ada Broker,");
+    expect(ack.html).toMatch(/within 24 hours/i);
+    expect(ack.html).toContain("https://lnaflow.com/brand/logo-email.png");
+    expect(ack.html).toContain("Lemon Tree SAS");
+  });
+
+  it("sends the FR acknowledgement when locale is French", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await import("./route");
+    await POST(
+      new Request("http://localhost/api/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Léa Martin",
+          email: "lea@example.fr",
+          company: "Cabinet Martin",
+          role: "propertyManager",
+          locale: "fr",
+        }),
+      })
+    );
+
+    const ack = sendMail.mock.calls[1][0] as { subject: string; html: string };
+    expect(ack.subject).toBe(fr.emails.demoAcknowledgement.subject);
+    expect(ack.html).toContain("Bonjour Léa Martin,");
+    expect(ack.html).toMatch(/sous 24 heures/i);
+  });
+
+  it("soft-fails acknowledgement with 200 acknowledged:false after inbox notify", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail
+      .mockResolvedValueOnce({ ok: true })
+      .mockResolvedValueOnce({ ok: false, error: "SMTP down" });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { POST } = await import("./route");
+    const res = await POST(
+      new Request("http://localhost/api/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Ada Broker",
+          email: "ada@cabinet.fr",
+          company: "Cabinet Ada",
+          role: "other",
+          locale: "en",
+        }),
+      })
+    );
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({
+      success: true,
+      acknowledged: false,
+    });
+    expect(error).toHaveBeenCalledWith(
+      "Demo-request acknowledgement failed",
+      expect.objectContaining({
+        acknowledged: { ok: false, error: "SMTP down" },
+      })
+    );
+    error.mockRestore();
   });
 
   it("rejects roles outside the ICP allowlist", async () => {
