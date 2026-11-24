@@ -11,6 +11,14 @@ export interface ExcelGridProps {
   className?: string;
   /** Nom de fichier affiché dans la barre de titre (pass i18n `home.hero.excel.filename`). */
   caption: string;
+  /** Hide the green Excel filename chrome (LNAW-123 how-it-works cards). */
+  hideCaption?: boolean;
+  /** Row-label weight; default semibold. */
+  rowLabelClassName?: string;
+  /** Override thead row background (default sheet-header). */
+  headerClassName?: string;
+  /** Extra classes on numeric cell values. */
+  valueClassName?: string;
 }
 
 /**
@@ -24,6 +32,10 @@ export function ExcelGrid({
   revealed,
   className,
   caption,
+  hideCaption = false,
+  rowLabelClassName,
+  headerClassName,
+  valueClassName,
 }: ExcelGridProps) {
   return (
     <div
@@ -32,13 +44,15 @@ export function ExcelGrid({
         className
       )}
     >
-      <div className="bg-excel-green truncate px-2 py-1 font-mono text-[11.5px] text-white">
-        {caption}
-      </div>
+      {!hideCaption ? (
+        <div className="bg-excel-green truncate px-2 py-1 font-mono text-[11.5px] text-white">
+          {caption}
+        </div>
+      ) : null}
       <div className="max-w-full overflow-x-auto">
         <table className="w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums">
           <thead>
-            <tr className="bg-sheet-header">
+            <tr className={cn("bg-sheet-header", headerClassName)}>
               {columns.map((col, i) => (
                 <th
                   key={col}
@@ -58,7 +72,10 @@ export function ExcelGrid({
               <tr key={row.label}>
                 <th
                   scope="row"
-                  className="border-gray-30 text-foreground h-[30px] border px-2 text-left font-semibold whitespace-nowrap"
+                  className={cn(
+                    "border-gray-30 text-foreground h-[30px] border px-2 text-left font-semibold whitespace-nowrap",
+                    rowLabelClassName
+                  )}
                 >
                   {row.label}
                 </th>
@@ -75,6 +92,7 @@ export function ExcelGrid({
                       <span
                         className={cn(
                           "inline-block transition-opacity duration-200",
+                          valueClassName,
                           hidden ? "opacity-0" : "opacity-100"
                         )}
                       >
