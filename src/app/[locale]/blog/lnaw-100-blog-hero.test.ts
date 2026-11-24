@@ -70,5 +70,6 @@ describe("LNAW-100 blog hero assets", () => {
     );
     expect(page).toMatch(/post\.ogImage \?\? post\.image/);
     expect(page).toMatch(/post\.articleImage/);
+    expect(page).toMatch(/twitter:\s*\{/);
   });
 });
