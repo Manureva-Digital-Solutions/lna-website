@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(slug, locale);
   if (!post) return {};
   const shareImage = post.ogImage ?? post.image;
+  const images = shareImage ? [{ url: shareImage }] : [];
   return {
     title: `${post.title} — LNA Blog`,
     description: post.description,
@@ -36,7 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: post.title,
       description: post.description,
-      images: shareImage ? [{ url: shareImage }] : [],
+      images,
+    },
+    // Override layout twitter.images so posts keep their own share card (LNAW-122).
+    twitter: {
+      card: "summary_large_image",
+      images: shareImage ? [shareImage] : [],
     },
   };
 }

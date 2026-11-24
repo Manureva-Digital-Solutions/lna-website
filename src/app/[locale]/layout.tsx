@@ -11,6 +11,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { DemoRequestModal } from "@/components/forms/DemoRequestModal";
 import { routing } from "@/i18n/routing";
 import { SITE_URL, PRELAUNCH } from "@/lib/site";
+import { localeOgImagePath } from "@/lib/og";
 import { ibmPlexMono, ibmPlexSans } from "@/lib/fonts";
 
 export function generateStaticParams() {
@@ -24,6 +25,13 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "seo" });
+  const tHero = await getTranslations({ locale, namespace: "home.hero" });
+  const ogImage = {
+    url: localeOgImagePath(locale),
+    width: 1200,
+    height: 630,
+    alt: `${tHero("heading")} ${tHero("headingHighlight")}`,
+  };
 
   return {
     title: t("title"),
@@ -38,7 +46,11 @@ export async function generateMetadata({
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      images: [{ url: "/brand/og-default.svg", width: 1200, height: 630 }],
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [ogImage],
     },
     metadataBase: new URL(SITE_URL),
     // Pre-launch: keep the site out of search indexes until launch day.
