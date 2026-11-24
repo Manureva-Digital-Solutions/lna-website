@@ -12,8 +12,29 @@ import {
 } from "@/components/landing/visuals/demo-sheet-data";
 
 /** Total loop length (ms). Final filled + download state held ≥ 2s. */
-const LOOP_MS = 9000;
+export const HERO_LOOP_MS = 9000;
 const HOLD_FINAL_MS = 2500;
+
+/** Phase unlock times (ms from loop start). Exported for tests. */
+export const HERO_LOOP_PHASE_MS = {
+  rate: 700,
+  cost: 2000,
+  quota: 3300,
+  others: 4800,
+  download: HERO_LOOP_MS - HOLD_FINAL_MS,
+} as const;
+
+/** Discrete animation steps — state updates only on these boundaries. */
+const PHASE_STEPS = [
+  { at: 0, phase: 0 },
+  { at: HERO_LOOP_PHASE_MS.rate, phase: 1 },
+  { at: HERO_LOOP_PHASE_MS.cost, phase: 2 },
+  { at: HERO_LOOP_PHASE_MS.quota, phase: 3 },
+  { at: HERO_LOOP_PHASE_MS.others, phase: 4 },
+  { at: HERO_LOOP_PHASE_MS.download, phase: 5 },
+] as const;
+
+const FINAL_PHASE = 5;
 
 type FieldKey = "rate" | "cost" | "quota";
 
@@ -61,55 +82,109 @@ export function HeroLoopVisual() {
     [locale]
   );
 
-  const [elapsed, setElapsed] = useState(LOOP_MS);
+  // Start empty to avoid a completed-frame flash before the loop begins.
+  const [phase, setPhase] = useState(0);
+  const [inView, setInView] = useState(true);
+  const [pageVisible, setPageVisible] = useState(
+    () =>
+      typeof document === "undefined" || document.visibilityState !== "hidden"
+  );
+
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      setPageVisible(document.visibilityState !== "hidden");
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (reduceMotion) {
-      setElapsed(LOOP_MS);
+      setPhase(FINAL_PHASE);
       return;
     }
-    setElapsed(0);
-    const started = performance.now();
-    let frame = 0;
-    const tick = (now: number) => {
-      setElapsed((now - started) % LOOP_MS);
-      frame = requestAnimationFrame(tick);
+
+    if (!inView || !pageVisible) {
+      return;
+    }
+
+    let cancelled = false;
+    const timers: number[] = [];
+
+    const clearTimers = () => {
+      for (const id of timers) window.clearTimeout(id);
+      timers.length = 0;
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [reduceMotion]);
 
-  const showRate = elapsed >= 700 || !!reduceMotion;
-  const showCost = elapsed >= 2000 || !!reduceMotion;
-  const showQuota = elapsed >= 3300 || !!reduceMotion;
-  const showOthers = elapsed >= 4800 || !!reduceMotion;
-  const showDownload = !!reduceMotion || elapsed >= LOOP_MS - HOLD_FINAL_MS;
+    const runLoop = () => {
+      if (cancelled) return;
+      clearTimers();
+      setPhase(0);
+      for (const step of PHASE_STEPS) {
+        if (step.at === 0) continue;
+        timers.push(
+          window.setTimeout(() => {
+            if (!cancelled) setPhase(step.phase);
+          }, step.at)
+        );
+      }
+      timers.push(
+        window.setTimeout(() => {
+          if (!cancelled) runLoop();
+        }, HERO_LOOP_MS)
+      );
+    };
 
-  const fieldsFilled = reduceMotion
-    ? 9
-    : Number(showRate) +
-      Number(showCost) +
-      Number(showQuota) +
-      (showOthers ? 6 : 0);
-  const docsRead = reduceMotion
+    runLoop();
+
+    return () => {
+      cancelled = true;
+      clearTimers();
+    };
+  }, [reduceMotion, inView, pageVisible]);
+
+  // Prefer reduceMotion on the render path so the final frame has no empty flash.
+  const activePhase = reduceMotion ? FINAL_PHASE : phase;
+  const showRate = activePhase >= 1;
+  const showCost = activePhase >= 2;
+  const showQuota = activePhase >= 3;
+  const showOthers = activePhase >= 4;
+  const showDownload = activePhase >= 5;
+
+  const fieldsFilled =
+    Number(showRate) +
+    Number(showCost) +
+    Number(showQuota) +
+    (showOthers ? 6 : 0);
+  const docsRead = showOthers
     ? 4
-    : showOthers
-      ? 4
-      : showQuota
-        ? 2
-        : showCost || showRate
-          ? 1
-          : 0;
+    : showQuota
+      ? 2
+      : showCost || showRate
+        ? 1
+        : 0;
 
-  const activeField: FieldKey | null = reduceMotion
-    ? null
-    : !showRate
+  const activeField: FieldKey | null =
+    reduceMotion || activePhase >= 4
       ? null
-      : !showCost
+      : activePhase === 1
         ? "rate"
-        : !showQuota
+        : activePhase === 2
           ? "cost"
-          : !showOthers
+          : activePhase === 3
             ? "quota"
             : null;
 
@@ -166,7 +241,6 @@ export function HeroLoopVisual() {
   const formulaValue = values.rate[2];
   const anyFieldShown = showRate || showCost || showQuota;
 
-  const rootRef = useRef<HTMLDivElement>(null);
   const excelWindowRef = useRef<HTMLDivElement>(null);
   const pdfFieldRefs = useRef<Partial<Record<FieldKey, HTMLElement | null>>>(
     {}
@@ -246,6 +320,7 @@ export function HeroLoopVisual() {
     <div
       ref={rootRef}
       data-hero-loop
+      data-hero-phase={activePhase}
       role="img"
       aria-label={t("visual.description")}
       className="relative w-full min-w-0"

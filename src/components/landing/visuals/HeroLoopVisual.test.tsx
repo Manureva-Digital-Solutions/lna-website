@@ -1,34 +1,67 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { HeroLoopVisual } from "@/components/landing/visuals/HeroLoopVisual";
+import {
+  HeroLoopVisual,
+  HERO_LOOP_PHASE_MS,
+} from "@/components/landing/visuals/HeroLoopVisual";
 import { DEMO_ISSUERS } from "@/components/landing/visuals/demo-sheet-data";
 import { renderWithIntl } from "@/test/render";
 import en from "../../../../messages/en.json";
 import fr from "../../../../messages/fr.json";
+
+const reducedMotionState = { current: true as boolean | null };
 
 vi.mock("framer-motion", async () => {
   const actual =
     await vi.importActual<typeof import("framer-motion")>("framer-motion");
   return {
     ...actual,
-    useReducedMotion: () => true,
+    useReducedMotion: () => reducedMotionState.current,
   };
 });
 
+function stubIntersectionObserver(intersecting = true) {
+  class MockIntersectionObserver {
+    callback: IntersectionObserverCallback;
+    constructor(callback: IntersectionObserverCallback) {
+      this.callback = callback;
+    }
+    observe(target: Element) {
+      this.callback(
+        [
+          {
+            isIntersecting: intersecting,
+            target,
+            intersectionRatio: intersecting ? 1 : 0,
+          } as IntersectionObserverEntry,
+        ],
+        this as unknown as IntersectionObserver
+      );
+    }
+    unobserve() {}
+    disconnect() {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+    root = null;
+    rootMargin = "";
+    thresholds = [0];
+  }
+  vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
+}
+
 describe("HeroLoopVisual (LNAW-121)", () => {
   beforeEach(() => {
-    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
-      return window.setTimeout(
-        () => cb(performance.now()),
-        16
-      ) as unknown as number;
-    });
-    vi.stubGlobal("cancelAnimationFrame", (id: number) => {
-      window.clearTimeout(id);
+    reducedMotionState.current = true;
+    stubIntersectionObserver(true);
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "visible",
     });
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -69,10 +102,27 @@ describe("HeroLoopVisual (LNAW-121)", () => {
     expect(screen.getByText("devis-lumina-2026.pdf")).toBeInTheDocument();
   });
 
+  it("formats rates and costs for EN vs FR (LNA-252)", () => {
+    const { unmount } = renderWithIntl(<HeroLoopVisual />);
+    expect(screen.getAllByText("0.34%").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("€4,218.00").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText(/0,34/)).not.toBeInTheDocument();
+    unmount();
+
+    renderWithIntl(<HeroLoopVisual />, { locale: "fr" });
+    expect(screen.getAllByText(/0,34\s*%/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/4[\s\u00a0]218,00\s*€/).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText("0.34%")).not.toBeInTheDocument();
+    expect(screen.queryByText("€4,218.00")).not.toBeInTheDocument();
+  });
+
   it("shows the final filled sheet without review/confidence cues when reduced-motion", () => {
     const { container } = renderWithIntl(<HeroLoopVisual />);
     const root = container.querySelector("[data-hero-loop]") as HTMLElement;
     expect(root).toBeTruthy();
+    expect(root).toHaveAttribute("data-hero-phase", "5");
 
     for (const issuer of DEMO_ISSUERS) {
       expect(within(root).getAllByText(issuer).length).toBeGreaterThanOrEqual(
@@ -99,5 +149,55 @@ describe("HeroLoopVisual (LNAW-121)", () => {
     expect(
       screen.queryByText(/Generali|MetLife|Malakoff/i)
     ).not.toBeInTheDocument();
+  });
+
+  it("advances through phases with timers when reduced-motion is off", () => {
+    reducedMotionState.current = false;
+    vi.useFakeTimers();
+
+    const { container } = renderWithIntl(<HeroLoopVisual />);
+    const root = () =>
+      container.querySelector("[data-hero-loop]") as HTMLElement;
+    const rateCell = () =>
+      container.querySelector('[data-hero-cell="rate-0"] span');
+
+    expect(root()).toHaveAttribute("data-hero-phase", "0");
+    expect(rateCell()).toHaveClass("opacity-0");
+
+    act(() => {
+      vi.advanceTimersByTime(HERO_LOOP_PHASE_MS.rate);
+    });
+    expect(root()).toHaveAttribute("data-hero-phase", "1");
+    expect(rateCell()).toHaveClass("opacity-100");
+
+    act(() => {
+      vi.advanceTimersByTime(HERO_LOOP_PHASE_MS.cost - HERO_LOOP_PHASE_MS.rate);
+    });
+    expect(root()).toHaveAttribute("data-hero-phase", "2");
+
+    act(() => {
+      vi.advanceTimersByTime(
+        HERO_LOOP_PHASE_MS.quota - HERO_LOOP_PHASE_MS.cost
+      );
+    });
+    expect(root()).toHaveAttribute("data-hero-phase", "3");
+
+    act(() => {
+      vi.advanceTimersByTime(
+        HERO_LOOP_PHASE_MS.others - HERO_LOOP_PHASE_MS.quota
+      );
+    });
+    expect(root()).toHaveAttribute("data-hero-phase", "4");
+    expect(screen.getByText("4 / 4")).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(
+        HERO_LOOP_PHASE_MS.download - HERO_LOOP_PHASE_MS.others
+      );
+    });
+    expect(root()).toHaveAttribute("data-hero-phase", "5");
+    expect(
+      screen.getByText(en.home.hero.loop.downloadButton)
+    ).toBeInTheDocument();
   });
 });

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { UseCases } from "@/components/landing/UseCases";
-import { HeroExcelWindow } from "@/components/landing/visuals/HeroExcelWindow";
+import { HeroLoopVisual } from "@/components/landing/visuals/HeroLoopVisual";
 import { Footer } from "@/components/layout/footer";
 import { renderWithIntl } from "@/test/render";
 import en from "../../../messages/en.json";
@@ -102,23 +102,27 @@ describe("LNAW-95 localisation", () => {
   });
 
   it("formats hero Excel rates and costs for EN vs FR (LNA-252)", () => {
-    const { unmount } = renderWithIntl(<HeroExcelWindow />);
-    expect(screen.getByText("0.34%")).toBeInTheDocument();
-    expect(screen.getByText("€4,218.00")).toBeInTheDocument();
+    const { unmount } = renderWithIntl(<HeroLoopVisual />);
+    expect(screen.getAllByText("0.34%").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("€4,218.00").length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText(/0,34/)).not.toBeInTheDocument();
     unmount();
 
-    renderWithIntl(<HeroExcelWindow />, { locale: "fr" });
+    renderWithIntl(<HeroLoopVisual />, { locale: "fr" });
     // Intl may use narrow NBSP between number and %
-    expect(screen.getByText(/0,34\s*%/)).toBeInTheDocument();
-    expect(screen.getByText(/4[\s\u00a0]218,00\s*€/)).toBeInTheDocument();
+    expect(screen.getAllByText(/0,34\s*%/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/4[\s\u00a0]218,00\s*€/).length
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText("0.34%")).not.toBeInTheDocument();
     expect(screen.queryByText("€4,218.00")).not.toBeInTheDocument();
   });
 
   it("keeps FR ribbon chrome off the EN hero sheet", () => {
-    renderWithIntl(<HeroExcelWindow />);
-    expect(screen.getByText(en.home.hero.excel.tabFile)).toBeInTheDocument();
+    renderWithIntl(<HeroLoopVisual />);
+    expect(
+      screen.getAllByText(en.home.hero.excel.tabFile).length
+    ).toBeGreaterThanOrEqual(1);
     expect(
       screen.queryByText(fr.home.hero.excel.tabFile)
     ).not.toBeInTheDocument();
