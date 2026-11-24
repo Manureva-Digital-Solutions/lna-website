@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useHasMounted } from "@/lib/use-has-mounted";
 import {
   DEMO_FILLED,
   DEMO_ISSUERS,
@@ -58,6 +59,11 @@ export function HeroLoopVisual() {
   const x = useTranslations("home.hero.excel");
   const locale = useLocale();
   const reduceMotion = useReducedMotion();
+  const mounted = useHasMounted();
+  // LNAW-119 — prefers-reduced-motion is client-only knowledge, so honour it
+  // only once hydrated: SSR and the first client paint must render the same
+  // opening frame (phase 0) whatever the user's motion preference.
+  const motionReduced = mounted && reduceMotion === true;
 
   const pct = (v: number, digits = 2) =>
     new Intl.NumberFormat(locale, {
@@ -112,7 +118,7 @@ export function HeroLoopVisual() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion) {
+    if (motionReduced) {
       setPhase(FINAL_PHASE);
       return;
     }
@@ -154,10 +160,12 @@ export function HeroLoopVisual() {
       cancelled = true;
       clearTimers();
     };
-  }, [reduceMotion, inView, pageVisible]);
+  }, [motionReduced, inView, pageVisible]);
 
-  // Prefer reduceMotion on the render path so the final frame has no empty flash.
-  const activePhase = reduceMotion ? FINAL_PHASE : phase;
+  // After mount, reduced motion jumps straight to the final frame so the loop
+  // never plays; before mount `motionReduced` is false and we render phase 0,
+  // which is exactly what the server rendered.
+  const activePhase = motionReduced ? FINAL_PHASE : phase;
   const showRate = activePhase >= 1;
   const showCost = activePhase >= 2;
   const showQuota = activePhase >= 3;
@@ -178,7 +186,7 @@ export function HeroLoopVisual() {
         : 0;
 
   const activeField: FieldKey | null =
-    reduceMotion || activePhase >= 4
+    motionReduced || activePhase >= 4
       ? null
       : activePhase === 1
         ? "rate"
@@ -189,7 +197,7 @@ export function HeroLoopVisual() {
             : null;
 
   const cellVisible = (issuerIdx: number, field: FieldKey) => {
-    if (reduceMotion || showOthers) return true;
+    if (motionReduced || showOthers) return true;
     if (issuerIdx > 0) return false;
     if (field === "rate") return showRate;
     if (field === "cost") return showCost;
@@ -197,7 +205,7 @@ export function HeroLoopVisual() {
   };
 
   const cellHighlight = (issuerIdx: number, field: FieldKey) =>
-    !reduceMotion && issuerIdx === 0 && activeField === field;
+    !motionReduced && issuerIdx === 0 && activeField === field;
 
   const pdfFields = [
     {
@@ -314,7 +322,7 @@ export function HeroLoopVisual() {
     };
     // Re-measure when fields/cells appear so paths stay aligned.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showRate, showCost, showQuota, locale, reduceMotion]);
+  }, [showRate, showCost, showQuota, locale, motionReduced]);
 
   return (
     <div
