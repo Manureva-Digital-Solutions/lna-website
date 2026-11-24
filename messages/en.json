@@ -154,15 +154,22 @@
       "heading": "Three steps, the same as in the app",
       "template": {
         "label": "Choose a template",
-        "description": "Drop in the Excel file you already fill in, or reuse a previous one."
+        "description": "Drop in the Excel file you already fill in, or reuse a previous one.",
+        "loaded": "Template loaded"
       },
       "documents": {
         "label": "Drop documents",
-        "description": "Drag your documents in together; reading starts with no further setup."
+        "description": "Drag your documents in together; reading starts with no further setup.",
+        "sorted": "Each document is sorted automatically.",
+        "read": "4 documents read"
       },
       "download": {
         "label": "Download your Excel",
         "description": "Get your file, filled in and ready to use."
+      },
+      "visual": {
+        "description": "Animation: an Excel template drops in and loads, four sample PDFs are sorted with document-type tags, then the comparison sheet fills and Download Excel is pressed.",
+        "dropHint": "Excel template drop zone"
       }
     },
     "useCases": {

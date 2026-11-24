@@ -154,15 +154,22 @@
       "heading": "Trois étapes, les mêmes que dans l'application",
       "template": {
         "label": "Choisir un modèle",
-        "description": "Déposez le fichier Excel que vous remplissez déjà, ou reprenez-en un des précédents."
+        "description": "Déposez le fichier Excel que vous remplissez déjà, ou reprenez-en un des précédents.",
+        "loaded": "Modèle chargé"
       },
       "documents": {
         "label": "Déposer les documents",
-        "description": "Glissez vos documents ensemble ; la lecture démarre sans autre réglage."
+        "description": "Glissez vos documents ensemble ; la lecture démarre sans autre réglage.",
+        "sorted": "Chaque document est classé automatiquement.",
+        "read": "4 documents lus"
       },
       "download": {
         "label": "Téléchargez votre Excel",
         "description": "Récupérez votre fichier, rempli, prêt à l'emploi."
+      },
+      "visual": {
+        "description": "Animation : un modèle Excel est déposé et chargé, quatre PDF d'exemple sont classés avec leur type de document, puis le tableau comparatif se remplit et Télécharger Excel est pressé.",
+        "dropHint": "Zone de dépôt du modèle Excel"
       }
     },
     "useCases": {

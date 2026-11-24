@@ -2,14 +2,13 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { ThreeStepsVisuals } from "@/components/landing/visuals/ThreeStepsVisuals";
 
 /**
- * LNAW-96 — frozen v4: three columns ≥1056, 1px Gray 20 top rule,
- * Plex Mono 01/02/03, 20px titles, Gray 70 body; stack below 1056.
+ * LNAW-96 — frozen v4 shell: H2 + three steps.
  * LNAW-124 — step 3 is download (no review/confidence wording).
+ * LNAW-123 — animated product visuals per step (template → docs → download).
  */
-const STEPS = ["template", "documents", "download"] as const;
-
 export function HowItWorks() {
   const t = useTranslations("home.howItWorks");
   return (
@@ -20,23 +19,9 @@ export function HowItWorks() {
             {t("heading")}
           </h2>
         </AnimateIn>
-        <ol className="grid grid-cols-1 gap-8 min-[1056px]:grid-cols-3 min-[1056px]:gap-12">
-          {STEPS.map((step, i) => (
-            <AnimateIn key={step} delay={i * 0.05}>
-              <li className="border-gray-20 flex flex-col gap-2 border-t pt-4">
-                <span className="text-muted-foreground font-mono text-xs">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-tile text-foreground">
-                  {t(`${step}.label`)}
-                </h3>
-                <p className="text-body text-muted-foreground max-w-[46ch] text-pretty">
-                  {t(`${step}.description`)}
-                </p>
-              </li>
-            </AnimateIn>
-          ))}
-        </ol>
+        <AnimateIn delay={0.05}>
+          <ThreeStepsVisuals />
+        </AnimateIn>
       </Container>
     </Section>
   );
