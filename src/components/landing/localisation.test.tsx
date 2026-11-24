@@ -43,10 +43,12 @@ describe("LNAW-95 localisation", () => {
     );
 
     renderWithIntl(<Hero />);
-    // Ghost CTA is a Button render=<a> (role=button), same label as steps H2.
-    expect(
-      screen.getByRole("button", { name: en.home.howItWorks.heading })
-    ).toHaveAttribute("href", "#steps");
+    // Ghost CTA is a real anchor to #steps — link semantics, no role="button".
+    const stepsCta = screen.getByRole("link", {
+      name: en.home.howItWorks.heading,
+    });
+    expect(stepsCta).toHaveAttribute("href", "#steps");
+    expect(stepsCta).not.toHaveAttribute("role", "button");
   });
 
   it("renders mono 01–03 on steps and use cases (Gilbert)", () => {
