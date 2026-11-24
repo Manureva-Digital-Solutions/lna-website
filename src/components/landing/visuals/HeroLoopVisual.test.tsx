@@ -63,6 +63,60 @@ function stubIntersectionObserver(intersecting = true) {
   vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 }
 
+/** jsdom has no matchMedia: the hero only measures connectors on wide screens. */
+function stubMatchMedia(matches: boolean) {
+  vi.stubGlobal("matchMedia", (query: string) => {
+    const list = {
+      matches,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    };
+    return list as unknown as MediaQueryList;
+  });
+}
+
+const REDUCED_MOTION_TRANSITION = "motion-reduce:transition-none";
+
+/**
+ * Nodes that used to keep a 300ms transition after the reduced-motion jump:
+ * PDF field rows + their values, Excel cells + their values, the connector
+ * paths and the download CTA.
+ */
+function transitionTargets(root: ParentNode) {
+  return Array.from(
+    root.querySelectorAll(
+      [
+        "[data-pdf-field]",
+        "[data-pdf-field] > span:last-child",
+        "[data-hero-cell]",
+        "[data-hero-cell] > span",
+        "[data-hero-loop] svg > g",
+      ].join(", ")
+    )
+  );
+}
+
+function transitionClasses(node: Element) {
+  return (node.getAttribute("class") ?? "")
+    .split(/\s+/)
+    .filter(
+      (token) => token.includes("transition") || token.includes("duration")
+    )
+    .sort()
+    .join(" ");
+}
+
+function transitionSignature(root: ParentNode) {
+  return transitionTargets(root).map(
+    (node) => `${node.tagName}|${transitionClasses(node)}`
+  );
+}
+
 describe("HeroLoopVisual (LNAW-121)", () => {
   let hydrationRoot: Root | undefined;
   let hydrationContainer: HTMLDivElement | undefined;
@@ -285,5 +339,105 @@ describe("HeroLoopVisual (LNAW-121)", () => {
     expect(
       screen.getByText(en.home.hero.loop.downloadButton)
     ).toBeInTheDocument();
+  });
+
+  it("drops the 300ms cell transitions when the user prefers reduced motion (LNAW-134)", () => {
+    reducedMotionState.current = true;
+    stubMatchMedia(true);
+
+    const { container } = renderWithIntl(<HeroLoopVisual />);
+    const downloadCta = screen
+      .getByText(en.home.hero.loop.downloadButton)
+      .closest("div") as HTMLElement;
+
+    const targets = [...transitionTargets(container), downloadCta];
+    // 3 PDF rows + 3 values + 9 Excel cells + 9 values + 3 connectors + CTA
+    expect(targets.length).toBe(28);
+
+    for (const node of targets) {
+      expect(node.getAttribute("class")).toContain(REDUCED_MOTION_TRANSITION);
+    }
+
+    // The connector paths are rendered and covered too.
+    expect(container.querySelectorAll("[data-hero-loop] svg > g").length).toBe(
+      3
+    );
+
+    // The motion-on animation is untouched: the 300ms transitions stay declared.
+    expect(container.querySelector('[data-hero-cell="rate-0"]')).toHaveClass(
+      "transition-colors",
+      "duration-300"
+    );
+    expect(
+      container.querySelector('[data-hero-cell="rate-0"] span')
+    ).toHaveClass("transition-opacity", "duration-300");
+    expect(container.querySelector("[data-pdf-field]")).toHaveClass(
+      "transition-[background-color,opacity]",
+      "duration-300"
+    );
+    expect(downloadCta).toHaveClass("transition-opacity", "duration-300");
+    expect(container.querySelector("[data-hero-loop] svg > g")).toHaveClass(
+      "transition-opacity",
+      "duration-300"
+    );
+  });
+
+  it("keeps identical transition classes with reduced motion on or off (LNAW-134)", () => {
+    stubMatchMedia(true);
+
+    reducedMotionState.current = true;
+    const reduced = renderWithIntl(<HeroLoopVisual />);
+    const reducedSignature = transitionSignature(reduced.container);
+    reduced.unmount();
+
+    reducedMotionState.current = false;
+    const animated = renderWithIntl(<HeroLoopVisual />);
+    const animatedSignature = transitionSignature(animated.container);
+
+    // The utility is CSS-only, so both motion modes declare the same transitions
+    // and only `prefers-reduced-motion` decides whether they run.
+    expect(animatedSignature).toEqual(reducedSignature);
+    expect(reducedSignature.length).toBe(27);
+    expect(
+      reducedSignature.every((entry) =>
+        entry.includes(REDUCED_MOTION_TRANSITION)
+      )
+    ).toBe(true);
+  });
+
+  it("keeps the transition classes stable across hydration with reduced motion (LNAW-134)", async () => {
+    reducedMotionState.current = true;
+    // Narrow viewport: the connectors are desktop-only, so both the server
+    // markup and the hydrated tree render the same set of transition nodes.
+    stubMatchMedia(false);
+
+    const element = withIntl(<HeroLoopVisual />);
+    const container = document.createElement("div");
+    hydrationContainer = container;
+    container.innerHTML = renderToString(element);
+    document.body.appendChild(container);
+
+    const serverSignature = transitionSignature(container);
+    expect(serverSignature.length).toBe(24);
+
+    const errors: string[] = [];
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation((...args: unknown[]) => {
+        errors.push(args.map((arg) => String(arg)).join(" "));
+      });
+
+    await act(async () => {
+      hydrationRoot = hydrateRoot(container, element);
+    });
+
+    expect(errors.filter((msg) => /hydrat|did not match/i.test(msg))).toEqual(
+      []
+    );
+    // The CSS-only `motion-reduce` utility never flips a class after mount, so
+    // the hydrated frame matches the server markup.
+    expect(transitionSignature(container)).toEqual(serverSignature);
+
+    errorSpy.mockRestore();
   });
 });
