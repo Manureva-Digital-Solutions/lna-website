@@ -8,6 +8,7 @@ import {
   demoAcknowledgementEmail,
   resolveEmailLocale,
 } from "@/lib/transactional-email";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 interface DemoRequestBody {
   name: string;
@@ -19,6 +20,11 @@ interface DemoRequestBody {
 }
 
 export async function POST(request: Request) {
+  // Throttle before parsing or sending anything: abusive traffic must never
+  // reach SMTP. Separate bucket per route so both forms stay usable.
+  const limit = checkRateLimit("demo-request", request);
+  if (!limit.ok) return rateLimitResponse(limit.retryAfterSeconds);
+
   try {
     const body: DemoRequestBody = await request.json();
     const { name, email, company, role, message, locale } = body;
@@ -61,7 +67,13 @@ export async function POST(request: Request) {
           locale: emailLocale,
         }
       );
-      return NextResponse.json({ success: true, delivered: false });
+      return NextResponse.json({
+        success: true,
+        delivered: false,
+        // No SMTP ⇒ no acknowledgement went out. Say so, or the form promises
+        // the visitor a confirmation email that will never arrive.
+        acknowledged: false,
+      });
     }
 
     // 1. Internal notification — durable record of the request.

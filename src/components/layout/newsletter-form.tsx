@@ -48,20 +48,24 @@ export function NewsletterForm() {
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(
-          typeof data.error === "string" && data.error ? data.error : t("error")
-        );
+        // 429 = our own rate limit; keep locale copy either way and never toast
+        // the API's English `error` string.
+        showToast(res.status === 429 ? t("rateLimited") : t("error"), "error");
+        return;
       }
 
-      showToast(t("success"), "success");
+      const data = (await res.json().catch(() => ({}))) as {
+        confirmed?: boolean;
+      };
+      // Only promise a confirmation email when one was actually sent.
+      showToast(
+        data.confirmed === false ? t("successNoConfirm") : t("success"),
+        "success"
+      );
       window.gtag?.("event", "newsletter_signup", { method: "footer" });
       form.reset();
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : t("invalidEmail"),
-        "error"
-      );
+    } catch {
+      showToast(t("error"), "error");
     } finally {
       setStatus("idle");
     }

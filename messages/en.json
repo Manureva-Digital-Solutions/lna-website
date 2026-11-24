@@ -911,7 +911,8 @@
       "emailInvalid": "Please enter a valid email address.",
       "companyRequired": "Company is required.",
       "roleRequired": "Please select your role.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "rateLimited": "Too many requests. Please wait a minute and try again."
     },
     "roles": {
       "accountant": "Accountant",
@@ -944,8 +945,10 @@
     "emailLabel": "Email for newsletter",
     "subscribe": "Subscribe",
     "success": "You're subscribed! Check your email to confirm.",
+    "successNoConfirm": "You're subscribed!",
     "invalidEmail": "Please enter a valid email address.",
-    "error": "Could not subscribe. Please try again."
+    "error": "Could not subscribe. Please try again.",
+    "rateLimited": "Too many attempts. Please try again in a minute."
   },
   "languageSwitcher": {
     "label": "Language",
