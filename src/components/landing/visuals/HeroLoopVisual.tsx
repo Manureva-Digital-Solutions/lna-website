@@ -408,7 +408,7 @@ export function HeroLoopVisual() {
                     }}
                     data-pdf-field={field.key}
                     className={cn(
-                      "m-0 flex items-center justify-between gap-3 px-2.5 py-2.5 text-[11px] leading-snug transition-[background-color,opacity] duration-300 sm:text-[12px]",
+                      "m-0 flex items-center justify-between gap-3 px-2.5 py-2.5 text-[11px] leading-snug transition-[background-color,opacity] duration-300 motion-reduce:transition-none sm:text-[12px]",
                       i > 0 && "border-t border-solid",
                       i > 0 &&
                         (anyFieldShown ? "border-primary" : "border-border/70"),
@@ -422,7 +422,7 @@ export function HeroLoopVisual() {
                     </span>
                     <span
                       className={cn(
-                        "text-foreground shrink-0 font-mono text-[12px] font-semibold tabular-nums transition-opacity duration-300 sm:text-[13px]",
+                        "text-foreground shrink-0 font-mono text-[12px] font-semibold tabular-nums transition-opacity duration-300 motion-reduce:transition-none sm:text-[13px]",
                         field.show ? "opacity-100" : "opacity-35"
                       )}
                     >
@@ -582,14 +582,14 @@ export function HeroLoopVisual() {
                               key={`${row.key}-${issuerIdx}`}
                               data-hero-cell={`${row.key}-${issuerIdx}`}
                               className={cn(
-                                "border-border border-r border-b px-1 py-0.5 text-right transition-colors duration-300",
+                                "border-border border-r border-b px-1 py-0.5 text-right transition-colors duration-300 motion-reduce:transition-none",
                                 highlight &&
                                   "outline-primary bg-[#e8eef7] outline-2 -outline-offset-2"
                               )}
                             >
                               <span
                                 className={cn(
-                                  "text-foreground font-mono transition-opacity duration-300",
+                                  "text-foreground font-mono transition-opacity duration-300 motion-reduce:transition-none",
                                   visible ? "opacity-100" : "opacity-0"
                                 )}
                               >
@@ -662,7 +662,7 @@ export function HeroLoopVisual() {
             </div>
             <div
               className={cn(
-                "bg-primary text-primary-foreground flex items-center justify-between gap-6 px-5 py-3 text-[13px] leading-none font-medium transition-opacity duration-300",
+                "bg-primary text-primary-foreground flex items-center justify-between gap-6 px-5 py-3 text-[13px] leading-none font-medium transition-opacity duration-300 motion-reduce:transition-none",
                 showDownload ? "opacity-100" : "opacity-0"
               )}
             >
@@ -685,7 +685,7 @@ export function HeroLoopVisual() {
             <g
               key={line.key}
               style={{ opacity: line.on ? 1 : 0 }}
-              className="transition-opacity duration-300"
+              className="transition-opacity duration-300 motion-reduce:transition-none"
             >
               <path
                 d={line.d}
