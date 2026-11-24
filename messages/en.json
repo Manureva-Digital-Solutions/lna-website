@@ -176,15 +176,32 @@
       "heading": "Three situations LNA handles today",
       "adp": {
         "title": "Compare loan insurance quotes",
-        "description": "Rates, total costs and coverage shares from each quote land in the rows of your comparison sheet."
+        "description": "Rates, total costs and coverage shares from each quote land in the rows of your comparison sheet.",
+        "visualLabel": "Loan insurance quote excerpt on the left; rate, total cost and cover ratio fill into the sheet on the right.",
+        "docBadge": "Loan insurance quote",
+        "docHeading": "Lumina Cover"
       },
       "health": {
         "title": "Track health cover",
-        "description": "Hospital, optical and dental items from each quote fill in your tracking sheet."
+        "description": "Hospital, optical and dental items from each quote fill in your tracking sheet.",
+        "visualLabel": "Health cover quote excerpt on the left; hospital, optical and dental amounts fill into the sheet on the right.",
+        "docBadge": "Health cover quote",
+        "docHeading": "Clarté Santé",
+        "colCover": "Cover",
+        "rowHospital": "Hospital",
+        "rowOptical": "Optical",
+        "rowDental": "Dental"
       },
       "condo": {
         "title": "Transfer a condo service-charge statement",
-        "description": "Item, amount and apportionment key, line by line, into your building tracking file."
+        "description": "Item, amount and apportionment key, line by line, into your building tracking file.",
+        "visualLabel": "Condo service-charge statement excerpt on the left; item, amount and allocation key fill into the sheet on the right.",
+        "docBadge": "Service-charge statement",
+        "docHeading": "Résidence des Pins",
+        "colField": "Field",
+        "rowItem": "Item",
+        "rowAmount": "Amount",
+        "rowKey": "Allocation key"
       }
     },
     "trust": {

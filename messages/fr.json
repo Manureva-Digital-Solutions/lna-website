@@ -176,15 +176,32 @@
       "heading": "Trois situations que LNA traite aujourd'hui",
       "adp": {
         "title": "Comparer des devis d'assurance emprunteur",
-        "description": "Les taux, coûts totaux et quotités de chaque devis atterrissent dans les lignes de votre tableau de comparaison."
+        "description": "Les taux, coûts totaux et quotités de chaque devis atterrissent dans les lignes de votre tableau de comparaison.",
+        "visualLabel": "Extrait de devis d'assurance emprunteur à gauche ; le taux, le coût total et la quotité se remplissent dans le tableau à droite.",
+        "docBadge": "Devis assurance emprunteur",
+        "docHeading": "Lumina Cover"
       },
       "health": {
         "title": "Suivre une complémentaire santé",
-        "description": "Les postes hospitalisation, optique et dentaire de chaque devis remplissent votre trame de suivi."
+        "description": "Les postes hospitalisation, optique et dentaire de chaque devis remplissent votre trame de suivi.",
+        "visualLabel": "Extrait de devis complémentaire santé à gauche ; hospitalisation, optique et dentaire se remplissent dans le tableau à droite.",
+        "docBadge": "Devis complémentaire santé",
+        "docHeading": "Clarté Santé",
+        "colCover": "Poste",
+        "rowHospital": "Hospitalisation",
+        "rowOptical": "Optique",
+        "rowDental": "Dentaire"
       },
       "condo": {
         "title": "Reprendre un décompte de charges de copropriété",
-        "description": "Poste, montant et clé de répartition, ligne à ligne, dans votre fichier de suivi d'immeuble."
+        "description": "Poste, montant et clé de répartition, ligne à ligne, dans votre fichier de suivi d'immeuble.",
+        "visualLabel": "Extrait de décompte de charges à gauche ; poste, montant et clé de répartition se remplissent dans le tableau à droite.",
+        "docBadge": "Décompte de charges",
+        "docHeading": "Résidence des Pins",
+        "colField": "Champ",
+        "rowItem": "Poste",
+        "rowAmount": "Montant",
+        "rowKey": "Clé de répartition"
       }
     },
     "trust": {
