@@ -23,7 +23,32 @@ describe("blog locale content (FR MDX + EN fallback)", () => {
     );
     expect(why?.category).toBe("Perspectives sectorielles");
     expect(why?.image).toBe("/illustrations/hero-mockup.svg");
+    expect(why?.articleImage).toBe(
+      "/illustrations/lna-blog-hero-1600x900.webp"
+    );
+    expect(why?.ogImage).toBe("/illustrations/lna-blog-hero-og-1200x630.png");
     expect(why?.content).toMatch(/coût caché de la saisie manuelle/);
+  });
+
+  it("keeps FR why-pdf share image on the OG PNG, not the listing SVG", () => {
+    const whyFr = getPostBySlug("why-pdf-to-excel-automation-matters", "fr");
+    const whyEn = getPostBySlug("why-pdf-to-excel-automation-matters", "en");
+    const fiveFr = getPostBySlug(
+      "five-signs-you-need-document-automation",
+      "fr"
+    );
+    const fiveEn = getPostBySlug(
+      "five-signs-you-need-document-automation",
+      "en"
+    );
+
+    expect(whyFr?.ogImage).toBe(whyEn?.ogImage);
+    expect(whyFr?.ogImage).toBe("/illustrations/lna-blog-hero-og-1200x630.png");
+    expect(existsSync(publicPath(whyFr!.ogImage!))).toBe(true);
+
+    // five-signs has no ogImage in EN, so FR stays without one
+    expect(fiveEn?.ogImage).toBeUndefined();
+    expect(fiveFr?.ogImage).toBeUndefined();
   });
 
   it("keeps English posts unchanged when locale is en", () => {
