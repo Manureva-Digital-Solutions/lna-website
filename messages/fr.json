@@ -80,8 +80,26 @@
       "ctaPrimary": "Tester sur mes documents",
       "ctaNote": "Vous créez un compte, puis vous déposez vos premiers documents.",
       "visual": {
-        "description": "Quatre PDF illustratifs — devis d'assurance emprunteur Lumina Cover, Atelier Protect et Rive Prévoyance, plus un tableau d'amortissement — alimentent un tableau comparatif Excel dont les colonnes sont ces émetteurs et les lignes les garanties : taux, coût total, quotité.",
+        "description": "Animation : un devis d'assurance emprunteur à gauche ; le taux, le coût total et la quotité se surlignent un à un, rejoignent les cellules Excel correspondantes, puis les colonnes des autres émetteurs se remplissent ; les compteurs atteignent Documents lus 4/4 et Champs remplis 9 ; Télécharger Excel apparaît.",
         "provenance": "Démo illustrative : émetteurs fictifs et valeurs d'exemple. Pas une extraction client réelle."
+      },
+      "loop": {
+        "pdfIssuer": "Lumina Cover",
+        "pdfProduct": "Assurance emprunteur",
+        "pdfBadge": "Devis assurance emprunteur",
+        "pdfQuoteRef": "Devis n° LC-2026-0418",
+        "pdfLoanMeta": "Prêt immobilier - 25 ans",
+        "pdfHeading": "Proposition d'assurance de prêt",
+        "fieldRate": "Taux annuel de l'assurance",
+        "fieldCost": "Coût total de l'assurance",
+        "fieldQuota": "Quotité assurée",
+        "pdfGuaranteesLabel": "Garanties",
+        "pdfGuaranteesValue": "DC • PTIA • ITT",
+        "pdfDocNote": "Document illustratif. Émetteur fictif, valeurs d'exemple.",
+        "documentsReadLabel": "Documents lus",
+        "fieldsFilledLabel": "Champs remplis",
+        "fileLabel": "Fichier",
+        "downloadButton": "Télécharger Excel"
       },
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
