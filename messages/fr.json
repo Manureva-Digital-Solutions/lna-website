@@ -1,9 +1,9 @@
 {
   "seo": {
     "title": "LNA — vos PDF remplissent votre tableau Excel",
-    "description": "Déposez vos devis, tableaux d'amortissement ou décomptes de charges. LNA remplit votre propre modèle Excel, avec un niveau de fiabilité sur chaque champ.",
+    "description": "Déposez vos devis, tableaux d'amortissement ou décomptes de charges. LNA remplit votre propre modèle Excel, directement dans votre feuille.",
     "ogTitle": "LNA — vos PDF remplissent votre tableau Excel",
-    "ogDescription": "Déposez vos devis, tableaux d'amortissement ou décomptes de charges. LNA remplit votre propre modèle Excel, avec un niveau de fiabilité sur chaque champ.",
+    "ogDescription": "Déposez vos devis, tableaux d'amortissement ou décomptes de charges. LNA remplit votre propre modèle Excel, directement dans votre feuille.",
     "features": {
       "title": "Fonctionnalités LNA — Traitement Documentaire IA & Extraction Intelligente",
       "description": "Découvrez toutes les fonctionnalités de LNA : extraction IA, export PDF vers Excel, Q&R propulsé par LLM et rôles contextuels IA. Découvrez ce qui distingue LNA."
@@ -76,7 +76,7 @@
   "home": {
     "hero": {
       "heading": "Vos PDF entrent.",
-      "description": "Vous déposez votre modèle Excel et les devis. Vous récupérez le même fichier, complété, avec le niveau de fiabilité de chaque champ.",
+      "description": "Vous déposez votre modèle Excel et les devis. Vous récupérez le même fichier, complété, directement dans votre modèle Excel.",
       "ctaPrimary": "Tester sur mes documents",
       "ctaNote": "Vous créez un compte, puis vous déposez vos premiers documents.",
       "visual": {
@@ -86,7 +86,6 @@
       "headingHighlight": "Votre tableau Excel sort, déjà rempli.",
       "excel": {
         "filename": "comparatif-adp.xlsx",
-        "reviewMarker": "[REVIEW]",
         "formulaRef": "D2",
         "formulaFx": "fx",
         "tabFile": "Fichier",
@@ -95,7 +94,6 @@
         "tabLayout": "Mise en page",
         "tabFormulas": "Formules",
         "tabData": "Données",
-        "tabReview": "Révision",
         "tabView": "Affichage",
         "sheet": "Feuil1",
         "ready": "Prêt"
@@ -120,25 +118,16 @@
         "roleOther": "Autre",
         "provenance": "Noms de fichiers d'exemple pour la démo du hero (Lumina Cover, Atelier Protect, Rive Prévoyance + amortissement). Émetteurs fictifs uniquement."
       },
-      "confidence": {
-        "heading": "Vous voyez ce dont l'IA n'est pas sûre",
-        "body": "Chaque champ extrait porte son niveau de fiabilité, en pourcentage. Sous le seuil de relecture, la valeur part marquée dans le fichier exporté au lieu d'être noyée dans le reste.",
-        "tableCaption": "Grille de vérification : une ligne par garantie, une colonne par émetteur, avec le niveau de fiabilité de chaque valeur extraite.",
-        "colIndex": "#",
-        "colRowKey": "Row Key",
-        "colConf": "Conf.",
-        "levelHigh": "Élevée",
-        "levelMedium": "Moyenne",
-        "levelLow": "Faible",
-        "reviewLegend": "[REVIEW] — écrit dans la cellule exportée sous 0,6",
+      "fields": {
+        "heading": "Chaque champ à sa place",
+        "body": "Montants, dates, durées : chaque valeur du PDF arrive dans la bonne colonne.",
+        "tableCaption": "Tableau comparatif rempli : une ligne par garantie, une colonne par émetteur.",
         "provenance": "Mêmes valeurs d'exemple et émetteurs fictifs que le tableau comparatif du hero."
       },
       "validation": {
-        "heading": "Rien ne part sans votre validation",
-        "body": "L'export est une décision, pas un effet de bord : vous relisez les champs signalés, puis vous déclenchez le téléchargement. Chaque export est inscrit dans une piste d'audit.",
-        "stepLabel": "Étape 3 — Vérifier & Télécharger",
-        "checkbox": "J'ai relu les champs signalés",
-        "checkboxReview": "Conserver le marqueur [REVIEW] dans le fichier exporté",
+        "heading": "Un Excel prêt à partager",
+        "body": "Votre modèle, vos formules et votre mise en forme restent intacts.",
+        "stepLabel": "Téléchargez votre Excel",
         "downloadButton": "Télécharger Excel",
         "auditNote": "L'export est inscrit dans la piste d'audit."
       }
@@ -153,9 +142,9 @@
         "label": "Déposer les documents",
         "description": "Glissez vos documents ensemble ; la lecture démarre sans autre réglage."
       },
-      "review": {
-        "label": "Vérifier & Télécharger",
-        "description": "Relisez les champs signalés, puis récupérez votre fichier."
+      "download": {
+        "label": "Téléchargez votre Excel",
+        "description": "Récupérez votre fichier, rempli, prêt à l'emploi."
       }
     },
     "useCases": {

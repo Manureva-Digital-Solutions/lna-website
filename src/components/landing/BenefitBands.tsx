@@ -7,7 +7,7 @@ import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
 import { BeforeAfterExcel } from "@/components/landing/visuals/BeforeAfterExcel";
 import { RoleClassification } from "@/components/landing/visuals/RoleClassification";
-import { ConfidenceGrid } from "@/components/landing/visuals/ConfidenceGrid";
+import { FilledComparisonSheet } from "@/components/landing/visuals/FilledComparisonSheet";
 import { ExportGate } from "@/components/landing/visuals/ExportGate";
 import { appUrls } from "@/lib/app-urls";
 
@@ -73,10 +73,10 @@ export function BenefitBands() {
           <div className="mt-16 grid min-w-0 grid-cols-1 items-start gap-8 min-[1056px]:mt-24 min-[1056px]:grid-cols-[repeat(16,minmax(0,1fr))] min-[1056px]:gap-x-8">
             <div className="flex min-w-0 flex-col min-[1056px]:col-span-5">
               <h3 className="text-h3 text-foreground mb-4">
-                {t("confidence.heading")}
+                {t("fields.heading")}
               </h3>
               <p className="text-body text-muted-foreground mb-4 max-w-[480px] max-[671px]:mb-3 min-[1056px]:mb-8">
-                {t("confidence.body")}
+                {t("fields.body")}
               </p>
               <Link
                 href={appUrls.register}
@@ -87,7 +87,7 @@ export function BenefitBands() {
               </Link>
             </div>
             <div className="bg-gray-10 min-w-0 p-4 max-[1056px]:mt-4 max-[672px]:-mx-4 max-[671px]:mt-3 min-[1056px]:col-span-11 min-[1056px]:mt-0 min-[1313px]:p-12 md:p-8">
-              <ConfidenceGrid />
+              <FilledComparisonSheet />
             </div>
           </div>
         </AnimateIn>

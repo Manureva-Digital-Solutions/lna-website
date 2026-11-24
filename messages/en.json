@@ -1,9 +1,9 @@
 {
   "seo": {
     "title": "LNA — your PDFs fill in your Excel sheet",
-    "description": "Drop in your quotes, amortisation schedules or service-charge statements. LNA fills your own Excel template, with a confidence level on every field.",
+    "description": "Drop in your quotes, amortisation schedules or service-charge statements. LNA fills your own Excel template, straight into your sheet.",
     "ogTitle": "LNA — your PDFs fill in your Excel sheet",
-    "ogDescription": "Drop in your quotes, amortisation schedules or service-charge statements. LNA fills your own Excel template, with a confidence level on every field.",
+    "ogDescription": "Drop in your quotes, amortisation schedules or service-charge statements. LNA fills your own Excel template, straight into your sheet.",
     "features": {
       "title": "LNA Features — AI Document Processing & Intelligent Data Extraction",
       "description": "Explore LNA's full feature set: AI data extraction, PDF to Excel export, LLM-powered Q&A, and context-aware AI roles. See what sets LNA apart."
@@ -76,7 +76,7 @@
   "home": {
     "hero": {
       "heading": "Your PDFs go in.",
-      "description": "You drop in your Excel template and the quotes. You get the same file back, completed, with a confidence level on every field.",
+      "description": "You drop in your Excel template and the quotes. You get the same file back, completed, straight into your Excel template.",
       "ctaPrimary": "Try it on my documents",
       "ctaNote": "Create an account, then drop in your first documents.",
       "visual": {
@@ -86,7 +86,6 @@
       "headingHighlight": "Your Excel sheet comes out, already filled.",
       "excel": {
         "filename": "comparison-adp.xlsx",
-        "reviewMarker": "[REVIEW]",
         "formulaRef": "D2",
         "formulaFx": "fx",
         "tabFile": "File",
@@ -95,7 +94,6 @@
         "tabLayout": "Page Layout",
         "tabFormulas": "Formulas",
         "tabData": "Data",
-        "tabReview": "Review",
         "tabView": "View",
         "sheet": "Sheet1",
         "ready": "Ready"
@@ -120,25 +118,16 @@
         "roleOther": "Other",
         "provenance": "Sample filenames for the hero demo (Lumina Cover, Atelier Protect, Rive Prévoyance + amortisation). Fictional issuers only."
       },
-      "confidence": {
-        "heading": "You see what the AI is unsure about",
-        "body": "Every extracted field carries its confidence level, as a percentage. Below the review threshold, the value is flagged in the exported file instead of being lost in the rest.",
-        "tableCaption": "Review grid: one row per guarantee, one column per issuer, with the confidence level of each extracted value.",
-        "colIndex": "#",
-        "colRowKey": "Row Key",
-        "colConf": "Conf.",
-        "levelHigh": "High",
-        "levelMedium": "Medium",
-        "levelLow": "Low",
-        "reviewLegend": "[REVIEW] — written into the exported cell below 0.6",
+      "fields": {
+        "heading": "Every field in its place",
+        "body": "Amounts, dates, terms: every value from the PDF lands in the right column.",
+        "tableCaption": "Filled comparison sheet: one row per guarantee, one column per issuer.",
         "provenance": "Same sample values and fictional issuers as the hero comparison sheet."
       },
       "validation": {
-        "heading": "Nothing leaves without your approval",
-        "body": "Exporting is a decision, not a side effect: you review the flagged fields, then you trigger the download. Every export is recorded in an audit trail.",
-        "stepLabel": "Step 3 — Review & Download",
-        "checkbox": "I have reviewed the flagged fields",
-        "checkboxReview": "Keep the [REVIEW] marker in the exported file",
+        "heading": "An Excel ready to share",
+        "body": "Your template, formulas and formatting stay as they are.",
+        "stepLabel": "Download your Excel",
         "downloadButton": "Download Excel",
         "auditNote": "The export is recorded in the audit trail."
       }
@@ -153,9 +142,9 @@
         "label": "Drop documents",
         "description": "Drag your documents in together; reading starts with no further setup."
       },
-      "review": {
-        "label": "Review & Download",
-        "description": "Check the flagged fields, then collect your file."
+      "download": {
+        "label": "Download your Excel",
+        "description": "Get your file, filled in and ready to use."
       }
     },
     "useCases": {

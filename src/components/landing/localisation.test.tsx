@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { UseCases } from "@/components/landing/UseCases";
-import { ConfidenceGrid } from "@/components/landing/visuals/ConfidenceGrid";
 import { HeroExcelWindow } from "@/components/landing/visuals/HeroExcelWindow";
 import { Footer } from "@/components/layout/footer";
 import { renderWithIntl } from "@/test/render";
@@ -82,20 +81,24 @@ describe("LNAW-95 localisation", () => {
     ).toBeInTheDocument();
   });
 
-  it("keeps English Row Key / Conf. headers on both locales (Gilbert / product)", () => {
-    expect(en.home.bands.confidence.colRowKey).toBe("Row Key");
-    expect(en.home.bands.confidence.colConf).toBe("Conf.");
-    expect(fr.home.bands.confidence.colRowKey).toBe("Row Key");
-    expect(fr.home.bands.confidence.colConf).toBe("Conf.");
+  it("uses Gilbert LNAW-124 step 3 and fields band wording in both locales", () => {
+    expect(en.home.howItWorks.download.label).toBe("Download your Excel");
+    expect(en.home.howItWorks.download.description).toBe(
+      "Get your file, filled in and ready to use."
+    );
+    expect(fr.home.howItWorks.download.label).toBe("Téléchargez votre Excel");
+    expect(fr.home.howItWorks.download.description).toBe(
+      "Récupérez votre fichier, rempli, prêt à l'emploi."
+    );
+    expect(en.home.bands.fields.heading).toBe("Every field in its place");
+    expect(fr.home.bands.fields.heading).toBe("Chaque champ à sa place");
+    expect(en.home.bands.validation.heading).toBe("An Excel ready to share");
+    expect(fr.home.bands.validation.heading).toBe("Un Excel prêt à partager");
 
-    const { unmount } = renderWithIntl(<ConfidenceGrid />);
-    expect(screen.getByRole("columnheader", { name: "Row Key" })).toBeTruthy();
-    expect(screen.getByRole("columnheader", { name: "Conf." })).toBeTruthy();
-    unmount();
-
-    renderWithIntl(<ConfidenceGrid />, { locale: "fr" });
-    expect(screen.getByRole("columnheader", { name: "Row Key" })).toBeTruthy();
-    expect(screen.getByRole("columnheader", { name: "Conf." })).toBeTruthy();
+    renderWithIntl(<HowItWorks />);
+    expect(
+      screen.getByRole("heading", { name: en.home.howItWorks.download.label })
+    ).toBeInTheDocument();
   });
 
   it("formats hero Excel rates and costs for EN vs FR (LNA-252)", () => {

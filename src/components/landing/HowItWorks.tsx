@@ -4,13 +4,11 @@ import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
 
 /**
- * Les libellés des trois étapes sont ceux de l'app, mot pour mot
- * (RapprochementPage.tsx, objet i18n t.steps). Ne pas les reformuler.
- *
  * LNAW-96 — frozen v4: three columns ≥1056, 1px Gray 20 top rule,
  * Plex Mono 01/02/03, 20px titles, Gray 70 body; stack below 1056.
+ * LNAW-124 — step 3 is download (no review/confidence wording).
  */
-const STEPS = ["template", "documents", "review"] as const;
+const STEPS = ["template", "documents", "download"] as const;
 
 export function HowItWorks() {
   const t = useTranslations("home.howItWorks");

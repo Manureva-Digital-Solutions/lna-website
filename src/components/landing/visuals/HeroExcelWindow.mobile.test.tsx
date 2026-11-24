@@ -13,16 +13,12 @@ describe("LNAW-115 HeroExcelWindow mobile contracts", () => {
     expect(en.home.hero.excel.formulaFx).toBe("fx");
   });
 
-  it("keeps formula-bar [REVIEW] black (not status-low red)", () => {
+  it("shows the D2 value in the formula bar without [REVIEW]", () => {
     const { container } = renderWithIntl(<HeroExcelWindow />);
     const formulaBar = container.querySelector(".h-\\[30px\\]");
     expect(formulaBar).not.toBeNull();
-    const marker = [...formulaBar!.querySelectorAll("span")].find(
-      (el) => el.textContent === en.home.hero.excel.reviewMarker
-    );
-    expect(marker).toBeTruthy();
-    expect(marker!.className).toMatch(/text-foreground/);
-    expect(marker!.className).not.toMatch(/text-status-low/);
+    expect(formulaBar!.textContent).toMatch(/0\.41%/);
+    expect(formulaBar!.textContent).not.toMatch(/\[REVIEW\]/);
   });
 
   it("hides empty excel rows 9–12 below the sm breakpoint", () => {
