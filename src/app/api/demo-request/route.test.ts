@@ -17,6 +17,37 @@ vi.mock("@/lib/mailer", () => ({
   sendMail: (...args: unknown[]) => sendMail(...args),
 }));
 
+/** Each test gets a fresh module graph AND fresh limiter counters. */
+async function loadRoute() {
+  const { resetRateLimit } = await import("@/lib/rate-limit");
+  resetRateLimit();
+  return import("./route");
+}
+
+function demoRequest(
+  body: Record<string, unknown>,
+  ip = "198.51.100.10"
+): Request {
+  return new Request("http://localhost/api/demo-request", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // nginx appends the real peer address as the rightmost entry.
+      "X-Forwarded-For": ip,
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+const VALID_BODY = {
+  name: "Léa Martin",
+  email: "lea@example.fr",
+  company: "Cabinet Martin",
+  role: "accountant",
+  message: "Besoin d'une démo",
+  locale: "fr",
+};
+
 describe("POST /api/demo-request", () => {
   beforeEach(() => {
     vi.resetModules();
@@ -37,21 +68,8 @@ describe("POST /api/demo-request", () => {
     mailConfigured.mockReturnValue(true);
     sendMail.mockResolvedValue({ ok: true });
 
-    const { POST } = await import("./route");
-    const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Léa Martin",
-          email: "lea@example.fr",
-          company: "Cabinet Martin",
-          role: "accountant",
-          message: "Besoin d'une démo",
-          locale: "fr",
-        }),
-      })
-    );
+    const { POST } = await loadRoute();
+    const res = await POST(demoRequest(VALID_BODY));
 
     expect(res.status).toBe(200);
     expect(sendMail).toHaveBeenCalledTimes(2);
@@ -68,18 +86,14 @@ describe("POST /api/demo-request", () => {
     mailConfigured.mockReturnValue(true);
     sendMail.mockResolvedValue({ ok: true });
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Ada Broker",
-          email: "ada@cabinet.fr",
-          company: "Cabinet Ada",
-          role: "insuranceBroker",
-          locale: "en",
-        }),
+      demoRequest({
+        name: "Ada Broker",
+        email: "ada@cabinet.fr",
+        company: "Cabinet Ada",
+        role: "insuranceBroker",
+        locale: "en",
       })
     );
 
@@ -109,18 +123,14 @@ describe("POST /api/demo-request", () => {
     mailConfigured.mockReturnValue(true);
     sendMail.mockResolvedValue({ ok: true });
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Léa Martin",
-          email: "lea@example.fr",
-          company: "Cabinet Martin",
-          role: "propertyManager",
-          locale: "fr",
-        }),
+      demoRequest({
+        name: "Léa Martin",
+        email: "lea@example.fr",
+        company: "Cabinet Martin",
+        role: "propertyManager",
+        locale: "fr",
       })
     );
 
@@ -137,18 +147,14 @@ describe("POST /api/demo-request", () => {
       .mockResolvedValueOnce({ ok: false, error: "SMTP down" });
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Ada Broker",
-          email: "ada@cabinet.fr",
-          company: "Cabinet Ada",
-          role: "other",
-          locale: "en",
-        }),
+      demoRequest({
+        name: "Ada Broker",
+        email: "ada@cabinet.fr",
+        company: "Cabinet Ada",
+        role: "other",
+        locale: "en",
       })
     );
 
@@ -169,17 +175,13 @@ describe("POST /api/demo-request", () => {
   it("rejects roles outside the ICP allowlist", async () => {
     mailConfigured.mockReturnValue(true);
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Sam",
-          email: "sam@broker.fr",
-          company: "Courtage Sam",
-          role: "ceo\nBcc: evil@x.com",
-        }),
+      demoRequest({
+        name: "Sam",
+        email: "sam@broker.fr",
+        company: "Courtage Sam",
+        role: "ceo\nBcc: evil@x.com",
       })
     );
 
@@ -192,17 +194,13 @@ describe("POST /api/demo-request", () => {
     mailConfigured.mockReturnValue(true);
     sendMail.mockResolvedValue({ ok: true });
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Léa\nMartin",
-          email: "lea@example.fr",
-          company: "Cabinet\r\nMartin",
-          role: "propertyManager",
-        }),
+      demoRequest({
+        name: "Léa\nMartin",
+        email: "lea@example.fr",
+        company: "Cabinet\r\nMartin",
+        role: "propertyManager",
       })
     );
 
@@ -218,26 +216,102 @@ describe("POST /api/demo-request", () => {
     mailConfigured.mockReturnValue(false);
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    const { POST } = await import("./route");
+    const { POST } = await loadRoute();
     const res = await POST(
-      new Request("http://localhost/api/demo-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Sam",
-          email: "sam@broker.fr",
-          company: "Courtage Sam",
-          role: "insuranceBroker",
-        }),
+      demoRequest({
+        name: "Sam",
+        email: "sam@broker.fr",
+        company: "Courtage Sam",
+        role: "insuranceBroker",
       })
     );
 
     expect(res.status).toBe(200);
+    // Nothing was sent, so the form must not promise a confirmation email.
+    await expect(res.json()).resolves.toEqual({
+      success: true,
+      delivered: false,
+      acknowledged: false,
+    });
     expect(sendMail).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining("email NOT sent"),
       expect.objectContaining({ role: "insuranceBroker" })
     );
     warn.mockRestore();
+  });
+
+  it("returns 429 with Retry-After once one IP exceeds the limit", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await loadRoute();
+    for (let i = 0; i < 5; i++) {
+      const res = await POST(demoRequest(VALID_BODY, "203.0.113.50"));
+      expect(res.status).toBe(200);
+    }
+    // 5 valid submissions = 5 inbox + 5 acknowledgement sends.
+    expect(sendMail).toHaveBeenCalledTimes(10);
+
+    const blocked = await POST(demoRequest(VALID_BODY, "203.0.113.50"));
+
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers.get("Retry-After")).toMatch(/^\d+$/);
+    expect(Number(blocked.headers.get("Retry-After"))).toBeGreaterThan(0);
+    await expect(blocked.json()).resolves.toEqual({ error: "rate_limited" });
+    // The abusive request never reached SMTP.
+    expect(sendMail).toHaveBeenCalledTimes(10);
+  });
+
+  it("keeps the limit per IP, not global", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await loadRoute();
+    for (let i = 0; i < 5; i++) {
+      await POST(demoRequest(VALID_BODY, "203.0.113.51"));
+    }
+    expect((await POST(demoRequest(VALID_BODY, "203.0.113.51"))).status).toBe(
+      429
+    );
+
+    const otherVisitor = await POST(demoRequest(VALID_BODY, "203.0.113.52"));
+    expect(otherVisitor.status).toBe(200);
+    await expect(otherVisitor.json()).resolves.toEqual({
+      success: true,
+      acknowledged: true,
+    });
+  });
+
+  it("still accepts one normal submission in EN and FR", async () => {
+    mailConfigured.mockReturnValue(true);
+    sendMail.mockResolvedValue({ ok: true });
+
+    const { POST } = await loadRoute();
+
+    const english = await POST(
+      demoRequest(
+        {
+          name: "Ada Broker",
+          email: "ada@cabinet.fr",
+          company: "Cabinet Ada",
+          role: "insuranceBroker",
+          locale: "en",
+        },
+        "203.0.113.53"
+      )
+    );
+    expect(english.status).toBe(200);
+    await expect(english.json()).resolves.toEqual({
+      success: true,
+      acknowledged: true,
+    });
+
+    const french = await POST(demoRequest(VALID_BODY, "203.0.113.54"));
+    expect(french.status).toBe(200);
+    await expect(french.json()).resolves.toEqual({
+      success: true,
+      acknowledged: true,
+    });
   });
 });
