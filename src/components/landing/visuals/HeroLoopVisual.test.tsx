@@ -1,4 +1,8 @@
 import { act, screen, within } from "@testing-library/react";
+import { hydrateRoot, type Root } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import { NextIntlClientProvider } from "next-intl";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   HeroLoopVisual,
@@ -19,6 +23,15 @@ vi.mock("framer-motion", async () => {
     useReducedMotion: () => reducedMotionState.current,
   };
 });
+
+/** Same provider renderWithIntl uses, exposed for SSR/hydration assertions. */
+function withIntl(ui: ReactElement) {
+  return (
+    <NextIntlClientProvider locale="en" messages={en}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 function stubIntersectionObserver(intersecting = true) {
   class MockIntersectionObserver {
@@ -51,6 +64,9 @@ function stubIntersectionObserver(intersecting = true) {
 }
 
 describe("HeroLoopVisual (LNAW-121)", () => {
+  let hydrationRoot: Root | undefined;
+  let hydrationContainer: HTMLDivElement | undefined;
+
   beforeEach(() => {
     reducedMotionState.current = true;
     stubIntersectionObserver(true);
@@ -60,7 +76,15 @@ describe("HeroLoopVisual (LNAW-121)", () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (hydrationRoot) {
+      const root = hydrationRoot;
+      hydrationRoot = undefined;
+      await act(async () => root.unmount());
+    }
+    hydrationContainer?.remove();
+    hydrationContainer = undefined;
+    vi.restoreAllMocks();
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
@@ -116,6 +140,68 @@ describe("HeroLoopVisual (LNAW-121)", () => {
     ).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText("0.34%")).not.toBeInTheDocument();
     expect(screen.queryByText("€4,218.00")).not.toBeInTheDocument();
+  });
+
+  it("renders the motion-allowed opening frame on the server, even with reduced motion (LNAW-119)", () => {
+    reducedMotionState.current = true;
+
+    const html = renderToString(withIntl(<HeroLoopVisual />));
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    expect(
+      doc.querySelector("[data-hero-loop]")!.getAttribute("data-hero-phase")
+    ).toBe("0");
+
+    const rateCell = doc.querySelector('[data-hero-cell="rate-0"] span');
+    expect(rateCell).not.toBeNull();
+    expect(rateCell!.className).toContain("opacity-0");
+    expect(rateCell!.className).not.toContain("opacity-100");
+
+    expect(doc.querySelector("[data-hero-loop-status]")!.textContent).toContain(
+      "0 / 4"
+    );
+  });
+
+  it("hydrates without a mismatch, then jumps to the final frame with reduced motion (LNAW-119)", async () => {
+    reducedMotionState.current = true;
+
+    const element = withIntl(<HeroLoopVisual />);
+    const container = document.createElement("div");
+    hydrationContainer = container;
+    container.innerHTML = renderToString(element);
+    document.body.appendChild(container);
+
+    // Server markup is the opening frame, whatever the motion preference.
+    expect(container.querySelector("[data-hero-loop]")).toHaveAttribute(
+      "data-hero-phase",
+      "0"
+    );
+
+    const errors: string[] = [];
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation((...args: unknown[]) => {
+        errors.push(args.map((arg) => String(arg)).join(" "));
+      });
+
+    await act(async () => {
+      hydrationRoot = hydrateRoot(container, element);
+    });
+
+    const hero = () =>
+      container.querySelector("[data-hero-loop]") as HTMLElement;
+
+    expect(errors.filter((msg) => /hydrat|did not match/i.test(msg))).toEqual(
+      []
+    );
+    // After mount the reduced-motion branch applies: final filled sheet.
+    expect(hero()).toHaveAttribute("data-hero-phase", "5");
+    expect(screen.getByText("4 / 4")).toBeInTheDocument();
+    expect(
+      screen.getByText(en.home.hero.loop.downloadButton)
+    ).toBeInTheDocument();
+
+    errorSpy.mockRestore();
   });
 
   it("shows the final filled sheet without review/confidence cues when reduced-motion", () => {
