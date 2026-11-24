@@ -4,7 +4,7 @@ import { Button, LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
-import { HeroExcelWindow } from "@/components/landing/visuals/HeroExcelWindow";
+import { HeroLoopVisual } from "@/components/landing/visuals/HeroLoopVisual";
 import { appUrls } from "@/lib/app-urls";
 
 /** Répond à la première question du visiteur : « ça remplit mon tableau ? » */
@@ -15,7 +15,7 @@ export function Hero() {
   return (
     <Section className="overflow-hidden pt-10 pb-12 md:pt-12 md:pb-16">
       <Container grid className="items-start gap-y-10">
-        <div className="col-span-4 flex flex-col gap-5 min-[672px]:col-span-8 min-[1056px]:col-span-6">
+        <div className="col-span-4 flex flex-col gap-5 min-[672px]:col-span-8 min-[1056px]:col-span-5">
           <AnimateIn>
             <h1 className="text-hero text-foreground min-[1056px]:max-w-[460px]">
               <span className="block">{t("heading")}</span>
@@ -59,11 +59,11 @@ export function Hero() {
 
         <AnimateIn
           delay={0.15}
-          className="col-span-4 w-full min-w-0 min-[672px]:col-span-8 min-[1056px]:col-span-10"
+          className="col-span-4 w-full min-w-0 min-[672px]:col-span-8 min-[1056px]:col-span-11"
         >
-          <div className="bg-gray-10 w-full rounded-none p-3 sm:p-4 md:p-5">
-            <HeroExcelWindow />
-            <p className="text-muted-foreground mt-3 text-[11px] leading-4">
+          <div className="bg-gray-10 w-full overflow-visible rounded-none p-3 pt-5 sm:p-4 sm:pt-6 md:p-5 md:pt-7">
+            <HeroLoopVisual />
+            <p className="text-muted-foreground mt-4 max-w-[62ch] text-[11px] leading-4">
               {t("visual.provenance")}
             </p>
           </div>

@@ -80,8 +80,26 @@
       "ctaPrimary": "Try it on my documents",
       "ctaNote": "Create an account, then drop in your first documents.",
       "visual": {
-        "description": "Four illustrative PDFs — loan insurance quotes from Lumina Cover, Atelier Protect and Rive Prévoyance, plus a loan amortisation schedule — feed an Excel comparison sheet whose columns are those issuers and whose rows are the guarantees: rate, total cost, cover ratio.",
+        "description": "Animation: a loan-insurance quote PDF on the left; rate, total cost and cover ratio highlight one by one, flow into the matching Excel cells, then the other issuers’ columns fill; counters reach Documents read 4/4 and Fields filled 9; Download Excel appears.",
         "provenance": "Illustrative demo: fictional issuers and sample values. Not a real client extraction."
+      },
+      "loop": {
+        "pdfIssuer": "Lumina Cover",
+        "pdfProduct": "Loan insurance",
+        "pdfBadge": "Loan insurance quote",
+        "pdfQuoteRef": "Quote no. LC-2026-0418",
+        "pdfLoanMeta": "Mortgage loan - 25 years",
+        "pdfHeading": "Loan insurance proposal",
+        "fieldRate": "Annual insurance rate",
+        "fieldCost": "Total insurance cost",
+        "fieldQuota": "Cover ratio",
+        "pdfGuaranteesLabel": "Coverages",
+        "pdfGuaranteesValue": "DC • PTIA • ITT",
+        "pdfDocNote": "Illustrative document. Fictional issuer, sample values.",
+        "documentsReadLabel": "Documents read",
+        "fieldsFilledLabel": "Fields filled",
+        "fileLabel": "File",
+        "downloadButton": "Download Excel"
       },
       "headingHighlight": "Your Excel sheet comes out, already filled.",
       "excel": {
