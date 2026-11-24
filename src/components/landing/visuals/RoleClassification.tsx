@@ -4,7 +4,7 @@ import { DEMO_SOURCE_DOCS } from "@/components/landing/visuals/demo-sheet-data";
 
 /**
  * Tile 2 — source PDFs for the shared ADP comparison demo
- * (same fictional issuers as the hero / before-after / confidence sheet).
+ * (same fictional issuers as the hero / before-after / filled sheet).
  */
 export function RoleClassification() {
   const t = useTranslations("home.bands.mixed");

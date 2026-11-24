@@ -3,28 +3,24 @@
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
-  DEMO_CONFIDENCE,
   DEMO_FILLED,
   DEMO_ISSUERS,
 } from "@/components/landing/visuals/demo-sheet-data";
 
-type Cell =
-  | { kind: "text"; value: string }
-  | { kind: "review"; value: string }
-  | { kind: "empty" };
+type Cell = { kind: "text"; value: string } | { kind: "empty" };
 
 /**
- * Sober HTML Excel window for the homepage hero (LNAW-87).
+ * Sober HTML Excel window for the homepage hero (LNAW-87 / LNAW-124).
  * Columns/values come from the shared fictional ADP demo set
  * (`demo-sheet-data.ts`) so hero, bands and PDF stack stay consistent.
  * Chrome labels follow the page locale (LNA-252).
+ * LNAW-124: no [REVIEW] markers, review outlines, or confidence cues.
  */
 export function HeroExcelWindow() {
   const t = useTranslations("home.hero");
   const g = useTranslations("grid");
   const x = useTranslations("home.hero.excel");
   const locale = useLocale();
-  const reviewMarker = x("reviewMarker");
 
   const pct = (v: number, digits = 2) =>
     new Intl.NumberFormat(locale, {
@@ -46,7 +42,6 @@ export function HeroExcelWindow() {
     x("tabLayout"),
     x("tabFormulas"),
     x("tabData"),
-    x("tabReview"),
     x("tabView"),
   ] as const;
 
@@ -62,18 +57,18 @@ export function HeroExcelWindow() {
     { kind: "empty" },
   ];
 
-  const rateCell = (i: number): Cell =>
-    DEMO_CONFIDENCE.rate[i] < 0.6
-      ? { kind: "review", value: pct(DEMO_FILLED.rate[i]) }
-      : { kind: "text", value: pct(DEMO_FILLED.rate[i]) };
+  const rateCell = (i: number): Cell => ({
+    kind: "text",
+    value: pct(DEMO_FILLED.rate[i]),
+  });
   const costCell = (i: number): Cell => ({
     kind: "text",
     value: eur(DEMO_FILLED.totalCost[i]),
   });
-  const quotaCell = (i: number): Cell =>
-    DEMO_CONFIDENCE.quota[i] < 0.6
-      ? { kind: "review", value: pct(DEMO_FILLED.quota[i], 0) }
-      : { kind: "text", value: pct(DEMO_FILLED.quota[i], 0) };
+  const quotaCell = (i: number): Cell => ({
+    kind: "text",
+    value: pct(DEMO_FILLED.quota[i], 0),
+  });
 
   const dataRows: { label: string; cells: Cell[] }[] = [
     {
@@ -108,7 +103,7 @@ export function HeroExcelWindow() {
     },
   ];
 
-  const formulaReview = pct(DEMO_FILLED.rate[2]);
+  const formulaValue = pct(DEMO_FILLED.rate[2]);
 
   return (
     <div
@@ -138,7 +133,7 @@ export function HeroExcelWindow() {
         </span>
       </div>
 
-      {/* Ribbon tabs — hide later tabs below sm (frozen HTML) so FR labels are not clipped at 390 */}
+      {/* Ribbon tabs — hide later tabs below sm so FR labels are not clipped at 390 */}
       <div className="border-border bg-gray-10 flex flex-wrap gap-x-0.5 gap-y-0 border-b px-1 pt-0.5 text-[9px] sm:flex-nowrap sm:overflow-hidden sm:px-1.5 sm:text-[10px]">
         {tabs.map((tab, i) => (
           <span
@@ -165,9 +160,7 @@ export function HeroExcelWindow() {
           {x("formulaFx")}
         </span>
         <span className="text-foreground flex h-full min-w-0 flex-1 items-center overflow-hidden px-2 font-mono sm:px-2.5">
-          {/* Formula bar only: [REVIEW] stays foreground black (cells keep red). */}
-          <span className="text-foreground shrink-0">{reviewMarker}</span>
-          <span className="ml-1 truncate">{formulaReview}</span>
+          <span className="truncate">{formulaValue}</span>
         </span>
       </div>
 
@@ -214,19 +207,12 @@ export function HeroExcelWindow() {
 
             {dataRows.map((row, rowIdx) => {
               const excelRow = rowIdx + 2;
-              // Frozen ≤672: review rows (2, 4) get extra height for stacked [REVIEW].
-              const reviewRow = excelRow === 2 || excelRow === 4;
               return (
                 <tr key={row.label}>
                   <th className="border-border text-muted-foreground bg-gray-10 border-r border-b px-0.5 py-0.5 text-center font-normal">
                     {excelRow}
                   </th>
-                  <td
-                    className={cn(
-                      "border-border text-foreground border-r border-b px-1 py-0.5 font-semibold",
-                      reviewRow && "max-sm:h-9"
-                    )}
-                  >
+                  <td className="border-border text-foreground border-r border-b px-1 py-0.5 font-semibold">
                     {row.label}
                   </td>
                   {row.cells.map((cell, i) => {
@@ -236,13 +222,14 @@ export function HeroExcelWindow() {
                         key={`${row.label}-${i}`}
                         className={cn(
                           "border-border border-r border-b px-1 py-0.5 text-right",
-                          reviewRow && "max-sm:h-9",
                           i >= 3 && "hidden sm:table-cell",
                           isSelected &&
                             "outline-excel-green outline outline-2 -outline-offset-2"
                         )}
                       >
-                        <CellContent cell={cell} reviewMarker={reviewMarker} />
+                        {cell.kind === "empty" ? null : (
+                          <span className="text-foreground">{cell.value}</span>
+                        )}
                       </td>
                     );
                   })}
@@ -285,26 +272,5 @@ export function HeroExcelWindow() {
         <span>{x("ready")}</span>
       </div>
     </div>
-  );
-}
-
-function CellContent({
-  cell,
-  reviewMarker,
-}: {
-  cell: Cell;
-  reviewMarker: string;
-}) {
-  if (cell.kind === "empty") return null;
-  if (cell.kind === "text") {
-    return <span className="text-foreground">{cell.value}</span>;
-  }
-  return (
-    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1 max-sm:flex-col max-sm:items-end max-sm:gap-0">
-      <span className="text-status-low font-mono text-[9px] leading-tight sm:text-[11.5px]">
-        {reviewMarker}
-      </span>
-      <span className="text-foreground">{cell.value}</span>
-    </span>
   );
 }

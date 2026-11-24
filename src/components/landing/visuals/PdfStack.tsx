@@ -23,7 +23,7 @@ export function PdfStack({ docs, className }: PdfStackProps) {
           )}
         >
           <span
-            className="bg-status-low text-primary-foreground inline-flex items-center justify-center rounded-none py-0.5 font-mono text-[9px] font-semibold tracking-wide uppercase"
+            className="bg-primary text-primary-foreground inline-flex items-center justify-center rounded-none py-0.5 font-mono text-[9px] font-semibold tracking-wide uppercase"
             aria-hidden="true"
           >
             PDF

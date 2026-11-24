@@ -2,13 +2,14 @@ import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Hero } from "@/components/landing/Hero";
 import { FinalCta } from "@/components/landing/FinalCta";
-import { ConfidenceGrid } from "@/components/landing/visuals/ConfidenceGrid";
+import { FilledComparisonSheet } from "@/components/landing/visuals/FilledComparisonSheet";
 import { Header } from "@/components/layout/header";
 import { renderWithIntl } from "@/test/render";
 import en from "../../../messages/en.json";
 
 /**
  * LNAW-82 — lock responsive contracts from frozen ≤672 / ticket AC.
+ * LNAW-124 — confidence/review grid contracts removed with the grid itself.
  */
 describe("LNAW-82 responsive contracts", () => {
   it("makes the hero primary CTA full width below 672px", () => {
@@ -30,23 +31,12 @@ describe("LNAW-82 responsive contracts", () => {
     expect(cta).toHaveClass("pl-4");
   });
 
-  it("hides the confidence index column below 672px", () => {
-    renderWithIntl(<ConfidenceGrid />);
-    expect(screen.getByRole("columnheader", { name: "#" })).toHaveClass(
-      "max-[671px]:hidden"
-    );
-  });
-
-  it("puts the confidence review legend on its own row below 672px", () => {
-    renderWithIntl(<ConfidenceGrid />);
-    const legend = screen.getByText(en.home.bands.confidence.reviewLegend);
-    expect(legend.className).toMatch(/max-\[671px\]:basis-full/);
-    expect(legend.className).toMatch(/max-\[671px\]:ml-0/);
-  });
-
-  it("keeps [REVIEW] markers readable in the confidence grid", () => {
-    renderWithIntl(<ConfidenceGrid />);
-    expect(screen.getAllByText("[REVIEW]").length).toBeGreaterThanOrEqual(2);
+  it("keeps the filled comparison sheet usable below 672px without review cues", () => {
+    const { container } = renderWithIntl(<FilledComparisonSheet />);
+    expect(
+      container.querySelector("[data-filled-comparison-sheet]")
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/\[REVIEW\]/)).not.toBeInTheDocument();
   });
 
   it("keeps FR | EN visible in the header (including ≤671)", () => {
