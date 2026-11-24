@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -25,8 +26,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   setRequestLocale(locale);
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(slug, locale);
   if (!post) return {};
+  const shareImage = post.ogImage ?? post.image;
   return {
     title: `${post.title} — LNA Blog`,
     description: post.description,
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: post.title,
       description: post.description,
-      images: post.image ? [{ url: post.image }] : [],
+      images: shareImage ? [{ url: shareImage }] : [],
     },
   };
 }
@@ -43,7 +45,7 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug, locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "blog" });
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(slug, locale);
   if (!post) notFound();
 
   return (
@@ -88,6 +90,18 @@ export default async function BlogPostPage({ params }: Props) {
                   {post.readingTime}
                 </span>
               </div>
+              {post.articleImage && (
+                <div className="bg-muted relative mb-8 aspect-[16/9] w-full overflow-hidden">
+                  <Image
+                    src={post.articleImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 960px"
+                    priority
+                  />
+                </div>
+              )}
               <BlogArticle content={post.content} />
             </div>
           </AnimateIn>
