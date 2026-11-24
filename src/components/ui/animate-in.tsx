@@ -1,8 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useHasMounted } from "@/lib/use-has-mounted";
 import { animateInMotionProps } from "@/components/ui/animate-in-props";
 
 interface AnimateInProps extends HTMLMotionProps<"div"> {
@@ -11,23 +11,6 @@ interface AnimateInProps extends HTMLMotionProps<"div"> {
 }
 
 export { animateInMotionProps } from "@/components/ui/animate-in-props";
-
-function subscribe() {
-  return () => {};
-}
-
-function getClientSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
-/** True only after hydration — SSR and the first client paint both see false. */
-function useHasMounted() {
-  return useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
-}
 
 /**
  * Scroll-reveal wrapper that cannot blank the page or trip React #418.
