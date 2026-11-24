@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { Button, LinkButton } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
@@ -41,15 +41,14 @@ export function Hero() {
                   aria-hidden="true"
                 />
               </LinkButton>
-              <Button
+              <LinkButton
                 variant="ghost"
-                nativeButton={false}
-                render={<a href="#steps" />}
+                href="#steps"
                 className="text-primary h-auto justify-start gap-2 border-0 px-0 py-1 font-normal shadow-none hover:bg-transparent min-[672px]:ml-3"
               >
                 {tSteps("heading")}
                 <ArrowDown className="size-4" aria-hidden="true" />
-              </Button>
+              </LinkButton>
               <p className="text-muted-foreground mt-3 text-sm">
                 {t("ctaNote")}
               </p>

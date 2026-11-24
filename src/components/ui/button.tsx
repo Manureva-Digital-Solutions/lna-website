@@ -1,6 +1,12 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  type ComponentProps,
+  type HTMLAttributes,
+  type ReactElement,
+} from "react";
 import { Link } from "@/i18n/navigation";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -49,20 +55,47 @@ const buttonVariants = cva(
   }
 );
 
+function isAnchorRender(
+  render: ButtonPrimitive.Props["render"]
+): render is ReactElement<HTMLAttributes<HTMLAnchorElement>, "a"> {
+  return isValidElement(render) && render.type === "a";
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
   nativeButton,
+  render,
+  children,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  const classes = cn(buttonVariants({ variant, size, className }));
+  // Base UI defaults `nativeButton` to true, so a non-button target has to opt
+  // out or it warns and keeps the wrong element semantics (LNAW-118).
+  const isNativeButton = nativeButton ?? !render;
+
+  // An anchor is a link. Base UI's non-native branch stamps `role="button"` on
+  // it, so render the element as-is with the button styling and let the browser
+  // handle navigation and keyboard activation. Prefer `LinkButton` for CTAs.
+  if (!isNativeButton && isAnchorRender(render)) {
+    const anchorProps = {
+      ...props,
+      "data-slot": "button",
+      className: cn(classes, render.props.className),
+    } as ComponentProps<"a">;
+    return cloneElement(render, anchorProps, children);
+  }
+
   return (
     <ButtonPrimitive
       data-slot="button"
-      nativeButton={nativeButton ?? (props.render ? false : undefined)}
-      className={cn(buttonVariants({ variant, size, className }))}
+      nativeButton={isNativeButton}
+      className={classes}
       {...props}
-    />
+    >
+      {children}
+    </ButtonPrimitive>
   );
 }
 
