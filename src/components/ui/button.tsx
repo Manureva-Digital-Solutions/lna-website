@@ -5,6 +5,8 @@ import {
   isValidElement,
   type ComponentProps,
   type HTMLAttributes,
+  type KeyboardEvent,
+  type MouseEvent,
   type ReactElement,
 } from "react";
 import { Link } from "@/i18n/navigation";
@@ -61,19 +63,27 @@ function isAnchorRender(
   return isValidElement(render) && render.type === "a";
 }
 
+function isButtonRender(
+  render: ButtonPrimitive.Props["render"]
+): render is ReactElement<ComponentProps<"button">, "button"> {
+  return isValidElement(render) && render.type === "button";
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
   nativeButton,
   render,
+  disabled = false,
   children,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   const classes = cn(buttonVariants({ variant, size, className }));
   // Base UI defaults `nativeButton` to true, so a non-button target has to opt
-  // out or it warns and keeps the wrong element semantics (LNAW-118).
-  const isNativeButton = nativeButton ?? !render;
+  // out or it warns and keeps the wrong element semantics (LNAW-118). A
+  // `render` target that is itself a <button> still counts as native.
+  const isNativeButton = nativeButton ?? (!render || isButtonRender(render));
 
   // An anchor is a link. Base UI's non-native branch stamps `role="button"` on
   // it, so render the element as-is with the button styling and let the browser
@@ -84,6 +94,35 @@ function Button({
       "data-slot": "button",
       className: cn(classes, render.props.className),
     } as ComponentProps<"a">;
+
+    // A plain <a> has no disabled state of its own: it stays focusable and
+    // navigates anyway. Expose it as disabled and block activation instead.
+    if (disabled) {
+      const disabledAnchorProps = {
+        ...anchorProps,
+        "aria-disabled": true,
+        "data-disabled": "",
+        // Prefer out of the tab order; callers may still set an explicit
+        // tabIndex, so also block Enter/Space activation below.
+        tabIndex: render.props.tabIndex ?? -1,
+        // Nothing to activate, so swallow clicks (including the caller's).
+        onClick: (event: MouseEvent<HTMLAnchorElement>) => {
+          event.preventDefault();
+          event.stopPropagation();
+        },
+        // An explicit tabIndex keeps the anchor focusable; without this
+        // guard Enter/Space would still navigate.
+        onKeyDown: (event: KeyboardEvent<HTMLAnchorElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        },
+        className: cn(anchorProps.className, "pointer-events-none opacity-50"),
+      } as ComponentProps<"a">;
+      return cloneElement(render, disabledAnchorProps, children);
+    }
+
     return cloneElement(render, anchorProps, children);
   }
 
@@ -91,6 +130,8 @@ function Button({
     <ButtonPrimitive
       data-slot="button"
       nativeButton={isNativeButton}
+      disabled={disabled}
+      render={render}
       className={classes}
       {...props}
     >
