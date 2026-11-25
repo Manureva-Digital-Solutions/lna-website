@@ -204,6 +204,45 @@ describe("DemoRequestForm ICP roles", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the locale rate-limit message on a 429 without the raw API string", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 429,
+        json: async () => ({ error: "rate_limited" }),
+      })
+    );
+    const user = userEvent.setup();
+    renderWithIntl(<DemoRequestForm />);
+
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.nameLabel)),
+      "Ada Broker"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.emailLabel)),
+      "ada@cabinet.fr"
+    );
+    await user.type(
+      screen.getByLabelText(new RegExp(en.demoForm.companyLabel)),
+      "Cabinet Ada"
+    );
+    await user.selectOptions(
+      screen.getByLabelText(new RegExp(en.demoForm.roleLabel)),
+      "other"
+    );
+    await user.click(screen.getByRole("button", { name: en.demoForm.submit }));
+
+    expect(
+      await screen.findByText(en.demoForm.errors.rateLimited)
+    ).toBeInTheDocument();
+    expect(screen.queryByText("rate_limited")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(en.demoForm.errors.generic)
+    ).not.toBeInTheDocument();
+  });
+
   it("renders FR ICP labels with the same stable option values", () => {
     renderWithIntl(<DemoRequestForm />, { locale: "fr" });
 

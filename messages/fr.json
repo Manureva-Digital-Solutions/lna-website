@@ -948,7 +948,8 @@
       "emailInvalid": "Veuillez saisir une adresse email valide.",
       "companyRequired": "L'entreprise est requise.",
       "roleRequired": "Veuillez sélectionner votre rôle.",
-      "generic": "Une erreur est survenue. Veuillez réessayer."
+      "generic": "Une erreur est survenue. Veuillez réessayer.",
+      "rateLimited": "Trop de demandes. Veuillez patienter une minute avant de réessayer."
     },
     "roles": {
       "accountant": "Expert-comptable",
@@ -981,8 +982,10 @@
     "emailLabel": "Email pour la newsletter",
     "subscribe": "S'abonner",
     "success": "Vous êtes abonné ! Vérifiez votre email pour confirmer.",
+    "successNoConfirm": "Vous êtes abonné !",
     "invalidEmail": "Veuillez saisir une adresse email valide.",
-    "error": "Inscription impossible. Veuillez réessayer."
+    "error": "Inscription impossible. Veuillez réessayer.",
+    "rateLimited": "Trop de tentatives. Veuillez réessayer dans une minute."
   },
   "languageSwitcher": {
     "label": "Langue",

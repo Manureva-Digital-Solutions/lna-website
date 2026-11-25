@@ -76,7 +76,10 @@ export function DemoRequestForm({ onClose, isModal }: DemoRequestFormProps) {
 
       if (!res.ok) {
         // Never surface raw API English strings in the UI — keep locale copy.
-        throw new Error(t("errors.generic"));
+        // 429 (our own rate limit) gets an explicit "too many requests" line.
+        throw new Error(
+          res.status === 429 ? t("errors.rateLimited") : t("errors.generic")
+        );
       }
 
       const data = (await res.json().catch(() => ({}))) as {

@@ -4,6 +4,7 @@ import {
   newsletterConfirmationEmail,
   resolveEmailLocale,
 } from "@/lib/transactional-email";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 /**
  * Newsletter signup.
@@ -19,6 +20,11 @@ import {
  */
 
 export async function POST(request: Request) {
+  // Throttle before parsing or sending anything: abusive traffic must never
+  // reach SMTP. Separate bucket per route so both forms stay usable.
+  const limit = checkRateLimit("newsletter", request);
+  if (!limit.ok) return rateLimitResponse(limit.retryAfterSeconds);
+
   try {
     const body = await request.json();
     const { email, locale } = body as { email?: string; locale?: string };
@@ -32,7 +38,13 @@ export async function POST(request: Request) {
 
     if (!mailConfigured()) {
       console.log("Newsletter signup (SMTP_HOST not set):", { email });
-      return NextResponse.json({ success: true, delivered: false });
+      // Nothing was sent: no inbox record, no confirmation. Be honest so the
+      // form does not tell the visitor to check an email that never arrives.
+      return NextResponse.json({
+        success: true,
+        delivered: false,
+        confirmed: false,
+      });
     }
 
     // 1. Internal notification — this is the durable record of the signup.
