@@ -19,6 +19,11 @@ export interface ExcelGridProps {
   headerClassName?: string;
   /** Extra classes on numeric cell values. */
   valueClassName?: string;
+  /**
+   * Fit table to container with no horizontal scrollbar (LNAW-127 mini cards).
+   * Uses table-fixed + truncated cells instead of overflow-x-auto.
+   */
+  compact?: boolean;
 }
 
 /**
@@ -36,6 +41,7 @@ export function ExcelGrid({
   rowLabelClassName,
   headerClassName,
   valueClassName,
+  compact = false,
 }: ExcelGridProps) {
   return (
     <div
@@ -49,16 +55,38 @@ export function ExcelGrid({
           {caption}
         </div>
       ) : null}
-      <div className="max-w-full overflow-x-auto">
-        <table className="w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums">
+      <div
+        className={cn(
+          "max-w-full",
+          compact ? "overflow-hidden" : "overflow-x-auto"
+        )}
+      >
+        <table
+          className={cn(
+            "w-full min-w-0 border-collapse text-left text-[12.5px] tabular-nums",
+            compact && "table-fixed"
+          )}
+        >
+          {compact ? (
+            <colgroup>
+              <col style={{ width: "38%" }} />
+              {columns.slice(1).map((col) => (
+                <col key={col} />
+              ))}
+            </colgroup>
+          ) : null}
           <thead>
             <tr className={cn("bg-sheet-header", headerClassName)}>
               {columns.map((col, i) => (
                 <th
                   key={col}
                   scope="col"
+                  title={col}
                   className={cn(
-                    "border-gray-30 h-[30px] border px-2 font-semibold whitespace-nowrap text-white",
+                    "border-gray-30 border px-2 font-semibold text-white",
+                    compact
+                      ? "h-auto max-w-0 py-1 break-words whitespace-normal"
+                      : "h-[30px] whitespace-nowrap",
                     i > 0 && "text-right"
                   )}
                 >
@@ -72,8 +100,12 @@ export function ExcelGrid({
               <tr key={row.label}>
                 <th
                   scope="row"
+                  title={row.label}
                   className={cn(
-                    "border-gray-30 text-foreground h-[30px] border px-2 text-left font-semibold whitespace-nowrap",
+                    "border-gray-30 text-foreground border px-2 text-left font-semibold",
+                    compact
+                      ? "h-auto max-w-0 py-1 break-words whitespace-normal"
+                      : "h-[30px] whitespace-nowrap",
                     rowLabelClassName
                   )}
                 >
@@ -87,11 +119,17 @@ export function ExcelGrid({
                   return (
                     <td
                       key={row.label + "-" + i}
-                      className="border-gray-30 h-[30px] border px-2 text-right whitespace-nowrap"
+                      title={value}
+                      className={cn(
+                        "border-gray-30 border px-2 text-right",
+                        compact
+                          ? "h-auto max-w-0 py-1 break-words whitespace-normal"
+                          : "h-[30px] whitespace-nowrap"
+                      )}
                     >
                       <span
                         className={cn(
-                          "inline-block transition-opacity duration-200",
+                          "inline transition-opacity duration-200",
                           valueClassName,
                           hidden ? "opacity-0" : "opacity-100"
                         )}

@@ -2,6 +2,10 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import {
+  UseCaseBeforeAfter,
+  type UseCaseKey,
+} from "@/components/landing/visuals/UseCaseBeforeAfter";
 
 /**
  * Trois cas seulement : ce sont les trois verticales réellement implémentées.
@@ -10,11 +14,13 @@ import { AnimateIn } from "@/components/ui/animate-in";
  * LNAW-98 — frozen v4 (lna-v4-fr.html `.cases` / `.case`):
  * Gray 10 tiles · 1 px Gray 20 gaps · Plex Mono 01/02/03 · 20 px titles ·
  * Gray 70 body · no arrows · 3 cols ≥1056 · stack below.
- * Top padding 0 — previous `.sect` bottom already supplies the band gap.
- * No bottom pad — frozen `.sect` is `padding:96px 0 0`; `.secb` supplies
- * the 96px white gap via `margin-top`.
+ * LNAW-127 — mini document → filled-rows visual per card (≤520px at 1440).
  */
-const CASES = ["adp", "health", "condo"] as const;
+const CASES = [
+  "adp",
+  "health",
+  "condo",
+] as const satisfies readonly UseCaseKey[];
 
 export function UseCases() {
   const t = useTranslations("home.useCases");
@@ -29,22 +35,25 @@ export function UseCases() {
         <AnimateIn>
           <div
             data-use-cases
-            className="border-gray-20 bg-gray-20 grid grid-cols-1 gap-px border min-[1056px]:grid-cols-3"
+            className="border-gray-20 bg-gray-20 grid grid-cols-1 items-stretch gap-px border min-[1056px]:grid-cols-3"
           >
             {CASES.map((useCase, i) => (
               <article
                 key={useCase}
-                className="bg-gray-10 flex min-h-0 flex-col px-4 pt-6 pb-8 max-[672px]:min-h-0 min-[1056px]:min-h-[240px] min-[1056px]:px-8 min-[1056px]:pb-12"
+                className="bg-gray-10 flex h-full min-h-0 flex-col px-4 pt-6 pb-8 max-[672px]:min-h-0 min-[1056px]:max-h-[520px] min-[1056px]:px-8 min-[1056px]:pb-10"
               >
-                <span className="text-muted-foreground mb-4 block font-mono text-sm min-[1056px]:mb-10">
+                <span className="text-muted-foreground mb-3 block font-mono text-sm min-[1056px]:mb-6">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="text-tile text-foreground mb-3">
+                <h3 className="text-tile text-foreground mb-2">
                   {t(`${useCase}.title`)}
                 </h3>
-                <p className="text-body text-muted-foreground">
+                <p className="text-body text-muted-foreground min-h-[3.5rem]">
                   {t(`${useCase}.description`)}
                 </p>
+                <div className="mt-auto pt-1">
+                  <UseCaseBeforeAfter useCase={useCase} />
+                </div>
               </article>
             ))}
           </div>
