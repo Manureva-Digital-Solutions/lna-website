@@ -73,18 +73,18 @@ export default async function AboutPage({
         </Container>
       </Section>
 
-      {/* The Problem — LNAW-131: three-steps product visual (static completed) */}
+      {/* The Problem — LNAW-131: full-width section (copy + three-steps) */}
       <Section>
-        <Container className="flex flex-col gap-12">
-          <AnimateIn>
-            <div className="max-w-3xl">
+        <Container className="flex w-full flex-col gap-12">
+          <AnimateIn className="w-full">
+            <div className="w-full">
               <span className="text-primary text-xs font-semibold tracking-widest uppercase">
                 {t("problem.label")}
               </span>
               <h2 className="text-h2 text-foreground mt-3">
                 {t("problem.heading")}
               </h2>
-              <div className="text-body mt-6 space-y-4">
+              <div className="text-body mt-6 w-full space-y-4">
                 <p>{t("problem.p1")}</p>
                 <p>{t("problem.p2")}</p>
                 <p>{t("problem.p3")}</p>
@@ -92,7 +92,7 @@ export default async function AboutPage({
               </div>
             </div>
           </AnimateIn>
-          <AnimateIn delay={0.15}>
+          <AnimateIn delay={0.15} className="w-full">
             <div className="min-h-[28rem] w-full min-[1056px]:min-h-[24rem]">
               <ThreeStepsVisuals
                 staticComplete
