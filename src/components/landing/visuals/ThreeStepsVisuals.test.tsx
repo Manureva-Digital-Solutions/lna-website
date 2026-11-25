@@ -120,4 +120,22 @@ describe("ThreeStepsVisuals (LNAW-123)", () => {
     expect(blob).not.toMatch(/confidence|fiabilité|review|à vérifier|warning/i);
     expect(blob).not.toMatch(/\b(red|orange|amber)\b/i);
   });
+
+  it("supports an explicit static completed state for About (LNAW-131)", () => {
+    const { container } = renderWithIntl(
+      <ThreeStepsVisuals staticComplete ariaLabel={en.about.problem.imageAlt} />
+    );
+    const root = container.querySelector("[data-three-steps-visuals]");
+    expect(root?.getAttribute("data-static-complete")).toBe("true");
+    expect(root?.getAttribute("aria-label")).toBe(en.about.problem.imageAlt);
+    expect(
+      container
+        .querySelector('[data-step="download"]')
+        ?.getAttribute("data-active")
+    ).toBe("true");
+    expect(
+      within(root as HTMLElement).getByText(/Download Excel/i)
+    ).toBeInTheDocument();
+    expect(within(root as HTMLElement).queryByText(/CSV|JSON|API/i)).toBeNull();
+  });
 });

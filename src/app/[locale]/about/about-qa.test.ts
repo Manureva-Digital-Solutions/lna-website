@@ -16,28 +16,31 @@ describe("LNAW-89 / LNAW-90 About QA", () => {
     expect(aboutPage).toMatch(/mailto:hello@lnaflow\.com/);
     expect(aboutPage.match(/hello@lnaflow\.com/g)?.length).toBe(2);
   });
+});
 
-  it("switches workflow diagram asset by locale", () => {
-    expect(aboutPage).toMatch(/workflow-diagram-fr\.svg/);
-    expect(aboutPage).toMatch(/workflow-diagram\.svg/);
-    expect(aboutPage).toMatch(/locale === "fr"/);
+/** LNAW-131 — About uses the three-steps product visual, not the old diagrams. */
+describe("LNAW-131 About three-steps visual", () => {
+  it("renders ThreeStepsVisuals in static completed state with locale alt text", () => {
+    expect(aboutPage).toMatch(/ThreeStepsVisuals/);
+    expect(aboutPage).toMatch(/staticComplete/);
+    expect(aboutPage).toMatch(/problem\.imageAlt/);
+    expect(aboutPage).not.toMatch(/workflow-diagram/);
+    expect(en.about.problem.imageAlt).toMatch(/Excel/i);
+    expect(fr.about.problem.imageAlt).toMatch(/Excel/i);
+    expect(en.about.problem.imageAlt).not.toMatch(/CSV|JSON|API/i);
+    expect(fr.about.problem.imageAlt).not.toMatch(/CSV|JSON|API/i);
+  });
+
+  it("removes the unused workflow diagram assets", () => {
     expect(
       existsSync(
         join(process.cwd(), "public/illustrations/workflow-diagram.svg")
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       existsSync(
         join(process.cwd(), "public/illustrations/workflow-diagram-fr.svg")
       )
-    ).toBe(true);
-
-    const frSvg = readFileSync(
-      join(process.cwd(), "public/illustrations/workflow-diagram-fr.svg"),
-      "utf8"
-    );
-    expect(frSvg).toMatch(/Déposer/);
-    expect(frSvg).toMatch(/Extraction IA/);
-    expect(frSvg).not.toMatch(/>Upload</);
+    ).toBe(false);
   });
 });

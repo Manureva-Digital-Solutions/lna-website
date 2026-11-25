@@ -80,11 +80,22 @@ function PdfGlyph({ className }: { className?: string }) {
   );
 }
 
+type ThreeStepsVisualsProps = {
+  /** Force the completed end-state (About page). Still used when reduced-motion / narrow. */
+  staticComplete?: boolean;
+  /** Override the default howItWorks visual aria-label (e.g. About imageAlt). */
+  ariaLabel?: string;
+};
+
 /**
  * LNAW-123 — animated product visuals for the three-steps section.
+ * LNAW-131 — optional static completed state for About (Excel-only product story).
  * Reuses demo-sheet-data; no review/confidence cues.
  */
-export function ThreeStepsVisuals() {
+export function ThreeStepsVisuals({
+  staticComplete: staticCompleteProp = false,
+  ariaLabel,
+}: ThreeStepsVisualsProps = {}) {
   const t = useTranslations("home.howItWorks");
   const tHero = useTranslations("home.hero");
   const tBands = useTranslations("home.bands");
@@ -92,7 +103,7 @@ export function ThreeStepsVisuals() {
   const locale = useLocale();
   const reduceMotion = useReducedMotion();
   const isNarrow = useIsNarrow390();
-  const staticComplete = !!reduceMotion || isNarrow;
+  const staticComplete = staticCompleteProp || !!reduceMotion || isNarrow;
 
   const filename = tHero("excel.filename");
   /** null = not ticking yet; derived elapsed stays at final frame when static. */
@@ -195,8 +206,9 @@ export function ThreeStepsVisuals() {
   return (
     <div
       data-three-steps-visuals
+      data-static-complete={staticComplete ? "true" : "false"}
       role="img"
-      aria-label={t("visual.description")}
+      aria-label={ariaLabel ?? t("visual.description")}
       className={cn(
         "flex flex-col gap-6 transition-opacity duration-300",
         fadeOut && "opacity-40"

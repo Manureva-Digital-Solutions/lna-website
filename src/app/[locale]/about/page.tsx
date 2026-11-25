@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import {
   Target,
   Eye,
@@ -18,6 +17,7 @@ import { LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { ThreeStepsVisuals } from "@/components/landing/visuals/ThreeStepsVisuals";
 import { pageAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -73,42 +73,33 @@ export default async function AboutPage({
         </Container>
       </Section>
 
-      {/* The Problem */}
+      {/* The Problem — LNAW-131: full-width section (copy + three-steps) */}
       <Section>
-        <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <AnimateIn>
-              <div>
-                <span className="text-primary text-xs font-semibold tracking-widest uppercase">
-                  {t("problem.label")}
-                </span>
-                <h2 className="text-h2 text-foreground mt-3">
-                  {t("problem.heading")}
-                </h2>
-                <div className="text-body mt-6 space-y-4">
-                  <p>{t("problem.p1")}</p>
-                  <p>{t("problem.p2")}</p>
-                  <p>{t("problem.p3")}</p>
-                  <p>{t("problem.p4")}</p>
-                </div>
+        <Container className="flex w-full flex-col gap-12">
+          <AnimateIn className="w-full">
+            <div className="w-full">
+              <span className="text-primary text-xs font-semibold tracking-widest uppercase">
+                {t("problem.label")}
+              </span>
+              <h2 className="text-h2 text-foreground mt-3">
+                {t("problem.heading")}
+              </h2>
+              <div className="text-body mt-6 w-full space-y-4">
+                <p>{t("problem.p1")}</p>
+                <p>{t("problem.p2")}</p>
+                <p>{t("problem.p3")}</p>
+                <p>{t("problem.p4")}</p>
               </div>
-            </AnimateIn>
-            <AnimateIn delay={0.2}>
-              <div className="border-border bg-gray-10 flex items-center justify-center rounded-none border p-8">
-                <Image
-                  src={
-                    locale === "fr"
-                      ? "/illustrations/workflow-diagram-fr.svg"
-                      : "/illustrations/workflow-diagram.svg"
-                  }
-                  alt={t("problem.imageAlt")}
-                  width={480}
-                  height={360}
-                  className="w-full"
-                />
-              </div>
-            </AnimateIn>
-          </div>
+            </div>
+          </AnimateIn>
+          <AnimateIn delay={0.15} className="w-full">
+            <div className="min-h-[28rem] w-full min-[1056px]:min-h-[24rem]">
+              <ThreeStepsVisuals
+                staticComplete
+                ariaLabel={t("problem.imageAlt")}
+              />
+            </div>
+          </AnimateIn>
         </Container>
       </Section>
 
