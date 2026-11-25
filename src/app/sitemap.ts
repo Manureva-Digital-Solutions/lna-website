@@ -26,6 +26,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/blog",
     "/privacy",
     "/terms",
+    "/security",
+    "/dpa",
+    "/sub-processors",
   ];
 
   const posts = getAllPosts();

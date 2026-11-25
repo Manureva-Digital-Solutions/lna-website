@@ -41,6 +41,9 @@ export function Footer() {
   const legalLinks: FooterLink[] = [
     { href: "/privacy", label: t("privacyPolicy") },
     { href: "/terms", label: t("termsOfService") },
+    { href: "/security", label: t("security") },
+    { href: "/dpa", label: t("dpa") },
+    { href: "/sub-processors", label: t("subProcessors") },
   ];
 
   return (

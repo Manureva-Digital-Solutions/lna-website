@@ -63,6 +63,9 @@
     "contact": "Contact",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
+    "security": "Sécurité",
+    "dpa": "Accord de traitement des données",
+    "subProcessors": "Sous-traitants ultérieurs",
     "linkedin": "LinkedIn",
     "twitter": "Twitter",
     "email": "Email",
@@ -72,6 +75,11 @@
     "cookieSettings": "Gérer les cookies",
     "subscribe": "S'abonner",
     "signIn": "Se connecter"
+  },
+  "legal": {
+    "onThisPage": "Sur cette page",
+    "downloadPdfEn": "Download PDF (English)",
+    "downloadPdfFr": "Télécharger le PDF (français)"
   },
   "home": {
     "hero": {
