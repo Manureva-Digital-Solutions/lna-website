@@ -5,6 +5,7 @@ import {
   isValidElement,
   type ComponentProps,
   type HTMLAttributes,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactElement,
 } from "react";
@@ -101,11 +102,21 @@ function Button({
         ...anchorProps,
         "aria-disabled": true,
         "data-disabled": "",
+        // Prefer out of the tab order; callers may still set an explicit
+        // tabIndex, so also block Enter/Space activation below.
         tabIndex: render.props.tabIndex ?? -1,
         // Nothing to activate, so swallow clicks (including the caller's).
         onClick: (event: MouseEvent<HTMLAnchorElement>) => {
           event.preventDefault();
           event.stopPropagation();
+        },
+        // An explicit tabIndex keeps the anchor focusable; without this
+        // guard Enter/Space would still navigate.
+        onKeyDown: (event: KeyboardEvent<HTMLAnchorElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+          }
         },
         className: cn(anchorProps.className, "pointer-events-none opacity-50"),
       } as ComponentProps<"a">;

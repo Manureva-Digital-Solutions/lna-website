@@ -179,6 +179,33 @@ describe("LNAW-133 Button render passthrough and disabled anchors", () => {
     expect(onRenderClick).not.toHaveBeenCalled();
   });
 
+  it("blocks Enter and Space on a disabled cloned anchor with explicit tabIndex", () => {
+    const onButtonClick = vi.fn();
+    const onRenderClick = vi.fn();
+    const { container } = renderWithIntl(
+      <Button
+        render={<a href="#contact-form" tabIndex={0} onClick={onRenderClick} />}
+        disabled
+        onClick={onButtonClick}
+      >
+        Contact us
+      </Button>
+    );
+
+    const element = container.firstElementChild as HTMLElement;
+    expect(element).toHaveAttribute("tabindex", "0");
+    expect(element).toHaveAttribute("aria-disabled", "true");
+
+    for (const key of ["Enter", " "] as const) {
+      const keyEvent = createEvent.keyDown(element, { key });
+      fireEvent(element, keyEvent);
+      expect(keyEvent.defaultPrevented).toBe(true);
+    }
+
+    expect(onButtonClick).not.toHaveBeenCalled();
+    expect(onRenderClick).not.toHaveBeenCalled();
+  });
+
   it("still activates a cloned anchor that is not disabled", () => {
     const onButtonClick = vi.fn();
     const { container } = renderWithIntl(
