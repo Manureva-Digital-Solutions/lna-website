@@ -94,4 +94,25 @@ describe("LNAW-109 Security, DPA, Sub-processors", () => {
     expect(en.footer.subProcessors).toBe("Sub-processors");
     expect(fr.footer.subProcessors).toBe("Sous-traitants ultérieurs");
   });
+
+  it("uses full width below 672px and 80% width from 672px up", () => {
+    const shell = readFileSync(
+      join(root, "src/components/legal/LegalDocument.tsx"),
+      "utf8"
+    );
+    expect(shell).toMatch(/w-full/);
+    expect(shell).toMatch(/min-\[672px\]:w-\[80%\]/);
+    expect(shell).toMatch(/min-\[672px\]:max-w-\[80%\]/);
+
+    const privacy = readFileSync(
+      join(root, "src/app/[locale]/privacy/page.tsx"),
+      "utf8"
+    );
+    const terms = readFileSync(
+      join(root, "src/app/[locale]/terms/page.tsx"),
+      "utf8"
+    );
+    expect(privacy).toMatch(/legalPageWidth/);
+    expect(terms).toMatch(/legalPageWidth/);
+  });
 });

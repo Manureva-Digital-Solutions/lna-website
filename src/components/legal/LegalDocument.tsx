@@ -4,11 +4,15 @@ import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
 import type { LegalPage } from "@/lib/legal";
 
-/** Shared shell for legal pages: ~80% viewport width, centered. */
-export const legalPageWidth = "w-[80%] max-w-[80%]";
+/**
+ * Shared shell for legal pages: full width on small screens, 80% from 672px up
+ * (matches the v4 4→8 column breakpoint).
+ */
+export const legalPageWidth =
+  "w-full max-w-none min-[672px]:w-[80%] min-[672px]:max-w-[80%]";
 
 /**
- * LNAW-109 — v4 legal chrome (Plex, TOC + body, 80% width, centered H1).
+ * LNAW-109 — v4 legal chrome (Plex, TOC + body, responsive 100%/80%, centered H1).
  * Staging keeps [TO CONFIRM] / [À CONFIRMER] and [publication date] visible.
  */
 export function LegalDocument({
