@@ -557,7 +557,7 @@
       "p2": "It's slow. It's error-prone. And it scales with headcount, not with ambition — the more documents you process, the more people you need doing it.",
       "p3": "Organizations lose thousands of hours annually to this workflow. Errors compound — a misread digit on an invoice, a missed row in a report, a field copied to the wrong column — and the cost shows up in audits, reconciliations, and decisions made on bad data.",
       "p4": "LNA was built specifically to solve this. Not with a workaround. Not with a complicated configuration process. With genuine AI that reads documents the way you would — and outputs structured, accurate, exportable data automatically.",
-      "imageAlt": "Document processing workflow"
+      "imageAlt": "Three product steps: choose an Excel template, drop sample PDFs, download the filled Excel."
     },
     "missionVision": {
       "label": "Mission & Vision",

@@ -15,7 +15,11 @@ describe("blog locale content (FR MDX + EN fallback)", () => {
       "5 signes que votre équipe a besoin d'automatiser ses documents"
     );
     expect(five?.category).toBe("Bonnes pratiques");
-    expect(five?.image).toBe("/illustrations/workflow-diagram-fr.svg");
+    expect(five?.image).toBe("/illustrations/hero-mockup.svg");
+    expect(five?.articleImage).toBe(
+      "/illustrations/lna-blog-hero-1600x900.webp"
+    );
+    expect(five?.ogImage).toBe("/illustrations/lna-blog-hero-og-1200x630.png");
     expect(five?.content).toMatch(/L'automatisation documentaire/);
 
     expect(why?.title).toBe(
@@ -30,7 +34,7 @@ describe("blog locale content (FR MDX + EN fallback)", () => {
     expect(why?.content).toMatch(/coût caché de la saisie manuelle/);
   });
 
-  it("keeps FR why-pdf share image on the OG PNG, not the listing SVG", () => {
+  it("keeps FR/EN blog share images on the OG PNG, not the old workflow SVG", () => {
     const whyFr = getPostBySlug("why-pdf-to-excel-automation-matters", "fr");
     const whyEn = getPostBySlug("why-pdf-to-excel-automation-matters", "en");
     const fiveFr = getPostBySlug(
@@ -46,16 +50,24 @@ describe("blog locale content (FR MDX + EN fallback)", () => {
     expect(whyFr?.ogImage).toBe("/illustrations/lna-blog-hero-og-1200x630.png");
     expect(existsSync(publicPath(whyFr!.ogImage!))).toBe(true);
 
-    // five-signs has no ogImage in EN, so FR stays without one
-    expect(fiveEn?.ogImage).toBeUndefined();
-    expect(fiveFr?.ogImage).toBeUndefined();
+    expect(fiveEn?.ogImage).toBe(
+      "/illustrations/lna-blog-hero-og-1200x630.png"
+    );
+    expect(fiveFr?.ogImage).toBe(fiveEn?.ogImage);
+    expect(existsSync(publicPath(fiveEn!.ogImage!))).toBe(true);
+    expect(fiveEn?.image).not.toMatch(/workflow-diagram/);
+    expect(fiveFr?.image).not.toMatch(/workflow-diagram/);
   });
 
-  it("keeps English posts unchanged when locale is en", () => {
+  it("keeps English posts on blog-style images when locale is en", () => {
     const five = getPostBySlug("five-signs-you-need-document-automation", "en");
     expect(five?.title).toBe("5 Signs Your Team Needs Document Automation");
     expect(five?.category).toBe("Best Practices");
-    expect(five?.image).toBe("/illustrations/workflow-diagram.svg");
+    expect(five?.image).toBe("/illustrations/hero-mockup.svg");
+    expect(five?.articleImage).toBe(
+      "/illustrations/lna-blog-hero-1600x900.webp"
+    );
+    expect(five?.ogImage).toBe("/illustrations/lna-blog-hero-og-1200x630.png");
     expect(five?.content).toMatch(/Document automation isn't just/);
   });
 
