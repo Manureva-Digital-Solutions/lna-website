@@ -57,6 +57,19 @@ describe("TrustSection", () => {
     ).toHaveAttribute("href", "/terms");
   });
 
+  it("shows the export-history visual beside the three points (LNAW-128)", () => {
+    renderWithIntl(<TrustSection />);
+
+    const band = document.querySelector("[data-trust-band]") as HTMLElement;
+    expect(
+      within(band).getByRole("img", { name: en.home.trust.history.alt })
+    ).toBeInTheDocument();
+    expect(band.querySelector("[data-export-history]")).not.toBeNull();
+    expect(
+      within(band).getByText(en.home.trust.history.title)
+    ).toBeInTheDocument();
+  });
+
   it("does not show certifications, stats, or customer logos", () => {
     renderWithIntl(<TrustSection />);
 
@@ -66,6 +79,5 @@ describe("TrustSection", () => {
         /\b(ISO|SOC 2|certification|badge|logo strip)\b/i
       )
     ).toBeNull();
-    expect(within(band).queryByRole("img")).toBeNull();
   });
 });
