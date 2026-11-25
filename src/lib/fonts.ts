@@ -2,7 +2,10 @@ import localFont from "next/font/local";
 
 /**
  * IBM Plex — self-hosted woff2 (SIL OFL). Same-origin only; never load from
- * fonts.googleapis.com / fonts.gstatic.com (GDPR / Website v4).
+ * fonts.googleapis.com / fonts.gstatic.com (GDPR / Website v4 / LNAW-86).
+ *
+ * `preload: true` emits `<link rel="preload" as="font">` for each weight so
+ * first paint is not blocked waiting on a late stylesheet discovery.
  */
 export const ibmPlexSans = localFont({
   src: [
@@ -24,6 +27,7 @@ export const ibmPlexSans = localFont({
   ],
   variable: "--font-ibm-plex-sans",
   display: "swap",
+  preload: true,
   fallback: ["Helvetica Neue", "Arial", "sans-serif"],
 });
 
@@ -42,5 +46,6 @@ export const ibmPlexMono = localFont({
   ],
   variable: "--font-ibm-plex-mono",
   display: "swap",
+  preload: true,
   fallback: ["Menlo", "Consolas", "monospace"],
 });
