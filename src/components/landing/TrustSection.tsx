@@ -4,15 +4,14 @@ import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { ExportHistoryVisual } from "@/components/landing/visuals/ExportHistoryVisual";
 
 /**
  * Répond à la quatrième question du visiteur. N'affirme que ce qui est vrai
  * aujourd'hui : pas de badge, pas de certification non obtenue.
  *
- * LNAW-99 — frozen v4 (lna-v4-fr.html `.secb` / `.slist` / `.slinks`):
- * full-width Gray 10 · margin-top 96px · padding 64px 0 ·
- * heading c1-5 · list + legal links c7-16 ·
- * isolation / audit / delete icons · navy Privacy & Terms with arrows.
+ * LNAW-99 — frozen v4 security band shell.
+ * LNAW-128 — export-history visual beside the three factual points.
  */
 const POINTS = [
   { key: "isolation", Icon: IsolationIcon },
@@ -36,19 +35,22 @@ export function TrustSection() {
               {t("heading")}
             </h2>
             <div className="min-w-0 min-[1056px]:col-span-10 min-[1056px]:col-start-7">
-              <ul className="border-gray-30 border-b">
-                {POINTS.map(({ key, Icon }) => (
-                  <li
-                    key={key}
-                    className="border-gray-30 grid grid-cols-[40px_1fr] items-center gap-0 border-t py-5 text-base leading-[24px] min-[673px]:grid-cols-[48px_1fr] min-[673px]:text-lg min-[673px]:leading-[26px]"
-                  >
-                    <span className="text-primary inline-flex size-5 items-center justify-center">
-                      <Icon />
-                    </span>
-                    <span className="text-foreground">{t(key)}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="grid grid-cols-1 items-start gap-8 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] min-[900px]:gap-6">
+                <ul className="border-gray-30 border-b">
+                  {POINTS.map(({ key, Icon }) => (
+                    <li
+                      key={key}
+                      className="border-gray-30 grid grid-cols-[40px_1fr] items-center gap-0 border-t py-5 text-base leading-[24px] min-[673px]:grid-cols-[48px_1fr] min-[673px]:text-lg min-[673px]:leading-[26px]"
+                    >
+                      <span className="text-primary inline-flex size-5 items-center justify-center">
+                        <Icon />
+                      </span>
+                      <span className="text-foreground">{t(key)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <ExportHistoryVisual />
+              </div>
               <div className="mt-8 flex flex-wrap gap-8">
                 <Link
                   href="/privacy"

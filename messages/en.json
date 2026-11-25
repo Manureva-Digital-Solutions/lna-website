@@ -208,7 +208,20 @@
       "heading": "Your client documents stay yours",
       "isolation": "Your organisation's data is isolated from that of other customers.",
       "audit": "Every export is logged: who exported what, and when.",
-      "deletion": "Your documents are deleted on request (GDPR)."
+      "deletion": "Your documents are deleted on request (GDPR).",
+      "history": {
+        "title": "Export history",
+        "badge": "Audit log",
+        "colUser": "Who",
+        "colFile": "File",
+        "colWhen": "When",
+        "userCamille": "Camille Martin",
+        "userNoah": "Noah Bernard",
+        "userLea": "Léa Petit",
+        "userInes": "Inès Moreau",
+        "alt": "Illustrative export history: four fictional team members, the Excel files they exported, and the date and time of each export.",
+        "provenance": "Illustrative demo: fictional users and file names. Not a real client audit log."
+      }
     },
     "finalCta": {
       "heading": "Try it on my documents",

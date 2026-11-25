@@ -208,7 +208,20 @@
       "heading": "Vos documents clients restent les vôtres",
       "isolation": "Les données de votre organisation sont isolées de celles des autres clients.",
       "audit": "Chaque export est consigné : qui a exporté quoi, et quand.",
-      "deletion": "Vos documents sont supprimés sur demande (RGPD)."
+      "deletion": "Vos documents sont supprimés sur demande (RGPD).",
+      "history": {
+        "title": "Historique des exports",
+        "badge": "Piste d'audit",
+        "colUser": "Qui",
+        "colFile": "Fichier",
+        "colWhen": "Quand",
+        "userCamille": "Camille Martin",
+        "userNoah": "Noah Bernard",
+        "userLea": "Léa Petit",
+        "userInes": "Inès Moreau",
+        "alt": "Historique d'exports illustratif : quatre membres d'équipe fictifs, les fichiers Excel exportés, et la date et l'heure de chaque export.",
+        "provenance": "Démo illustrative : utilisateurs et noms de fichiers fictifs. Pas un journal d'audit client réel."
+      }
     },
     "finalCta": {
       "heading": "Tester sur mes documents",
