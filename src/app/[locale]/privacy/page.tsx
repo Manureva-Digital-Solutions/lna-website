@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { legalPageWidth } from "@/components/legal/LegalDocument";
 import { pageAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -43,20 +44,22 @@ export default async function PrivacyPage({
 
   return (
     <>
-      <Section className="overflow-hidden pt-24 pb-8 md:pt-32 md:pb-12">
-        <Container className="max-w-4xl">
+      <Section className="overflow-hidden pt-16 pb-8 md:pt-20 md:pb-10">
+        <Container className={legalPageWidth}>
           <AnimateIn>
-            <h1 className="text-hero text-foreground text-balance">
-              {t("heading")}
-            </h1>
-            <p className="text-body mt-4">{t("updated")}</p>
+            <div className="mx-auto max-w-3xl text-center">
+              <h1 className="text-hero text-foreground text-balance">
+                {t("heading")}
+              </h1>
+              <p className="text-body mt-4">{t("updated")}</p>
+            </div>
           </AnimateIn>
         </Container>
       </Section>
 
-      <Section className="pt-0 md:pt-0">
-        <Container className="max-w-4xl">
-          <div className="grid gap-12 lg:grid-cols-[220px_1fr]">
+      <Section className="border-gray-20 border-t pt-10 md:pt-14">
+        <Container className={legalPageWidth}>
+          <div className="grid gap-10 lg:grid-cols-[220px_1fr] lg:gap-16">
             {/* Table of Contents */}
             <AnimateIn>
               <nav className="lg:sticky lg:top-24">

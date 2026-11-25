@@ -112,6 +112,17 @@ describe("Footer", () => {
     expect(
       screen.getByRole("link", { name: copy.termsOfService })
     ).toHaveAttribute("href", "/terms");
+    expect(screen.getByRole("link", { name: copy.security })).toHaveAttribute(
+      "href",
+      "/security"
+    );
+    expect(screen.getByRole("link", { name: copy.dpa })).toHaveAttribute(
+      "href",
+      "/dpa"
+    );
+    expect(
+      screen.getByRole("link", { name: copy.subProcessors })
+    ).toHaveAttribute("href", "/sub-processors");
 
     expect(
       within(footer).getByRole("link", { name: copy.privacy })

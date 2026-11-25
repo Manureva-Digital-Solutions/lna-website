@@ -341,4 +341,10 @@
     font-weight: 400;
     color: var(--gray-70);
   }
+
+  [data-legal-document] table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
