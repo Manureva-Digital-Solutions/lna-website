@@ -10,11 +10,11 @@ const aboutPage = readFileSync(
 );
 
 describe("LNAW-89 / LNAW-90 About QA", () => {
-  it("keeps hello@lnaflow.com out of company.p4 so the mailto link is the only display", () => {
-    expect(en.about.company.p4).not.toMatch(/hello@lnaflow\.com/i);
-    expect(fr.about.company.p4).not.toMatch(/hello@lnaflow\.com/i);
-    expect(aboutPage).toMatch(/mailto:hello@lnaflow\.com/);
-    expect(aboutPage.match(/hello@lnaflow\.com/g)?.length).toBe(2);
+  it("keeps support@lnaflow.com out of company.p4 so the mailto link is the only display", () => {
+    expect(en.about.company.p4).not.toMatch(/support@lnaflow\.com/i);
+    expect(fr.about.company.p4).not.toMatch(/support@lnaflow\.com/i);
+    expect(aboutPage).toMatch(/mailto:support@lnaflow\.com/);
+    expect(aboutPage.match(/support@lnaflow\.com/g)?.length).toBe(2);
   });
 });
 

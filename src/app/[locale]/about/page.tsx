@@ -225,10 +225,10 @@ export default async function AboutPage({
               <p>
                 {t("company.p4")}{" "}
                 <a
-                  href="mailto:hello@lnaflow.com"
+                  href="mailto:support@lnaflow.com"
                   className="text-primary hover:underline"
                 >
-                  hello@lnaflow.com
+                  support@lnaflow.com
                 </a>
                 .
               </p>

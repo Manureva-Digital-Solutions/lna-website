@@ -26,6 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/blog",
     "/privacy",
     "/terms",
+    "/legal-notice",
     "/security",
     "/dpa",
     "/sub-processors",

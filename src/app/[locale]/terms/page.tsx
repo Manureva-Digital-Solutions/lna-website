@@ -182,7 +182,7 @@ export default async function TermsPage({
                   </li>
                   <li>
                     {t("s13.generalInquiries")}{" "}
-                    <a href="mailto:hello@lnaflow.com">hello@lnaflow.com</a>
+                    <a href="mailto:support@lnaflow.com">support@lnaflow.com</a>
                   </li>
                   <li>
                     {t("s13.orVisit")}{" "}

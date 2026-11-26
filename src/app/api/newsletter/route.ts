@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     const copy = newsletterConfirmationEmail(resolveEmailLocale(locale));
     const confirmed = await sendMail({
       to: email,
-      replyTo: { email: "hello@lnaflow.com" },
+      replyTo: { email: "support@lnaflow.com" },
       subject: copy.subject,
       html: copy.html,
     });

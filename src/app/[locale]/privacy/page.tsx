@@ -140,7 +140,6 @@ export default async function PrivacyPage({
                   <li>{t("s4.b2")}</li>
                   <li>{t("s4.b3")}</li>
                   <li>{t("s4.b4")}</li>
-                  <li>{t("s4.b5")}</li>
                 </ul>
 
                 <h2 id="data-sharing">{t("s5.heading")}</h2>
@@ -203,7 +202,7 @@ export default async function PrivacyPage({
                   </li>
                   <li>
                     {t("s10.generalInquiries")}{" "}
-                    <a href="mailto:hello@lnaflow.com">hello@lnaflow.com</a>
+                    <a href="mailto:support@lnaflow.com">support@lnaflow.com</a>
                   </li>
                   <li>
                     {t("s10.orVisit")}{" "}

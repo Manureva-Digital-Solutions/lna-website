@@ -28,6 +28,10 @@
       "title": "Conditions d'utilisation — LNA par Lemon Tree SAS",
       "description": "Consultez les Conditions d'utilisation de LNA, la plateforme de traitement documentaire propulsée par l'IA éditée par Lemon Tree SAS."
     },
+    "legalNotice": {
+      "title": "Mentions légales — LNA par Lemon Tree SAS",
+      "description": "Mentions légales de LNA, édité par Lemon Tree SAS : éditeur, hébergeur et contacts."
+    },
     "blog": {
       "title": "Blog LNA — Actualités IA documentaire, mises à jour produit & bonnes pratiques",
       "description": "Restez informé des dernières avancées en traitement documentaire IA, des mises à jour produit de LNA et des bonnes pratiques pour automatiser vos flux PDF vers Excel."
@@ -63,6 +67,7 @@
     "contact": "Contact",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
+    "legalNotice": "Mentions légales",
     "security": "Sécurité",
     "dpa": "Accord de traitement des données",
     "subProcessors": "Sous-traitants ultérieurs",
@@ -72,6 +77,7 @@
     "copyright": "© 2026 Lemon Tree SAS. Tous droits réservés.",
     "privacy": "Confidentialité",
     "terms": "Conditions",
+    "legalNoticeShort": "Mentions légales",
     "cookieSettings": "Gérer les cookies",
     "subscribe": "S'abonner",
     "signIn": "Se connecter"
@@ -659,7 +665,7 @@
     "sidebar": {
       "heading": "Autres moyens de nous contacter",
       "emailLabel": "Email",
-      "emailAddress": "hello@lnaflow.com",
+      "emailAddress": "support@lnaflow.com",
       "emailNote": "Nous répondons sous 24 heures les jours ouvrés.",
       "responseLabel": "Délai de réponse",
       "responseText": "Nous répondons généralement sous 24 heures.",
@@ -737,15 +743,14 @@
       "intro": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données, notamment :",
       "b1": "Stockage chiffré pour tous les documents et données extraites",
       "b2": "Connexions API sécurisées avec authentification JWT",
-      "b3": "Audits de sécurité réguliers et évaluations de vulnérabilités",
-      "b4": "Contrôle d'accès par rôle au sein de la plateforme",
-      "b5": "Isolation des données au niveau organisationnel pour les environnements multi-tenant"
+      "b3": "Contrôle d'accès par rôle au sein de la plateforme",
+      "b4": "Isolation des données au niveau organisationnel pour les environnements multi-tenant"
     },
     "s5": {
       "heading": "5. Partage des données",
       "intro": "Nous ne vendons pas vos informations personnelles ni vos données documentaires. Nous pouvons partager des informations avec :",
       "serviceProviders": "Prestataires de services :",
-      "serviceProvidersDesc": "Services tiers qui nous aident à exploiter la plateforme (ex. : infrastructure cloud, analytics). Manureva Solutions intervient en qualité de sous-traitant (processeur) pour l'hébergement et l'exploitation technique de la Plateforme, pour le compte de Lemon Tree SAS.",
+      "serviceProvidersDesc": "Services tiers qui nous aident à exploiter la plateforme (par exemple infrastructure cloud et analytics), dans le cadre de contrats écrits, pour le compte de Lemon Tree SAS.",
       "legalRequirements": "Obligations légales :",
       "legalRequirementsDesc": "Lorsque la loi, la réglementation ou une procédure judiciaire l'exige.",
       "businessTransfers": "Transferts d'entreprise :",
@@ -761,7 +766,7 @@
       "b5": "Vous opposer à certaines activités de traitement des données",
       "b6": "Retirer votre consentement le cas échéant",
       "exerciseRights": "Pour exercer l'un de ces droits, contactez-nous à",
-      "gdpr": "Pour les demandes liées au RGPD, nous proposons un Accord de traitement des données (DPA) pour les clients Enterprise."
+      "gdpr": "Pour les demandes liées au RGPD, nous proposons un Accord de traitement des données (DPA) à tous les clients."
     },
     "s7": {
       "heading": "7. Cookies & Suivi",
@@ -896,6 +901,30 @@
       "publicationDirector": "Directeur de la publication : Alexandre Prieto, Président",
       "hosting": "Hébergeur : OVH SAS, 2 rue Kellermann, 59100 Roubaix, France"
     }
+  },
+  "legalNotice": {
+    "heading": "Mentions légales",
+    "updated": "Dernière mise à jour : 1er mars 2026",
+    "onThisPage": "Sur cette page",
+    "sections": {
+      "publisher": "1. Éditeur",
+      "hosting": "2. Hébergement",
+      "contact": "3. Contact"
+    },
+    "intro": "Les présentes mentions légales s'appliquent au site LNA édité par Lemon Tree SAS. Les informations ci-dessous correspondent à celles du vendeur et de l'éditeur figurant dans nos Conditions d'utilisation.",
+    "seller": "Vendeur / éditeur du site : Lemon Tree SAS",
+    "company": "Lemon Tree SAS",
+    "legalForm": "Forme juridique : SAS (société par actions simplifiée)",
+    "address": "21 rue du Docteur Fournier, 37000 Tours, France",
+    "registration": "RCS Tours (SIREN 904 401 882) — SIRET 904 401 882 00017",
+    "capital": "Capital social : 2 500 €",
+    "vat": "FR 34 904 401 882",
+    "publicationDirector": "Directeur de la publication : Alexandre Prieto, Président",
+    "hosting": "Hébergeur : OVH SAS, 2 rue Kellermann, 59100 Roubaix, France",
+    "email": "Email :",
+    "generalInquiries": "Demandes générales :",
+    "orVisit": "Ou visitez notre",
+    "contactPage": "page Contact"
   },
   "error": {
     "notFound": {
