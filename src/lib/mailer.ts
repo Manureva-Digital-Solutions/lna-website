@@ -12,7 +12,7 @@
  *   SMTP_USER/PASS     — only if the relay requires SMTP AUTH (leave unset for IP auth)
  *   SMTP_FROM          — verified sender (default noreply@lnaflow.com)
  *   SMTP_FROM_NAME     — display name (default "LNA")
- *   CONTACT_INBOX      — where notifications are delivered (default hello@lnaflow.com)
+ *   CONTACT_INBOX      — where notifications are delivered (default support@lnaflow.com)
  *
  * NOTE: `noreply@lnaflow.com` needs no mailbox — sending is authorised by the
  * relay setting, and replies are routed via Reply-To to the visitor.
@@ -106,7 +106,7 @@ export async function sendMail({
 
   const fromAddress = env("SMTP_FROM", "noreply@lnaflow.com");
   const fromName = env("SMTP_FROM_NAME", "LNA");
-  const inbox = env("CONTACT_INBOX", "hello@lnaflow.com");
+  const inbox = env("CONTACT_INBOX", "support@lnaflow.com");
 
   try {
     await transporter().sendMail({

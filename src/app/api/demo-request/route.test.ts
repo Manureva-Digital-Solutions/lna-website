@@ -97,7 +97,7 @@ describe("POST /api/demo-request", () => {
       replyTo: { email: string };
     };
     expect(ack.to).toBe("ada@cabinet.fr");
-    expect(ack.replyTo.email).toBe("hello@lnaflow.com");
+    expect(ack.replyTo.email).toBe("support@lnaflow.com");
     expect(ack.subject).toBe(en.emails.demoAcknowledgement.subject);
     expect(ack.html).toContain("Hi Ada Broker,");
     expect(ack.html).toMatch(/within 24 hours/i);

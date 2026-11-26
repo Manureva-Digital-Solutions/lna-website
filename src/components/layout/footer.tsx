@@ -41,6 +41,7 @@ export function Footer() {
   const legalLinks: FooterLink[] = [
     { href: "/privacy", label: t("privacyPolicy") },
     { href: "/terms", label: t("termsOfService") },
+    { href: "/legal-notice", label: t("legalNotice") },
     { href: "/security", label: t("security") },
     { href: "/dpa", label: t("dpa") },
     { href: "/sub-processors", label: t("subProcessors") },
@@ -120,6 +121,12 @@ export function Footer() {
             className="hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
           >
             {t("terms")}
+          </Link>
+          <Link
+            href="/legal-notice"
+            className="hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+          >
+            {t("legalNoticeShort")}
           </Link>
           <button
             type="button"

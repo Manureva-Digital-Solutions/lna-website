@@ -112,6 +112,9 @@ describe("Footer", () => {
     expect(
       screen.getByRole("link", { name: copy.termsOfService })
     ).toHaveAttribute("href", "/terms");
+    expect(
+      within(legal).getByRole("link", { name: copy.legalNotice })
+    ).toHaveAttribute("href", "/legal-notice");
     expect(screen.getByRole("link", { name: copy.security })).toHaveAttribute(
       "href",
       "/security"
@@ -130,6 +133,11 @@ describe("Footer", () => {
     expect(
       within(footer).getByRole("link", { name: copy.terms })
     ).toHaveAttribute("href", "/terms");
+    expect(
+      within(footer)
+        .getAllByRole("link", { name: copy.legalNoticeShort })
+        .some((el) => el.getAttribute("href") === "/legal-notice")
+    ).toBe(true);
     expect(
       screen.getByRole("button", { name: copy.cookieSettings })
     ).toBeInTheDocument();

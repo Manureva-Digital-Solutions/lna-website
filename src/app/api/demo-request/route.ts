@@ -91,7 +91,7 @@ export async function POST(request: Request) {
     const ack = demoAcknowledgementEmail(emailLocale, safeName);
     const acknowledged = await sendMail({
       to: email,
-      replyTo: { email: "hello@lnaflow.com" },
+      replyTo: { email: "support@lnaflow.com" },
       subject: ack.subject,
       html: ack.html,
     });
